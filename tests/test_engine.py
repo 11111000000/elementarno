@@ -195,6 +195,54 @@ class SceneTests(unittest.TestCase):
         self.assertEqual(validate_scene(scene), [])
 
 
+class PerceptionTests(unittest.TestCase):
+    def test_normalize_drops_dangling_and_duplicate_surfaces(self):
+        from elementarno.perception import normalize_scene
+
+        scene = {
+            "surfaces": [{"id": "s1", "name": "table"}],
+            "objects": [
+                {"id": "o1", "category": "table", "on": None},
+                {"id": "o2", "category": "mug", "on": "s9", "fill_level": None},
+            ],
+            "regions": [],
+        }
+        normalized, notes = normalize_scene(scene)
+        categories = [o["category"] for o in normalized["objects"]]
+        self.assertEqual(categories, ["mug"])
+        self.assertNotIn("on", normalized["objects"][0])
+        self.assertNotIn("fill_level", normalized["objects"][0])
+        self.assertTrue(notes)
+
+    def test_dangling_ignores_null_references(self):
+        scene = load(BENCH / "mystery-study/scene-before.json")
+        scene["objects"][0]["on"] = None
+        findings = evaluate_all(RULES, scene)
+        self.assertNotIn("PHY-001", {f["rule_id"] for f in findings})
+
+    def test_extract_json_from_fenced_answer(self):
+        from elementarno.perception import MiniMaxPerception
+
+        text = '```json\n{"surfaces": [], "objects": []}\n```'
+        parsed = MiniMaxPerception.extract_json(text)
+        self.assertEqual(parsed["surfaces"], [])
+
+
+class FixtureTests(unittest.TestCase):
+    def test_fixture_generator_writes_png(self):
+        import subprocess
+
+        out = Path(tempfile.mkdtemp()) / "scene.png"
+        subprocess.run(
+            [sys.executable, str(ROOT / "tools/make_fixture.py"), "--preset", "study", "--out", str(out)],
+            check=True,
+            capture_output=True,
+        )
+        data = out.read_bytes()
+        self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertGreater(len(data), 100)
+
+
 class McpTests(unittest.TestCase):
     def test_stdio_client_roundtrip(self):
         client = StdioMcpClient(sys.executable, [str(ROOT / "tools/mcp/demo_server.py")])

@@ -50,35 +50,74 @@ Presence** (2026) фиксирует *affirmation bias* моделей: они �
 
 ```
 docs/PROTOCOL.md      доказательный контракт: схемы, DSL предикатов, семантика confidence
+docs/ARCHITECTURE.md  слои L0–L5, режимы, персоны, доменные паки, MCP как точка расширения
+docs/MATH.md          формальная модель: наблюдение, улика, вывод, абдукция, ценность информации
+docs/QUALITY-LOOP.md  операционный контур улучшения качества: метрики, цикл, откат
 docs/ROADMAP.md       фазы и гейты
 docs/NAMING.md        почему «Элементарно» и что проверить до запуска
 schemas/              JSON Schema (draft 2020-12) для сцены, правила, утверждения, гипотезы
-rules/                база правил (absence / physics / trace) — источники, конфаунды, опровержения
-tools/elementarno/    движок: резолвер путей, исполнитель правил, леджер, валидатор цитат
-eval/                 кейсы и харнесс метрик
-tests/                тесты движка и валидатора
+rules/                база правил (core / absence / puzzle / water / fire / mechanics / biology / semiotics)
+tools/elementarno/    движок: восприятие, сцена-граф, DSL, дифф, леджер, валидатор, рендерер
+tools/mcp/            демонстрационный MCP-сервер (JSON-RPC по stdio)
+tools/make_fixture.py генератор синтетических сцен с известной истиной
+eval/benchmarks/      бенчмарки: протокольный и «загадка по серии кадров»
+tests/                тесты движка, валидатора и восприятия
+flake.nix             окружение Nix: pillow, numpy, ruff; `nix develop`, `nix flake check`
+.opencode/skills/     скилл для агента: разбор фото через движок (установлен глобально)
 ```
 
 ## Быстрый старт
 
 ```bash
-# структурная проверка сцены и правил
-python3 -m tools.elementarno.cli check eval/cases/case-01-dust-outline.json
+# полный разбор одной фотографии: восприятие → улики → версия
+python3 -m tools.elementarno.cli analyze photo.jpg --persona doyle
 
-# какие улики сработали (с цитатами)
-python3 -m tools.elementarno.cli findings eval/cases/case-01-dust-outline.json
+# только сцена-граф (посмотреть, что извлечено)
+python3 -m tools.elementarno.cli perceive photo.jpg --out /tmp/scene.json --raw /tmp/raw.json
 
-# проверка утверждений LLM: все ссылки разрешаются? нет ли переуверенности?
-python3 -m tools.elementarno.cli verify eval/cases/case-01-dust-outline.json
+# улики с цитатами и источниками
+python3 -m tools.elementarno.cli findings /tmp/scene.json
 
-# прогон eval-кейсов
+# что изменилось между двумя кадрами
+python3 -m tools.elementarno.cli diff before.json after.json --json
+
+# загадка по серии кадров
+python3 -m tools.elementarno.cli puzzle puzzle.json --persona doyle
+
+# проверка утверждений: ссылки, потолки, фальсифицируемость
+python3 -m tools.elementarno.cli verify scene.json --ledger ledger.json
+
+# тесты и бенчмарки
+python3 -m unittest discover -s tests -t .
 python3 tools/run_eval.py
 ```
 
-Зависимостей нет — только стандартная библиотека Python 3.11+.
+Окружение с зависимостями (Pillow нужен для кроп-допроса):
+
+```bash
+nix develop            # python3 + pillow + numpy + ruff + jq
+nix flake check       # тесты в изолированном окружении
+```
+
+Зависимостей у самого движка нет — только стандартная библиотека Python 3.11+.
+
+## Восприятие: три прохода
+
+1. **Инвентаризация** — что есть: объекты, поверхности, свет.
+2. **След-проход** — где следы и где пусто: пылевые контуры, пустые крючки,
+   следы ног, линии воды.
+3. **Допрос кропа** — по каждому подозрительному участку бинарный вопрос
+   «есть ли здесь след удалённого предмета?» на малом контексте.
+
+Три прохода нужны потому, что у моделей есть affirmation bias: общее
+описание сцены физически не может найти то, чего нет. Сырые ответы модели
+сохраняются рядом со сценой — они часть цепочки доказательств.
+
+Измеренная задержка на одном кадре: ~6–15 с, 2–5 вызовов модели.
 
 ## Лицензия и данные
 
 Код: MIT. Правила — CC BY-SA 4.0, каждое со ссылкой на источник.
 Датасет Sherlock (Hessel et al.) — лицензию проверять до использования;
 у нас свой датасет с экспертной разметкой, он и есть актив.
+
