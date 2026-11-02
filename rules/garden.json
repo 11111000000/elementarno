@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "GRD-001",
-      "version": 1,
+      "version": 2,
       "pack": "garden",
       "title": "Взрыхлённый грунт",
       "domain": "garden",
@@ -69,7 +69,7 @@
     },
     {
       "id": "GRD-003",
-      "version": 1,
+      "version": 2,
       "pack": "garden",
       "title": "Следы по грунту, в стороне от дорожки",
       "domain": "garden",

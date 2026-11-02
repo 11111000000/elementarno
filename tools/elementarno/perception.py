@@ -82,35 +82,23 @@ TRACE_CHECKLIST = [
     ("crack", "трещина"),
 ]
 
-CHECKLIST_PROMPT = """Ты — эксперт по следовому анализу. Ответь по чек-листу: есть ли в кадре каждый из следов.
+CHECKLIST_PROMPT = """Ты — эксперт по следовому анализу. Перечисли следы, которые ты ВИДИШЬ на фотографии.
 
-ФОРМАТ ОТВЕТА (только JSON):
-{"items":[{"n":1,"yes":false,"confidence":0.0,"bbox":[0,0,0,0],"note":""}]}
+ФОРМАТ (только JSON, без markdown):
+{"found":[{"kind":"<один из списка ниже>","bbox":[x1,y1,x2,y2],"note":"что именно видно, своими словами"}]}
 
-n — номер пункта чек-листа. yes — true только если след ЯВНО виден.
-confidence — насколько уверен (0..1). bbox — область находки [x1,y1,x2,y2] в нормализованных координатах 0..1, если след найден, иначе [0,0,0,0].
-note — коротко, что именно видно (по-русски), иначе "".
+ПРАВИЛА:
+1. Перечисляй ТОЛЬКО то, что действительно видишь. Не выдумывай.
+2. kind — строго один из идентификаторов в списке ниже. Своими словами пиши только в note.
+3. bbox — область находки в нормализованных координатах 0..1. Если область не уверенная, bbox [0,0,0,0].
+4. note — 5–15 слов по-русски: что видно и где.
+5. Если следов нет — верни {"found":[]}. Это нормальный и правильный ответ.
+6. Один след — одна запись. Один и тот же вид в двух местах — две записи.
 
-КРИТИЧЕСКИ ВАЖНО:
-- Ложная находка хуже пропуска. Если сомневаешься — yes:false.
-- Если следов нет вообще — так и ответь, это нормальный результат.
-- Не выдумывай то, чего нет, даже если это «ожидаемо» для такого места.
-
-ЧЕК-ЛИСТ:
+СПИСОК ВИДОВ И ЧТО ЭТО ЗНАЧИТ:
 {checklist}
 
 Верни JSON."""
-
-
-def _build_checklist_prompt():
-    lines = []
-    for index, (kind, question) in enumerate(TRACE_CHECKLIST, start=1):
-        lines.append(f"{index}. [{kind}] {question}")
-    body = CHECKLIST_PROMPT.replace("{checklist}", "\n".join(lines))
-    return body
-
-
-CHECKLIST_READY = _build_checklist_prompt()
 
 VERIFY_PROMPT = """Ты эксперт по следовому анализу. Перед тобой та же фотография, которую уже смотрели.
 
@@ -121,6 +109,52 @@ VERIFY_PROMPT = """Ты эксперт по следовому анализу. �
 Ответь ТОЛЬКО JSON: {{"yes":true,"confidence":0.0,"note":""}}
 yes=false только если ты уверен, что такого на фотографии НЕТ.
 Сомневаешься — true с невысокой уверенностью."""
+
+
+def normalize_kind(raw, known):
+    """Привести название вида к нашему идентификатору.
+
+    Модель пишет почти точные ключи, но иногда с синонимом или опечаткой.
+    Несовпадение — это отсутствие улики, а не повод выдумывать вид.
+    """
+    if not raw:
+        return None
+    value = str(raw).strip().lower().replace(" ", "_").replace("-", "_")
+    if value in known:
+        return value
+    aliases = {
+        "mud_prints": "mud_footprint", "footprints": "footprint", "foot_print": "footprint",
+        "paint_spatter": "paint_splash", "paint_splashes": "paint_splash",
+        "paint_splatter": "paint_splash", "wood_dust": "sawdust", "shavings": "sawdust",
+        "mold": "mold_patch", "mould": "mold_patch", "mildew": "mold_patch",
+        "water_stain": "water_line", "waterline": "water_line", "flood_line": "water_line",
+        "oil": "oil_trace", "grease": "oil_trace", "grease_trace": "oil_trace",
+        "burn_mark": "burn", "burnt": "burn", "char": "burn",
+        "dust_mark": "dust_outline", "outline": "dust_outline", "dust_ring": "dust_outline",
+        "hook": "empty_hook", "empty_hanger": "empty_hook",
+        "unfaded": "unfaded_patch", "clean_patch": "unfaded_patch",
+        "wet_floor": "wet_trace", "wet_mark": "wet_trace", "puddle": "wet_trace",
+        "fingerprint_mark": "fingerprint", "prints": "fingerprint",
+        "flour": "flour_dust", "flour_powder": "flour_dust",
+        "plaster": "plaster_dust", "cement_dust": "plaster_dust",
+        "metal_shavings": "metal_swarf", "swarf": "metal_swarf", "grinding_dust": "metal_swarf",
+        "cup_mark": "cup_ring", "coffee_ring": "cup_ring", "mug_ring": "cup_ring",
+        "ink": "ink_trace", "toner": "ink_trace",
+    }
+    if value in aliases:
+        return aliases[value]
+    for candidate in known:
+        if candidate in value or value in candidate:
+            return candidate
+    return None
+
+
+def _build_checklist_prompt():
+    lines = [f"- {kind}: {question}" for kind, question in TRACE_CHECKLIST]
+    return CHECKLIST_PROMPT.replace("{checklist}", "\n".join(lines))
+
+
+CHECKLIST_READY = _build_checklist_prompt()
 
 
 class PerceptionError(RuntimeError):
@@ -226,7 +260,7 @@ VALID_REGION_KINDS = {
 
 class MiniMaxPerception:
     def __init__(self, model=DEFAULT_MODEL, endpoint=DEFAULT_ENDPOINT, api_key=None, timeout=180,
-                 think=False, min_confidence=0.5, verify_crops=True):
+                 think=False, min_confidence=0.5, verify_crops=True, votes=1):
         self.model = model
         self.endpoint = endpoint
         self.api_key = resolve_api_key(api_key)
@@ -234,6 +268,7 @@ class MiniMaxPerception:
         self.think = think
         self.min_confidence = min_confidence
         self.verify_crops = verify_crops
+        self.votes = max(1, votes)
 
     def _payload(self, image_b64, media_type, prompt, max_tokens=3000):
         content = [
@@ -445,43 +480,63 @@ class MiniMaxPerception:
         return scene, meta
 
     def _checklist(self, image_b64, media_type):
-        payload, latency = self.call(image_b64, media_type, CHECKLIST_READY, max_tokens=4000)
-        raw = [{"pass": "checklist", "prompt": CHECKLIST_READY, "payload": payload, "latency_ms": latency}]
-        try:
-            data = self.extract_json(self.text_of(payload))
-        except (json.JSONDecodeError, PerceptionError):
+        """Перечисление следов, при необходимости — голосованием.
+
+        Ответы модели различаются от сессии к сессии даже при temperature=0,
+        поэтому число голосов сделано параметром: один голос — скорость,
+        три голоса — устойчивость. Вид попадает в сцену, если набрал
+        большинство голосов.
+        """
+        raw = []
+        votes = []
+        for _ in range(self.votes):
+            payload, latency = self.call(image_b64, media_type, CHECKLIST_READY, max_tokens=4000)
+            raw.append({"pass": "checklist", "prompt": CHECKLIST_READY, "payload": payload,
+                        "latency_ms": latency})
+            try:
+                data = self.extract_json(self.text_of(payload))
+            except (json.JSONDecodeError, PerceptionError):
+                continue
+            votes.append(data.get("found", []) or [])
+
+        if not votes:
             return [], raw
 
-        by_number = {}
-        for item in data.get("items", []) or []:
-            try:
-                by_number[int(item.get("n"))] = item
-            except (TypeError, ValueError):
-                continue
+        known = {kind for kind, _ in TRACE_CHECKLIST}
+        questions = dict(TRACE_CHECKLIST)
+        tally = {}
+        for found in votes:
+            seen_in_vote = set()
+            for item in found:
+                kind = normalize_kind(item.get("kind"), known)
+                if not kind or kind in seen_in_vote:
+                    continue
+                seen_in_vote.add(kind)
+                entry = tally.setdefault(kind, {"count": 0, "item": item})
+                entry["count"] += 1
 
+        needed = (len(votes) // 2) + 1
         regions = []
-        for index, (kind, question) in enumerate(TRACE_CHECKLIST, start=1):
-            item = by_number.get(index)
-            if not item:
+        for index, (kind, entry) in enumerate(tally.items(), start=1):
+            if entry["count"] < needed:
                 continue
-            if not item.get("yes"):
-                continue
-            try:
-                confidence = float(item.get("confidence") or 0.0)
-            except (TypeError, ValueError):
-                confidence = 0.0
-            if confidence < self.min_confidence:
-                continue
+            item = entry["item"]
             bbox = item.get("bbox") or [0, 0, 0, 0]
             if not isinstance(bbox, list) or len(bbox) != 4:
                 bbox = [0, 0, 0, 0]
+            try:
+                confidence = float(item.get("confidence") or 0.7)
+            except (TypeError, ValueError):
+                confidence = 0.7
             regions.append({
                 "id": f"c{index}",
                 "kind": kind,
                 "bbox": bbox,
                 "note": item.get("note", ""),
-                "confidence": confidence,
-                "question": question,
+                "confidence": min(confidence, 0.95),
+                "votes": entry["count"],
+                "votes_total": len(votes),
+                "question": questions.get(kind, ""),
             })
         return regions, raw
 

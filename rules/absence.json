@@ -173,7 +173,7 @@
     },
     {
       "id": "ABS-004",
-      "version": 1,
+      "version": 2,
       "pack": "absence",
       "title": "Нарушенный слой пыли",
       "domain": "absence",

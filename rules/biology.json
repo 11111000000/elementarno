@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "BIO-001",
-      "version": 1,
+      "version": 2,
       "pack": "biology",
       "title": "След животного",
       "domain": "biology",
@@ -20,7 +20,7 @@
         "gte": 1
       },
       "inference": {
-        "claim": "На сцене найден след животного — в помещении есть или был питомец либо грызун",
+        "claim": "В сцене найден след животного: здесь есть или был питомец либо грызун",
         "confidence_prior": 0.75,
         "confidence_ceiling": 0.85,
         "tags": [
@@ -54,7 +54,7 @@
     },
     {
       "id": "BIO-002",
-      "version": 1,
+      "version": 2,
       "pack": "biology",
       "title": "Очаг плесени",
       "domain": "biology",
@@ -70,7 +70,7 @@
         "gte": 1
       },
       "inference": {
-        "claim": "На сцене есть очаг плесени — в помещении длительно держалась влага",
+        "claim": "В сцене есть очаг плесени: здесь длительно держалась влага",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
         "tags": [

@@ -198,14 +198,15 @@ def cmd_mcp_list(args):
 def cmd_perceive(args):
     from .perception import MiniMaxPerception
 
-    perception = MiniMaxPerception(model=args.model, think=args.think)
+    perception = MiniMaxPerception(model=args.model, think=args.think,
+                                   votes=getattr(args, "votes", 1))
     scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
     if args.out:
         Path(args.out).write_text(json.dumps(scene, ensure_ascii=False, indent=2), encoding="utf-8")
     if args.json:
         dump(scene)
         return 0
-    print(f"сцена-граф получен: {meta['model']}, {meta['latency_ms']} мс, попыток: {meta['attempts']}")
+    print(f"сцена-граф получен: {meta['model']}, {meta['latency_ms']} мс, вызовов: {meta.get('calls')}")
     print(f"  объектов: {len(scene['objects'])}, поверхностей: {len(scene['surfaces'])}, "
           f"регионов: {len(scene['regions'])}")
     for anomaly in scene["meta"]["perception"].get("anomalies", []):
@@ -216,7 +217,8 @@ def cmd_perceive(args):
 def cmd_analyze(args):
     from .perception import MiniMaxPerception
 
-    perception = MiniMaxPerception(model=args.model, think=args.think)
+    perception = MiniMaxPerception(model=args.model, think=args.think,
+                                   votes=getattr(args, "votes", 1))
     scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
@@ -226,8 +228,8 @@ def cmd_analyze(args):
                if not any(e.get("claim_id") == c["claim_id"] for e in report["errors"])]
     hypotheses = score_hypotheses(findings, usable, [])
     state = decide_verdict(findings, usable, args.min_findings, args.mode)
-    print(f"восприятие: {meta['model']}, {meta['latency_ms']} мс, токенов: "
-          f"{meta['input_tokens']}→{meta['output_tokens']}")
+    print(f"восприятие: {meta['model']}, {meta['latency_ms']} мс, вызовов: {meta.get('calls')}, "
+          f"токенов: {meta.get('input_tokens')}→{meta.get('output_tokens')}")
     print(render(args.mode, findings, usable, hypotheses, state, args.persona, report))
     return 0
 
@@ -392,6 +394,8 @@ def build_parser():
     perceive.add_argument("--think", action="store_true", help="включить расширенное мышление")
     perceive.add_argument("--raw", help="куда сохранить сырой ответ модели")
     perceive.add_argument("--out", help="куда сохранить сцена-граф")
+    perceive.add_argument("--votes", type=int, default=1,
+                          help="сколько раз спросить перечисление следов: больше голосов — устойчивее")
     perceive.add_argument("--json", action="store_true")
     perceive.set_defaults(func=cmd_perceive)
 
@@ -404,6 +408,7 @@ def build_parser():
     analyze.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
     analyze.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
     analyze.add_argument("--min-findings", type=int, default=1)
+    analyze.add_argument("--votes", type=int, default=1)
     analyze.set_defaults(func=cmd_analyze)
 
     reason = sub.add_parser("reason", help="слой рассуждения: связать улики в утверждения и версии")

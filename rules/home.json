@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "HOME-001",
-      "version": 1,
+      "version": 2,
       "pack": "home",
       "title": "Пыль в углах и вдоль плинтуса не сбита",
       "domain": "household",

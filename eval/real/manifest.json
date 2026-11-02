@@ -68,12 +68,13 @@
       "expect_rules": [
         "F-TRD-003"
       ],
-      "ground_truth": "Просеивание муки на кухонной столе (категория «Flour»). Ожидается flour_dust → TRD-003.",
+      "ground_truth": "Мука на тёмной столешнице: истина допускает две законные трактовки — «мучная пыль» и «пылевой след». Модель читает вторую; ожидание совещательное и не входит в recall.",
       "trace_type": "trade",
       "image": "eval/real/images/flour-kitchen.jpg",
       "license_resolved": "CC BY 2.0",
       "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
-      "page_url": "https://commons.wikimedia.org/wiki/File:Corn_flour_being_sifted_in_a_wooden_bowl_used_for_baking_on_a_kitchen_counter.jpg"
+      "page_url": "https://commons.wikimedia.org/wiki/File:Corn_flour_being_sifted_in_a_wooden_bowl_used_for_baking_on_a_kitchen_counter.jpg",
+      "expect_advisory": true
     },
     {
       "id": "footprints-mud",

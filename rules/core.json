@@ -54,7 +54,7 @@
     },
     {
       "id": "PHY-002",
-      "version": 1,
+      "version": 2,
       "pack": "core",
       "title": "Тень не совпадает с источником света",
       "domain": "consistency",
