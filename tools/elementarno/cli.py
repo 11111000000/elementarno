@@ -195,6 +195,43 @@ def cmd_mcp_list(args):
     return 0
 
 
+def cmd_perceive(args):
+    from .perception import MiniMaxPerception
+
+    perception = MiniMaxPerception(model=args.model, think=args.think)
+    scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
+    if args.out:
+        Path(args.out).write_text(json.dumps(scene, ensure_ascii=False, indent=2), encoding="utf-8")
+    if args.json:
+        dump(scene)
+        return 0
+    print(f"сцена-граф получен: {meta['model']}, {meta['latency_ms']} мс, попыток: {meta['attempts']}")
+    print(f"  объектов: {len(scene['objects'])}, поверхностей: {len(scene['surfaces'])}, "
+          f"регионов: {len(scene['regions'])}")
+    for anomaly in scene["meta"]["perception"].get("anomalies", []):
+        print(f"  ! {anomaly}")
+    return 0
+
+
+def cmd_analyze(args):
+    from .perception import MiniMaxPerception
+
+    perception = MiniMaxPerception(model=args.model, think=args.think)
+    scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
+    rules = selected_rules(args.rules, args.pack)
+    findings = evaluate_all(rules, scene)
+    claims = build_claims(findings)
+    report = validate(findings, {"claims": claims})
+    usable = [c for c in claims
+               if not any(e.get("claim_id") == c["claim_id"] for e in report["errors"])]
+    hypotheses = score_hypotheses(findings, usable, [])
+    state = decide_verdict(findings, usable, args.min_findings, args.mode)
+    print(f"восприятие: {meta['model']}, {meta['latency_ms']} мс, токенов: "
+          f"{meta['input_tokens']}→{meta['output_tokens']}")
+    print(render(args.mode, findings, usable, hypotheses, state, args.persona, report))
+    return 0
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="elementarno",
@@ -252,6 +289,26 @@ def build_parser():
 
     mcp = sub.add_parser("mcp-list", help="настроенные MCP-серверы")
     mcp.set_defaults(func=cmd_mcp_list)
+
+    perceive = sub.add_parser("perceive", help="изображение → сцена-граф через мультимодальную модель")
+    perceive.add_argument("image")
+    perceive.add_argument("--model", default="MiniMax-M3")
+    perceive.add_argument("--think", action="store_true", help="включить расширенное мышление")
+    perceive.add_argument("--raw", help="куда сохранить сырой ответ модели")
+    perceive.add_argument("--out", help="куда сохранить сцена-граф")
+    perceive.add_argument("--json", action="store_true")
+    perceive.set_defaults(func=cmd_perceive)
+
+    analyze = sub.add_parser("analyze", help="изображение → улики → версия (всё сразу)")
+    analyze.add_argument("image")
+    analyze.add_argument("--model", default="MiniMax-M3")
+    analyze.add_argument("--think", action="store_true")
+    analyze.add_argument("--raw", help="куда сохранить сырой ответ модели")
+    analyze.add_argument("--pack", action="append")
+    analyze.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
+    analyze.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
+    analyze.add_argument("--min-findings", type=int, default=1)
+    analyze.set_defaults(func=cmd_analyze)
 
     return parser
 

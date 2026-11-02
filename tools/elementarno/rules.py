@@ -193,7 +193,7 @@ def evaluate_predicate(predicate, scene, fired):
         return predicate["id"] in fired
     if kind == "dangling":
         known = {item.get("id") for item in scene.get(predicate["collection"], [])}
-        return any(ref not in known for ref in resolve(scene, predicate["path"]))
+        return any(ref is not None and ref not in known for ref in resolve(scene, predicate["path"]))
     if kind == "mismatch":
         left = resolve(scene, predicate["left"])
         right = resolve(scene, predicate["right"])
