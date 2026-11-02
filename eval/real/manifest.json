@@ -53,12 +53,13 @@
         "F-TRD-002",
         "F-TRD-009"
       ],
-      "ground_truth": "Распил доски в мастерской (категория «Circular saw blades»). Ожидается sawdust → TRD-002 и, при наличии масла, TRD-009.",
+      "ground_truth": "Категория файла — «Circular saw blades»: распил виден, но наличие именно стружки из категории не следует. Ожидание совещательное и не входит в recall.",
       "trace_type": "trade",
       "image": "eval/real/images/saw-workshop.jpg",
       "license_resolved": "CC BY 2.0",
       "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
-      "page_url": "https://commons.wikimedia.org/wiki/File:A_circular_saw_is_actively_cutting_through_a_wooden_plank_in_a_workshop.jpg"
+      "page_url": "https://commons.wikimedia.org/wiki/File:A_circular_saw_is_actively_cutting_through_a_wooden_plank_in_a_workshop.jpg",
+      "expect_advisory": true
     },
     {
       "id": "flour-kitchen",

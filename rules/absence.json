@@ -184,14 +184,47 @@
       ],
       "depends_on": [],
       "predicate": {
-        "kind": "count",
-        "path": "regions[kind=disturbed_dust]",
-        "gte": 1
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "regions[kind=disturbed_dust]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "surfaces[dust_present=true]",
+            "gte": 1
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "any",
+              "conditions": [
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=soil]",
+                  "value": true
+                },
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=sand]",
+                  "value": true
+                },
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=gravel]",
+                  "value": true
+                }
+              ]
+            }
+          }
+        ]
       },
       "inference": {
         "claim": "Слой пыли нарушен узкой полосой — по поверхности прошли или что-то протащили",
         "confidence_prior": 0.55,
-        "confidence_ceiling": 0.75,
+        "confidence_ceiling": 0.7,
         "tags": [
           "disturbed_dust",
           "walked"
@@ -204,7 +237,8 @@
       "confounds": [
         "Пыль могли сдуть сквозняком",
         "Уборка оставляет похожие полосы",
-        "Домашнее животное проходит по поверхности"
+        "Домашнее животное проходит по поверхности",
+        "Мокрый грунт, песок или галька дают похожую картину и не являются пылью"
       ],
       "exceptions": [
         "Полоса совпадает с направлением потока воздуха из щели"

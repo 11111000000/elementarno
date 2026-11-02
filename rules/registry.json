@@ -50,6 +50,21 @@
       "id": "trade",
       "title": "Следы ремесла и привычек",
       "layer": "epistemic"
+    },
+    {
+      "id": "home",
+      "title": "Быт",
+      "layer": "epistemic"
+    },
+    {
+      "id": "garden",
+      "title": "Сад и участок",
+      "layer": "epistemic"
+    },
+    {
+      "id": "office",
+      "title": "Офис",
+      "layer": "epistemic"
     }
   ]
 }

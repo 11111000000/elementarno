@@ -97,7 +97,7 @@
         "required": ["id", "about", "feature", "value"],
         "properties": {
           "id": {"type": "string"},
-          "about": {"type": "string"},
+          "about": {"type": "string", "description": "id наблюдаемой вершины: региона, объекта или поверхности"},
           "feature": {"type": "string"},
           "value": {},
           "confidence": {"type": "number", "minimum": 0, "maximum": 1}

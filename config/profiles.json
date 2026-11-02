@@ -28,7 +28,10 @@
         "absence",
         "puzzle",
         "presence",
-        "trade"
+        "trade",
+        "home",
+        "garden",
+        "office"
       ],
       "mode": "detective",
       "persona": "doyle",
@@ -55,7 +58,10 @@
         "absence",
         "water",
         "biology",
-        "trade"
+        "trade",
+        "home",
+        "garden",
+        "office"
       ],
       "mode": "forensic",
       "persona": "forensic",
