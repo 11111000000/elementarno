@@ -1,0 +1,181 @@
+{
+  "pack": "absence",
+  "title": "Улики отсутствия: то, чего нет, но что должно было быть",
+  "rules": [
+    {
+      "id": "ABS-001",
+      "version": 1,
+      "pack": "absence",
+      "title": "Пылевой контур от убранного предмета",
+      "domain": "absence",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=dust_outline]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности сохранился контур предмета, которого больше нет. Пыль по краям контура осыпается медленнее, чем заполняет середину, — значит предмет убрали недавно",
+        "confidence_prior": 0.65,
+        "confidence_ceiling": 0.85,
+        "tags": ["removal", "recent_movement"]
+      },
+      "anchors": ["regions[kind=dust_outline].id"],
+      "confounds": [
+        "Влажная уборка может размазать контур и выдать его за свежий",
+        "Контур может быть следом от декорации, которую убрали давно",
+        "Резкий свет из окна способен дать ложный контур"
+      ],
+      "exceptions": [
+        "Контур появляется и без предметов: трещина, скол, вмятина в дереве",
+        "Рельеф контура выпуклый, а не вогнутый — это не след, а выступ"
+      ],
+      "falsification": {
+        "refuted_by": ["ABS-004"],
+        "physical_test": "Посветить боковым светом: вогнутый контур — след предмета, выпуклый — дефект поверхности"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "следы перемещения предметов как метод реконструкции сцены",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "ABS-002",
+      "version": 1,
+      "pack": "absence",
+      "title": "Участок без пыли среди запылённой поверхности",
+      "domain": "absence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions", "surfaces"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=unfaded_patch]", "gte": 1},
+          {"kind": "count", "path": "surfaces[dust_present=true]", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "На запылённой поверхности есть участок, где пыли нет: там стоял предмет, пока пыль оседала вокруг. Предмет убрали после этого",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "tags": ["removal", "recent_movement"]
+      },
+      "anchors": ["regions[kind=unfaded_patch].id"],
+      "confounds": [
+        "Участок могли протереть или вымыть",
+        "Пыль могла не дойти до него из-за соседнего предмета",
+        "Солнечный свет может высушить и обесцветить участок"
+      ],
+      "exceptions": [
+        "Участок у края, где пыль сдувается воздухом",
+        "Поверхность очищали целиком, а контур здесь — артефакт уборки"
+      ],
+      "falsification": {
+        "refuted_by": ["ABS-001"],
+        "physical_test": "Проверить границы участка: ровные прямоугольные края — след предмета, неровные — неравномерная уборка"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "отсутствие следов как источник информации",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "ABS-003",
+      "version": 1,
+      "pack": "absence",
+      "title": "Пустой крючок со следами крепления",
+      "domain": "absence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=empty_hook]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Крючок пуст, но след крепления сохранился — предмет снимали и возвращали на место",
+        "confidence_prior": 0.65,
+        "confidence_ceiling": 0.8,
+        "tags": ["removal", "recent_movement"]
+      },
+      "anchors": ["regions[kind=empty_hook].id"],
+      "confounds": [
+        "Крючок мог быть пустым изначально",
+        "След крепления может остаться от давнего использования"
+      ],
+      "exceptions": [
+        "Крючок новый, след нанесён производителем"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить с другими крючками: если следы есть у всех, это конструкция, а не улика"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (раздел о следах на месте)",
+          "note": "следы оставления и снятия предметов",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "ABS-004",
+      "version": 1,
+      "pack": "absence",
+      "title": "Нарушенный слой пыли",
+      "domain": "absence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=disturbed_dust]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Слой пыли нарушен узкой полосой — по поверхности прошли или что-то протащили",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.75,
+        "tags": ["disturbed_dust", "walked"]
+      },
+      "anchors": ["regions[kind=disturbed_dust].id"],
+      "confounds": [
+        "Пыль могли сдуть сквозняком",
+        "Уборка оставляет похожие полосы",
+        "Домашнее животное проходит по поверхности"
+      ],
+      "exceptions": [
+        "Полоса совпадает с направлением потока воздуха из щели"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить ширину полосы и её связь с шириной обуви: след ноги отличается от полосы швабры"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "следы перемещения по сцене",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

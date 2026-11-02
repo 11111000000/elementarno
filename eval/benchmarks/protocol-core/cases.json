@@ -1,0 +1,42 @@
+{
+  "benchmark": "protocol-core",
+  "description": "Проверка протокола: какие правила обязаны сработать на эталонных сценах и где движок обязан отказаться.",
+  "cases": [
+    {
+      "id": "absence-dust-outline",
+      "scene": "scenes/absence-dust-outline.json",
+      "packs": ["core", "absence"],
+      "expect": {
+        "finding_ids": ["F-ABS-001"],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "shadow-conflict",
+      "scene": "scenes/shadow-conflict.json",
+      "packs": ["core", "absence"],
+      "expect": {
+        "finding_ids": ["F-PHY-002"],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "water-and-mold",
+      "scene": "scenes/water-and-mold.json",
+      "packs": ["core", "absence", "water"],
+      "expect": {
+        "finding_ids": ["F-WAT-001", "F-WAT-002"],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "nothing-to-conclude",
+      "scene": "scenes/nothing-to-conclude.json",
+      "packs": ["core", "absence", "water"],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    }
+  ]
+}

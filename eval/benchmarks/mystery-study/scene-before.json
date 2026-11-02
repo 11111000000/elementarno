@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "image_id": "study-before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "Синтетическая сцена. Первый кадр: кабинет до события."
+  },
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": true, "dust_state": "even"},
+    {"id": "s2", "name": "floor", "material": "boards", "dust_present": true, "dust_state": "even"},
+    {"id": "s3", "name": "rug", "material": "wool", "dust_present": true, "dust_state": "even"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "vase", "material": "ceramic", "size_m": 0.25, "on": "s1"},
+    {"id": "o2", "category": "chair", "material": "wood", "on": "s2"},
+    {"id": "o3", "category": "lamp", "material": "brass", "on": "s1"},
+    {"id": "o4", "category": "book", "material": "paper", "on": "s1"}
+  ],
+  "regions": [],
+  "observations": []
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://elementarno.dev/schemas/rule.schema.json",
+  "title": "Rule",
+  "description": "A citable inference rule. A rule without sources is an opinion, not evidence.",
+  "type": "object",
+  "required": ["id", "version", "pack", "title", "domain", "predicate", "inference", "confounds", "exceptions", "falsification", "sources", "review_status"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[A-Z]{2,6}-[0-9]{3}$"},
+    "version": {"type": "integer", "minimum": 1},
+    "pack": {"type": "string"},
+    "title": {"type": "string", "minLength": 3},
+    "domain": {"type": "string"},
+    "severity": {"type": "string", "enum": ["info", "notice", "critical"]},
+    "requires": {"type": "array", "items": {"type": "string"}},
+    "depends_on": {"type": "array", "items": {"type": "string"}},
+    "predicate": {"$ref": "#/$defs/predicate"},
+    "inference": {
+      "type": "object",
+      "required": ["claim", "confidence_prior", "confidence_ceiling"],
+      "properties": {
+        "claim": {"type": "string", "minLength": 3},
+        "confidence_prior": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_ceiling": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "anchors": {"type": "array", "items": {"type": "string"}},
+    "confounds": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "exceptions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "falsification": {
+      "type": "object",
+      "required": ["refuted_by", "physical_test"],
+      "properties": {
+        "refuted_by": {"type": "array", "items": {"type": "string"}},
+        "physical_test": {"type": "string", "minLength": 3}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ref"],
+        "properties": {
+          "ref": {"type": "string", "minLength": 3},
+          "note": {"type": "string"},
+          "verified": {"type": "boolean"}
+        }
+      }
+    },
+    "review_status": {"type": "string", "enum": ["draft", "reviewed"]},
+    "layer": {"type": "string", "enum": ["epistemic", "interpretive"]}
+  },
+  "$defs": {
+    "predicate": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["all", "any", "not", "present", "count", "absent", "rule", "dangling", "mismatch", "max", "distinct"]},
+        "conditions": {"type": "array", "items": {"$ref": "#/$defs/predicate"}},
+        "condition": {"$ref": "#/$defs/predicate"},
+        "path": {"type": "string"},
+        "value": {},
+        "gte": {"type": "number"},
+        "lte": {"type": "number"},
+        "gt": {"type": "number"},
+        "lt": {"type": "number"},
+        "id": {"type": "string"},
+        "collection": {"type": "string"},
+        "left": {"type": "string"},
+        "right": {"type": "string"}
+      }
+    }
+  }
+}

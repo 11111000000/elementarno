@@ -1,0 +1,18 @@
+{
+  "puzzle_id": "study-01",
+  "title": "Пропавшая ваза в кабинете",
+  "text": "Между двумя кадрами кабинета исчезла ваза со стола. Кто это сделал?",
+  "suspects": [
+    {"id": "s1", "label": "Садовник", "traits": ["muddy_boots", "came_from_outside"]},
+    {"id": "s2", "label": "Дворецкий", "traits": ["keys", "polished_shoes"]},
+    {"id": "s3", "label": "Горничная", "traits": ["wet_boots"]}
+  ],
+  "scenes": [
+    {"id": "frame-1", "graph": "scene-before.json"},
+    {"id": "frame-2", "graph": "scene-after.json"}
+  ],
+  "answer": {
+    "suspect": "s1",
+    "note": "Грязный след от обуви привёл садовника из сада; след совпадает по рисунку с его рабочими ботинками."
+  }
+}

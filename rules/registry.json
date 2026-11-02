@@ -1,0 +1,12 @@
+{
+  "packs": [
+    {"id": "core", "title": "Универсальные проверки", "layer": "epistemic", "always_on": true},
+    {"id": "absence", "title": "Улики отсутствия", "layer": "epistemic"},
+    {"id": "puzzle", "title": "Разбор загадок по серии кадров", "layer": "epistemic"},
+    {"id": "water", "title": "Залив и влага", "layer": "epistemic"},
+    {"id": "fire", "title": "Пожар", "layer": "epistemic"},
+    {"id": "mechanics", "title": "Механика", "layer": "epistemic"},
+    {"id": "biology", "title": "Следы жизни", "layer": "epistemic"},
+    {"id": "semiotics", "title": "Символический слой", "layer": "interpretive"}
+  ]
+}

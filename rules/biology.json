@@ -1,0 +1,90 @@
+{
+  "pack": "biology",
+  "title": "Следы жизни: вредители, влага, плесень",
+  "rules": [
+    {
+      "id": "BIO-001",
+      "version": 1,
+      "pack": "biology",
+      "title": "След животного",
+      "domain": "biology",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=footprint]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На сцене найден след животного — в помещении есть или был питомец либо грызун",
+        "confidence_prior": 0.75,
+        "confidence_ceiling": 0.85,
+        "tags": ["animal", "pest"]
+      },
+      "anchors": ["regions[kind=footprint].id"],
+      "confounds": [
+        "След может принадлежать человеку",
+        "След может быть старым"
+      ],
+      "exceptions": [
+        "Размер следа сопоставим с подошвой человека"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить размер и форму следа"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Wildlife and Biological Trace",
+          "note": "следы животных в жилой среде",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "BIO-002",
+      "version": 1,
+      "pack": "biology",
+      "title": "Очаг плесени",
+      "domain": "biology",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=mold_patch]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На сцене есть очаг плесени — в помещении длительно держалась влага",
+        "confidence_prior": 0.8,
+        "confidence_ceiling": 0.9,
+        "tags": ["mold", "damp"]
+      },
+      "anchors": ["regions[kind=mold_patch].id"],
+      "confounds": [
+        "Плесень может быть свежей",
+        "Очаг может быть локальным (попавшая влага)"
+      ],
+      "exceptions": [
+        "Очаг совпадает с зоной разлива"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага"
+      },
+      "sources": [
+        {
+          "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+          "note": "признаки плесени и их связь с влажностью",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

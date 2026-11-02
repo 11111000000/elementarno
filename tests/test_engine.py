@@ -1,0 +1,223 @@
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+
+from elementarno.diff import diff_scenes  # noqa: E402
+from elementarno.ledger import validate  # noqa: E402
+from elementarno.paths import resolve  # noqa: E402
+from elementarno.providers import StdioMcpClient  # noqa: E402
+from elementarno.puzzle import build_claims, load_puzzle, solve  # noqa: E402
+from elementarno.render import render  # noqa: E402
+from elementarno.rules import RuleError, evaluate_all, load_packs  # noqa: E402
+from elementarno.scene import validate_scene  # noqa: E402
+
+RULES = load_packs(ROOT / "rules")
+BENCH = ROOT / "eval" / "benchmarks"
+
+
+def load(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+class PathTests(unittest.TestCase):
+    def test_filter_and_field(self):
+        scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        self.assertEqual(len(resolve(scene, "regions[kind=dust_outline]")), 1)
+        self.assertEqual(resolve(scene, "regions[kind=dust_outline].id"), ["r1"])
+        self.assertEqual(resolve(scene, "regions[kind=burn]"), [])
+
+    def test_boolean_matching_is_strict(self):
+        scene = load(BENCH / "mystery-study/scene-before.json")
+        self.assertEqual(len(resolve(scene, "surfaces[dust_present=true]")), 3)
+        self.assertEqual(len(resolve(scene, "surfaces[dust_present=false]")), 0)
+
+
+class DiffTests(unittest.TestCase):
+    def test_detects_removal_addition_and_link(self):
+        before = load(BENCH / "mystery-study/scene-before.json")
+        after = load(BENCH / "mystery-study/scene-after.json")
+        changes = diff_scenes(before, after)
+        kinds = {c["kind"] for c in changes}
+        self.assertIn("object_removed", kinds)
+        self.assertIn("object_added", kinds)
+        self.assertIn("object_moved", kinds)
+        self.assertIn("surface_changed", kinds)
+        removal = next(c for c in changes if c["kind"] == "object_removed")
+        self.assertEqual(removal["matched_region"], "r1")
+        added = next(c for c in changes if c["kind"] == "object_added")
+        self.assertTrue(added["wet"])
+
+
+class RuleTests(unittest.TestCase):
+    def test_finding_cites_rule_and_source(self):
+        scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        findings = evaluate_all(RULES, scene)
+        ids = {f["rule_id"] for f in findings}
+        self.assertIn("ABS-001", ids)
+        finding = next(f for f in findings if f["rule_id"] == "ABS-001")
+        self.assertTrue(finding["sources"])
+        self.assertTrue(finding["confounds"])
+        self.assertEqual(finding["anchors"], ["r1"])
+
+    def test_draft_rule_caps_confidence(self):
+        scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        findings = evaluate_all(RULES, scene)
+        finding = next(f for f in findings if f["rule_id"] == "ABS-001")
+        self.assertTrue(finding["provisional"])
+        self.assertLessEqual(finding["confidence_ceiling"], 0.5)
+
+    def test_rule_without_source_is_rejected(self):
+        bad = {
+            "pack": "test",
+            "rules": [{
+                "id": "TST-001", "version": 1, "pack": "test", "title": "x",
+                "domain": "test", "predicate": {"kind": "absent", "path": "objects"},
+                "inference": {"claim": "y", "confidence_prior": 0.5, "confidence_ceiling": 0.5},
+                "confounds": ["c"], "exceptions": ["e"],
+                "falsification": {"refuted_by": [], "physical_test": "t"},
+                "sources": [], "review_status": "draft",
+            }],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "t.json").write_text(json.dumps(bad), encoding="utf-8")
+            with self.assertRaises(RuleError):
+                load_packs(tmp)
+
+
+class LedgerTests(unittest.TestCase):
+    def setUp(self):
+        self.scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        self.findings = evaluate_all(RULES, self.scene)
+
+    def test_claim_without_finding_is_rejected(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-X", "kind": "observation", "text": "что-то",
+            "support": [{"finding_id": "F-NOPE"}], "confidence": 0.3,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("unresolved_citation", codes)
+
+    def test_overconfidence_is_rejected(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "observation", "text": "что-то",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.95,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("overconfidence", codes)
+
+    def test_draft_rule_cannot_back_strong_claim(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "observation", "text": "что-то",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.8,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("draft_backs_strong_claim", codes)
+        self.assertIn("missing_provisional_flag", codes)
+
+    def test_hypothesis_requires_falsification(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "hypothesis", "text": "что-то",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("hypothesis_without_falsification", codes)
+
+    def test_rejected_hypothesis_needs_kill_log(self):
+        report = validate(self.findings, {"claims": [], "hypotheses": [{
+            "hypothesis_id": "H-1", "text": "версия", "claims": [], "status": "rejected",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("rejected_without_kill_log", codes)
+
+    def test_interpretation_is_capped_and_marked(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "interpretation", "text": "что-то",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.9, "speculative": True,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("interpretation_too_confident", codes)
+
+
+class RenderTests(unittest.TestCase):
+    def setUp(self):
+        self.scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        self.findings = evaluate_all(RULES, self.scene)
+        self.claims = build_claims(self.findings)
+
+    def test_persona_keeps_citations_and_confidence(self):
+        text = render("detective", self.findings, self.claims, [], "sufficient_evidence", "doyle")
+        self.assertIn("[ABS-001]", text)
+        self.assertIn("доказательство", text)
+        for claim in self.claims:
+            self.assertLessEqual(claim["confidence"], 0.5)
+        self.assertIn("Уотсон", text)
+
+    def test_refusal_is_rendered_in_persona(self):
+        text = render("detective", [], [], [], "insufficient_evidence", "doyle")
+        self.assertIn("Уотсон", text)
+        self.assertIn("недостаточно", text)
+
+    def test_audit_persona_is_not_doyle(self):
+        text = render("audit", self.findings, self.claims, [], "sufficient_evidence", "forensic")
+        self.assertNotIn("Уотсон", text)
+
+
+class PuzzleTests(unittest.TestCase):
+    def test_suspect_is_ranked_by_matching_tags(self):
+        puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
+        result = solve(puzzle, scenes, RULES)
+        self.assertTrue(result["evaluation"]["correct"])
+        self.assertEqual(result["suspects"][0]["suspect_id"], "s1")
+        self.assertTrue(result["suspects"][1]["score"] < result["suspects"][0]["score"])
+
+    def test_suspect_without_matching_tags_scores_zero(self):
+        puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
+        result = solve(puzzle, scenes, RULES)
+        butler = next(s for s in result["suspects"] if s["suspect_id"] == "s2")
+        self.assertEqual(butler["score"], 0.0)
+
+
+class SceneTests(unittest.TestCase):
+    def test_dangling_reference_is_detected(self):
+        scene = load(BENCH / "mystery-study/scene-before.json")
+        scene["objects"][0]["on"] = "missing"
+        problems = validate_scene(scene)
+        codes = {p["code"] for p in problems}
+        self.assertIn("dangling_surface", codes)
+
+    def test_clean_scene_has_no_problems(self):
+        scene = load(BENCH / "mystery-study/scene-after.json")
+        self.assertEqual(validate_scene(scene), [])
+
+
+class McpTests(unittest.TestCase):
+    def test_stdio_client_roundtrip(self):
+        client = StdioMcpClient(sys.executable, [str(ROOT / "tools/mcp/demo_server.py")])
+        try:
+            client.start()
+            tools = client.list_tools()
+            names = {t["name"] for t in tools}
+            self.assertIn("solar_elevation", names)
+            result = client.call_tool("solar_elevation", {"latitude": 55.75, "day_of_year": 172, "hour": 12})
+            self.assertIn("value", result)
+            self.assertLess(result["value"], 90)
+        finally:
+            client.stop()
+
+    def test_unknown_tool_raises(self):
+        client = StdioMcpClient(sys.executable, [str(ROOT / "tools/mcp/demo_server.py")])
+        try:
+            client.start()
+            with self.assertRaises(Exception):
+                client.call_tool("nope", {})
+        finally:
+            client.stop()
+
+
+if __name__ == "__main__":
+    unittest.main()

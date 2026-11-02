@@ -1,0 +1,11 @@
+{
+  "meta": {"image_id": "nothing-to-conclude", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "floor", "material": "laminate"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "chair", "material": "wood", "on": "s1"}
+  ],
+  "regions": [],
+  "observations": []
+}

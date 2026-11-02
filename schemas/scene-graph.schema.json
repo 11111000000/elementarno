@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://elementarno.dev/schemas/scene-graph.schema.json",
+  "title": "Scene graph",
+  "description": "What is visible in the image. Only fields present here may support a claim.",
+  "type": "object",
+  "required": ["surfaces", "objects", "regions"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "image_id": {"type": "string"},
+        "captured_at": {"type": ["string", "null"]},
+        "source": {"type": "string"},
+        "geometry": {"type": "string", "enum": ["unknown", "metric", "relative"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "material": {"type": "string"},
+          "dust_present": {"type": "boolean"},
+          "dust_state": {"type": "string", "enum": ["none", "even", "uneven", "patchy"]},
+          "wet": {"type": "boolean"},
+          "area_m2": {"type": "number"},
+          "sunlit": {"type": "boolean"},
+          "region": {"type": "string"}
+        }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category"],
+        "properties": {
+          "id": {"type": "string"},
+          "category": {"type": "string"},
+          "material": {"type": "string"},
+          "state": {"type": "string", "enum": ["new", "clean", "worn", "damaged", "fresh", "stale", "unknown"]},
+          "fill_level": {"type": "number", "minimum": 0, "maximum": 1},
+          "size_m": {"type": "number"},
+          "count": {"type": "integer"},
+          "on": {"type": "string"},
+          "wet": {"type": "boolean"},
+          "color": {"type": "string"},
+          "shadow_dir": {"type": "string"},
+          "visible": {"type": "boolean"},
+          "region": {"type": "string"}
+        }
+      }
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {
+            "type": "string",
+            "enum": [
+              "dust_outline", "empty_hook", "unfaded_patch", "stain", "scratch",
+              "crack", "dent", "burn", "water_line", "mold_patch", "footprint",
+              "tyre_mark", "tool_mark", "puddle", "condensation", "disturbed_dust",
+              "mud_footprint", "other"
+            ]
+          },
+          "shape": {"type": "string"},
+          "area_m2": {"type": "number"},
+          "contrast": {"type": "number", "minimum": 0, "maximum": 1},
+          "freshness": {"type": "string", "enum": ["sharp", "soft", "erased", "unknown"]},
+          "edges": {"type": "string", "enum": ["concave", "convex", "flat", "ragged", "unknown"]},
+          "bbox": {
+            "type": "array",
+            "items": {"type": "number"},
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "about", "feature", "value"],
+        "properties": {
+          "id": {"type": "string"},
+          "about": {"type": "string"},
+          "feature": {"type": "string"},
+          "value": {},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "light": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"type": "string", "enum": ["window", "lamp", "sun", "unknown"]},
+          "direction": {"type": "string"},
+          "position": {"type": "string"}
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "exif": {"type": "object"},
+        "gps": {"type": ["object", "null"]}
+      }
+    }
+  }
+}

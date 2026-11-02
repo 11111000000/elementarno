@@ -1,0 +1,90 @@
+{
+  "pack": "fire",
+  "title": "Пожар: ожоги и очаг",
+  "rules": [
+    {
+      "id": "FIRE-001",
+      "version": 1,
+      "pack": "fire",
+      "title": "Ожог на поверхности",
+      "domain": "fire",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=burn]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На сцене есть ожог — здесь был открытый огонь или сильный нагрев",
+        "confidence_prior": 0.85,
+        "confidence_ceiling": 0.95,
+        "tags": ["fire", "heat"]
+      },
+      "anchors": ["regions[kind=burn].id"],
+      "confounds": [
+        "Ожог может остаться от утюга, свечи или камина",
+        "Пятно может быть копотью, а не ожогом"
+      ],
+      "exceptions": [
+        "Ожог явно локальный и совпадает с нагревательным прибором"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Определить глубину обугливания: у очага она больше"
+      },
+      "sources": [
+        {
+          "ref": "NFPA 1033: Standard for Professional Fire Investigation, 2022",
+          "note": "методы осмотра места пожара",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "FIRE-002",
+      "version": 1,
+      "pack": "fire",
+      "title": "V-образное обугливание на полу",
+      "domain": "fire",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["observations"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "observations[feature=v_pattern].value",
+        "value": true
+      },
+      "inference": {
+        "claim": "На полу V-образное обугливание — огонь шёл снизу вверх, очаг был у пола",
+        "confidence_prior": 0.8,
+        "confidence_ceiling": 0.9,
+        "tags": ["fire", "origin", "low_burn"]
+      },
+      "anchors": [],
+      "confounds": [
+        "V-образный рисунок может дать истечение горящего потока сверху",
+        "Форма зависит от горючести материала"
+      ],
+      "exceptions": [
+        "Обугливание вызвано падением горящего тела"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, сужаются ли V-образные участки к низу и нет ли потёков сверху"
+      },
+      "sources": [
+        {
+          "ref": "NFPA 921: Guide for Fire and Explosions Investigations, 2024",
+          "note": "V-паттерн как признак низко расположенного очага",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

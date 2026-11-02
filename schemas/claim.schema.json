@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://elementarno.dev/schemas/claim.schema.json",
+  "title": "Claim and hypothesis ledger",
+  "description": "Every claim must resolve to at least one finding; confidence is capped by the rules it rests on.",
+  "type": "object",
+  "required": ["claims"],
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "kind", "text", "support", "confidence"],
+        "properties": {
+          "claim_id": {"type": "string"},
+          "kind": {"type": "string", "enum": ["observation", "inference", "hypothesis", "interpretation"]},
+          "text": {"type": "string", "minLength": 3},
+          "support": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["finding_id"],
+              "properties": {
+                "finding_id": {"type": "string"},
+                "note": {"type": "string"}
+              }
+            }
+          },
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "provisional": {"type": "boolean"},
+          "speculative": {"type": "boolean"},
+          "confounds": {"type": "array", "items": {"type": "string"}},
+          "falsification": {"type": "string"}
+        }
+      }
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["hypothesis_id", "text", "claims", "status"],
+        "properties": {
+          "hypothesis_id": {"type": "string"},
+          "text": {"type": "string"},
+          "claims": {"type": "array", "items": {"type": "string"}},
+          "status": {"type": "string", "enum": ["open", "rejected"]},
+          "log_odds": {"type": "number"},
+          "kill_log": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["rule_id"],
+              "properties": {
+                "rule_id": {"type": "string"},
+                "note": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

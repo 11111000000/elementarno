@@ -1,0 +1,59 @@
+{
+  "default_profile": "detective",
+  "providers": {
+    "local": {
+      "facts": {
+        "demo.greeting": "elementarno",
+        "demo.season": "winter"
+      }
+    }
+  },
+  "mcp_servers": {
+    "demo": {
+      "command": "python3",
+      "args": ["tools/mcp/demo_server.py"],
+      "capability_map": {
+        "demo.solar_elevation": "solar_elevation",
+        "demo.greeting": "greeting"
+      }
+    }
+  },
+  "profiles": {
+    "detective": {
+      "title": "Детектив",
+      "packs": ["core", "absence", "puzzle"],
+      "mode": "detective",
+      "persona": "doyle",
+      "min_findings": 1,
+      "allow_interpretation": true,
+      "capabilities": []
+    },
+    "audit": {
+      "title": "Аудит фотографии",
+      "packs": ["core", "absence"],
+      "mode": "audit",
+      "persona": null,
+      "min_findings": 1,
+      "allow_interpretation": false,
+      "capabilities": []
+    },
+    "household": {
+      "title": "Бытовой инцидент",
+      "packs": ["core", "absence", "water", "biology"],
+      "mode": "forensic",
+      "persona": "forensic",
+      "min_findings": 2,
+      "allow_interpretation": false,
+      "capabilities": ["demo.greeting"]
+    },
+    "mystery": {
+      "title": "Загадка по серии кадров",
+      "packs": ["core", "absence", "puzzle"],
+      "mode": "detective",
+      "persona": "doyle",
+      "min_findings": 1,
+      "allow_interpretation": true,
+      "capabilities": []
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "image_id": "study-after",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "Синтетическая сцена. Второй кадр: тот же кабинет после события."
+  },
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": true, "dust_state": "even"},
+    {"id": "s2", "name": "floor", "material": "boards", "dust_present": true, "dust_state": "patchy"},
+    {"id": "s3", "name": "rug", "material": "wool", "dust_present": true, "dust_state": "even"}
+  ],
+  "objects": [
+    {"id": "o3", "category": "lamp", "material": "brass", "on": "s1"},
+    {"id": "o4", "category": "book", "material": "paper", "on": "s1"},
+    {"id": "o2", "category": "chair", "material": "wood", "on": "s3"},
+    {"id": "o6", "category": "mud_footprint", "material": "mud", "wet": true, "on": "s2", "size_m": 0.3}
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "dust_outline",
+      "shape": "round",
+      "area_m2": 0.0625,
+      "contrast": 0.14,
+      "freshness": "sharp",
+      "edges": "concave",
+      "bbox": [0.31, 0.22, 0.38, 0.29]
+    }
+  ],
+  "observations": []
+}
