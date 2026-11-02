@@ -10,7 +10,9 @@
       "domain": "semiotics",
       "layer": "interpretive",
       "severity": "info",
-      "requires": ["objects"],
+      "requires": [
+        "objects"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -21,7 +23,11 @@
         "claim": "На предмете опознан знак — по нему можно судить о происхождении и принадлежности вещи",
         "confidence_prior": 0.35,
         "confidence_ceiling": 0.4,
-        "tags": ["provenance", "symbolic"]
+        "tags": [
+          "provenance",
+          "symbolic"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [
@@ -52,7 +58,9 @@
       "domain": "semiotics",
       "layer": "interpretive",
       "severity": "info",
-      "requires": ["objects"],
+      "requires": [
+        "objects"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -63,7 +71,11 @@
         "claim": "В сцене видна книга — вероятно, она что-то значит для хозяина помещения",
         "confidence_prior": 0.25,
         "confidence_ceiling": 0.35,
-        "tags": ["symbolic", "character"]
+        "tags": [
+          "symbolic",
+          "character"
+        ],
+        "step": "presence"
       },
       "anchors": [],
       "confounds": [

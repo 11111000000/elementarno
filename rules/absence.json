@@ -10,7 +10,9 @@
       "domain": "absence",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -21,9 +23,15 @@
         "claim": "На поверхности сохранился контур предмета, которого больше нет. Пыль по краям контура осыпается медленнее, чем заполняет середину, — значит предмет убрали недавно",
         "confidence_prior": 0.65,
         "confidence_ceiling": 0.85,
-        "tags": ["removal", "recent_movement"]
+        "tags": [
+          "removal",
+          "recent_movement"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=dust_outline].id"],
+      "anchors": [
+        "regions[kind=dust_outline].id"
+      ],
       "confounds": [
         "Влажная уборка может размазать контур и выдать его за свежий",
         "Контур может быть следом от декорации, которую убрали давно",
@@ -34,7 +42,9 @@
         "Рельеф контура выпуклый, а не вогнутый — это не след, а выступ"
       ],
       "falsification": {
-        "refuted_by": ["ABS-004"],
+        "refuted_by": [
+          "ABS-004"
+        ],
         "physical_test": "Посветить боковым светом: вогнутый контур — след предмета, выпуклый — дефект поверхности"
       },
       "sources": [
@@ -54,22 +64,39 @@
       "domain": "absence",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions", "surfaces"],
+      "requires": [
+        "regions",
+        "surfaces"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "regions[kind=unfaded_patch]", "gte": 1},
-          {"kind": "count", "path": "surfaces[dust_present=true]", "gte": 1}
+          {
+            "kind": "count",
+            "path": "regions[kind=unfaded_patch]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "surfaces[dust_present=true]",
+            "gte": 1
+          }
         ]
       },
       "inference": {
         "claim": "На запылённой поверхности есть участок, где пыли нет: там стоял предмет, пока пыль оседала вокруг. Предмет убрали после этого",
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
-        "tags": ["removal", "recent_movement"]
+        "tags": [
+          "removal",
+          "recent_movement"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=unfaded_patch].id"],
+      "anchors": [
+        "regions[kind=unfaded_patch].id"
+      ],
       "confounds": [
         "Участок могли протереть или вымыть",
         "Пыль могла не дойти до него из-за соседнего предмета",
@@ -80,7 +107,9 @@
         "Поверхность очищали целиком, а контур здесь — артефакт уборки"
       ],
       "falsification": {
-        "refuted_by": ["ABS-001"],
+        "refuted_by": [
+          "ABS-001"
+        ],
         "physical_test": "Проверить границы участка: ровные прямоугольные края — след предмета, неровные — неравномерная уборка"
       },
       "sources": [
@@ -100,7 +129,9 @@
       "domain": "absence",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -111,9 +142,15 @@
         "claim": "Крючок пуст, но след крепления сохранился — предмет снимали и возвращали на место",
         "confidence_prior": 0.65,
         "confidence_ceiling": 0.8,
-        "tags": ["removal", "recent_movement"]
+        "tags": [
+          "removal",
+          "recent_movement"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=empty_hook].id"],
+      "anchors": [
+        "regions[kind=empty_hook].id"
+      ],
       "confounds": [
         "Крючок мог быть пустым изначально",
         "След крепления может остаться от давнего использования"
@@ -142,7 +179,9 @@
       "domain": "absence",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -153,9 +192,15 @@
         "claim": "Слой пыли нарушен узкой полосой — по поверхности прошли или что-то протащили",
         "confidence_prior": 0.55,
         "confidence_ceiling": 0.75,
-        "tags": ["disturbed_dust", "walked"]
+        "tags": [
+          "disturbed_dust",
+          "walked"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=disturbed_dust].id"],
+      "anchors": [
+        "regions[kind=disturbed_dust].id"
+      ],
       "confounds": [
         "Пыль могли сдуть сквозняком",
         "Уборка оставляет похожие полосы",

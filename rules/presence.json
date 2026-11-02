@@ -1,0 +1,140 @@
+{
+  "pack": "presence",
+  "title": "Присутствие и действия людей: следы обуви, отпечатки, привычки",
+  "rules": [
+    {
+      "id": "PRES-001",
+      "version": 1,
+      "pack": "presence",
+      "title": "Следы обуви разного размера",
+      "domain": "presence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=footprint]", "gte": 2},
+          {"kind": "distinct", "path": "regions[kind=footprint].size_m", "gte": 2}
+        ]
+      },
+      "inference": {
+        "claim": "В сцене следы обуви как минимум двух размеров — здесь побывали разные люди",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "step": "presence",
+        "tags": ["two_people", "different_shoes"]
+      },
+      "anchors": ["regions[kind=footprint].id"],
+      "confounds": [
+        "Один человек мог сменить обувь",
+        "Следы разного размера могут оставить игрушки или животные",
+        "Оценка размера по фотографии без опоры неточна"
+      ],
+      "exceptions": [
+        "Следы принадлежат одному человеку, но сняты разной обувью"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить рисунок протектора обеих пар: совпадение рисунка при разном размере решает в пользу одной пары разного размера"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
+          "note": "след обуви как индивидуализирующий признак и оценка размера",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PRES-002",
+      "version": 1,
+      "pack": "presence",
+      "title": "Отпечаток ладони на стекле",
+      "domain": "presence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=fingerprint]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На стекле виден отпечаток ладони — в сцене кто-то переносил предметы или опирался на стекло",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "step": "action",
+        "tags": ["touched", "carried"]
+      },
+      "anchors": ["regions[kind=fingerprint].id"],
+      "confounds": [
+        "Отпечаток мог остаться от заводской упаковки или ремонта",
+        "След может быть загрязнением, а не отпечатком"
+      ],
+      "exceptions": [
+        "Отпечаток совпадает с технологическим следом производства"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить с отпечатками других сотрудников: повторяющийся одинаковый отпечаток — производственный след"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
+          "note": "проявление и оценка следов пальцевых ладоней",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PRES-003",
+      "version": 1,
+      "pack": "presence",
+      "title": "Отпечаток в слое пыли",
+      "domain": "presence",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions", "surfaces"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=fingerprint]", "gte": 1},
+          {"kind": "count", "path": "surfaces[dust_present=true]", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "Отпечаток пальца сохранился в пыли: к предмету прикасались уже после того, как на поверхность осела пыль",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "step": "action",
+        "tags": ["touched", "recent_touch", "after_dust"]
+      },
+      "anchors": ["regions[kind=fingerprint].id"],
+      "confounds": [
+        "Пыль могла осесть уже после касания, если она была сухой и рыхлой",
+        "След мог быть оставлен протиркой или ремонтом"
+      ],
+      "exceptions": [
+        "Отпечаток проявился при уборке, а не от касания"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить слои пыли: отпечаток режет слой насквозь — касание было после оседания; отпечаток лежит поверх — пыль осела позже"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
+          "note": "следы в пыли и на запылённых поверхностях",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

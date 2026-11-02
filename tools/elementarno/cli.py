@@ -141,10 +141,10 @@ def cmd_puzzle(args):
     print("\nУлики:")
     for finding in result["findings"]:
         print(f"  [{finding['rule_id']}] {finding['inference']} (≤ {finding['confidence_ceiling']:.2f}, "
-              f"метки: {', '.join(finding['tags']) or '—'})")
-    print("\nПодозреваемые:")
-    for suspect in result["suspects"]:
-        print(f"  {suspect['label']}: {suspect['score']:.2f} — {suspect['explanation']}")
+              f"ступень: {finding.get('step', 'action')}, метки: {', '.join(finding['tags']) or '—'})")
+    print("\nПрисутствовали:")
+    for participant in result["participants"]:
+        print(f"  {participant['label']}: {participant['score']:.2f} — {participant['explanation']}")
     report = validate(result["findings"], {"claims": result["claims"], "hypotheses": result["hypotheses"]})
     print("\n" + render(
         args.mode,

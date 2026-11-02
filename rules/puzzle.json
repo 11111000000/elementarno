@@ -10,22 +10,38 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "changes[kind=object_removed]", "gte": 1},
-          {"kind": "count", "path": "changes[kind=object_removed].matched_region", "gte": 1}
+          {
+            "kind": "count",
+            "path": "changes[kind=object_removed]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "changes[kind=object_removed].matched_region",
+            "gte": 1
+          }
         ]
       },
       "inference": {
         "claim": "Между кадрами исчез предмет, и на его месте сохранился след — исчезновение произошло незадолго до съёмки второго кадра",
         "confidence_prior": 0.7,
         "confidence_ceiling": 0.85,
-        "tags": ["removal", "recent_movement"]
+        "tags": [
+          "removal",
+          "recent_movement"
+        ],
+        "step": "activity"
       },
-      "anchors": ["changes[kind=object_removed].matched_region"],
+      "anchors": [
+        "changes[kind=object_removed].matched_region"
+      ],
       "confounds": [
         "Предмет мог унести кто-то посторонний",
         "След мог быть оставлен задолго до исчезновения"
@@ -34,7 +50,9 @@
         "Между кадрами прошла уборка, а не событие"
       ],
       "falsification": {
-        "refuted_by": ["PUZ-002"],
+        "refuted_by": [
+          "PUZ-002"
+        ],
         "physical_test": "Проверить совпадение площади следа и основания предмета"
       },
       "sources": [
@@ -54,20 +72,34 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "changes[kind=object_removed]", "gte": 1},
-          {"kind": "absent", "path": "changes[kind=object_removed].matched_region"}
+          {
+            "kind": "count",
+            "path": "changes[kind=object_removed]",
+            "gte": 1
+          },
+          {
+            "kind": "absent",
+            "path": "changes[kind=object_removed].matched_region"
+          }
         ]
       },
       "inference": {
         "claim": "Предмет исчез, но след за собой не оставил — место зачистили, а ведь обычное исчезновение оставляет след",
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
-        "tags": ["removal", "staged", "cleaned"]
+        "tags": [
+          "removal",
+          "staged",
+          "cleaned"
+        ],
+        "step": "activity"
       },
       "anchors": [],
       "confounds": [
@@ -79,7 +111,9 @@
         "Поверхность не собирает следов: стекло, ковёр без ворса"
       ],
       "falsification": {
-        "refuted_by": ["PUZ-001"],
+        "refuted_by": [
+          "PUZ-001"
+        ],
         "physical_test": "Найти на поверхности следы того же предмета в других местах"
       },
       "sources": [
@@ -99,7 +133,9 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -110,7 +146,11 @@
         "claim": "Между кадрами появился мокрый след: кто-то вошёл в помещение, принеся воду с собой",
         "confidence_prior": 0.7,
         "confidence_ceiling": 0.85,
-        "tags": ["wet_boots", "came_from_outside"]
+        "tags": [
+          "wet_boots",
+          "came_from_outside"
+        ],
+        "step": "presence"
       },
       "anchors": [],
       "confounds": [
@@ -141,7 +181,9 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -152,7 +194,11 @@
         "claim": "Между кадрами появился грязный след: человек пришёл с улицы и прошёл через комнату",
         "confidence_prior": 0.75,
         "confidence_ceiling": 0.9,
-        "tags": ["muddy_boots", "came_from_outside"]
+        "tags": [
+          "muddy_boots",
+          "came_from_outside"
+        ],
+        "step": "presence"
       },
       "anchors": [],
       "confounds": [
@@ -164,7 +210,7 @@
       ],
       "falsification": {
         "refuted_by": [],
-        "physical_test": "Сопоставить рисунок подошвы с обувью подозреваемых"
+        "physical_test": "Сопоставить рисунок подошвы с обувью участников сцены"
       },
       "sources": [
         {
@@ -183,7 +229,9 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -194,7 +242,11 @@
         "claim": "Между кадрами переместили предмет мебели — сцену готовили или приводили в порядок после события",
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
-        "tags": ["staged", "rearranged"]
+        "tags": [
+          "staged",
+          "rearranged"
+        ],
+        "step": "activity"
       },
       "anchors": [],
       "confounds": [
@@ -225,7 +277,9 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -236,7 +290,11 @@
         "claim": "Между кадрами изменился характер пыли на поверхности — по ней прошли или что-то двигали",
         "confidence_prior": 0.55,
         "confidence_ceiling": 0.75,
-        "tags": ["disturbed_dust", "walked"]
+        "tags": [
+          "disturbed_dust",
+          "walked"
+        ],
+        "step": "activity"
       },
       "anchors": [],
       "confounds": [
@@ -267,7 +325,9 @@
       "domain": "change",
       "layer": "epistemic",
       "severity": "info",
-      "requires": ["changes"],
+      "requires": [
+        "changes"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -278,7 +338,10 @@
         "claim": "Между кадрами в сцене появился новый предмет",
         "confidence_prior": 0.4,
         "confidence_ceiling": 0.55,
-        "tags": ["added_object"]
+        "tags": [
+          "added_object"
+        ],
+        "step": "activity"
       },
       "anchors": [],
       "confounds": [

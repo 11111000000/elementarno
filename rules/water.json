@@ -10,7 +10,9 @@
       "domain": "water",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -21,9 +23,15 @@
         "claim": "На поверхности сохранилась граница прежнего уровня воды — помещение заливали",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
-        "tags": ["flood", "water"]
+        "tags": [
+          "flood",
+          "water"
+        ],
+        "step": "scene"
       },
-      "anchors": ["regions[kind=water_line].id"],
+      "anchors": [
+        "regions[kind=water_line].id"
+      ],
       "confounds": [
         "Границу мог оставить иной раствор или клей",
         "След конденсата на холодной поверхности"
@@ -32,7 +40,9 @@
         "Граница совпадает с высотой мебели, а не с заливом"
       ],
       "falsification": {
-        "refuted_by": ["WAT-002"],
+        "refuted_by": [
+          "WAT-002"
+        ],
         "physical_test": "Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали"
       },
       "sources": [
@@ -52,22 +62,40 @@
       "domain": "water",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions"],
-      "depends_on": ["WAT-001"],
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [
+        "WAT-001"
+      ],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "regions[kind=mold_patch]", "gte": 1},
-          {"kind": "rule", "id": "WAT-001"}
+          {
+            "kind": "count",
+            "path": "regions[kind=mold_patch]",
+            "gte": 1
+          },
+          {
+            "kind": "rule",
+            "id": "WAT-001"
+          }
         ]
       },
       "inference": {
         "claim": "Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера",
         "confidence_prior": 0.75,
         "confidence_ceiling": 0.9,
-        "tags": ["mold", "after_water", "damp"]
+        "tags": [
+          "mold",
+          "after_water",
+          "damp"
+        ],
+        "step": "scene"
       },
-      "anchors": ["regions[kind=mold_patch].id"],
+      "anchors": [
+        "regions[kind=mold_patch].id"
+      ],
       "confounds": [
         "Плесень может быть от сырости без залива",
         "Плесень могла быть до залива и расти в другом месте"
@@ -96,7 +124,9 @@
       "domain": "water",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -107,9 +137,15 @@
         "claim": "На полу осталась лужа — вода поступила незадолго до съёмки",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
-        "tags": ["flood", "recent_water"]
+        "tags": [
+          "flood",
+          "recent_water"
+        ],
+        "step": "scene"
       },
-      "anchors": ["regions[kind=puddle].id"],
+      "anchors": [
+        "regions[kind=puddle].id"
+      ],
       "confounds": [
         "Лужа могла быть вымыта уборкой и оказаться здесь после",
         "Поверхность может быть постоянно влажной"

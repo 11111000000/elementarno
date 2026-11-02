@@ -21,7 +21,9 @@
       "properties": {
         "claim": {"type": "string", "minLength": 3},
         "confidence_prior": {"type": "number", "minimum": 0, "maximum": 1},
-        "confidence_ceiling": {"type": "number", "minimum": 0, "maximum": 1}
+        "confidence_ceiling": {"type": "number", "minimum": 0, "maximum": 1},
+        "step": {"type": "string", "enum": ["scene", "activity", "presence", "action"]},
+        "tags": {"type": "array", "items": {"type": "string"}}
       }
     },
     "anchors": {"type": "array", "items": {"type": "string"}},
