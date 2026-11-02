@@ -1,0 +1,168 @@
+{
+  "benchmark": "real-commons",
+  "description": "Пилот на 12 реальных фотографиях Wikimedia Commons. Истина берётся из категорий файла (человеческая разметка), а не из вывода модели.",
+  "source": "Wikimedia Commons",
+  "cases": [
+    {
+      "id": "mold-wall",
+      "commons_title": "File:Fungus staining and mold growth on the walls.jpg",
+      "license": "CC BY-SA 4.0",
+      "expect_rules": [
+        "F-BIO-002"
+      ],
+      "ground_truth": "Плесень на стенах (категория «Mold on buildings»). Ожидается region kind=mold_patch → BIO-002.",
+      "trace_type": "presence",
+      "image": "eval/real/images/mold-wall.jpg",
+      "license_resolved": "CC BY-SA 4.0",
+      "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:RASHIKA_AGARWAL&amp;action=edit&amp;redlink=1\" class=\"new\" title",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Fungus_staining_and_mold_growth_on_the_walls.jpg"
+    },
+    {
+      "id": "paint-splatter-table",
+      "commons_title": "File:Splatter paint on white table (Unsplash).jpg",
+      "license": "CC0",
+      "expect_rules": [
+        "F-TRD-001"
+      ],
+      "ground_truth": "Брызги краски на столе (категория «Paint splashes»). Ожидается paint_splash → TRD-001.",
+      "trace_type": "trade",
+      "image": "eval/real/images/paint-splatter-table.jpg",
+      "license_resolved": "CC0",
+      "artist": "Ricardo Viana <a rel=\"nofollow\" class=\"external text\" href=\"https://unsplash.com/@ricardoviana\">ricardoviana</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Splatter_paint_on_white_table_(Unsplash).jpg"
+    },
+    {
+      "id": "paint-splattered-white",
+      "commons_title": "File:Splattered white paint 2.jpg",
+      "license": "CC0",
+      "expect_rules": [
+        "F-TRD-001"
+      ],
+      "ground_truth": "Забрызганная белая краска (категория «White paint»). Ожидается paint_splash или paint_trace.",
+      "trace_type": "trade",
+      "image": "eval/real/images/paint-splattered-white.jpg",
+      "license_resolved": "CC0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Downtowngal\" title=\"User:Downtowngal\">Downtowngal</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Splattered_white_paint_2.jpg"
+    },
+    {
+      "id": "saw-workshop",
+      "commons_title": "File:A circular saw is actively cutting through a wooden plank in a workshop.jpg",
+      "license": "CC BY 2.0",
+      "expect_rules": [
+        "F-TRD-002",
+        "F-TRD-009"
+      ],
+      "ground_truth": "Распил доски в мастерской (категория «Circular saw blades»). Ожидается sawdust → TRD-002 и, при наличии масла, TRD-009.",
+      "trace_type": "trade",
+      "image": "eval/real/images/saw-workshop.jpg",
+      "license_resolved": "CC BY 2.0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:A_circular_saw_is_actively_cutting_through_a_wooden_plank_in_a_workshop.jpg"
+    },
+    {
+      "id": "flour-kitchen",
+      "commons_title": "File:Corn flour being sifted in a wooden bowl used for baking on a kitchen counter.jpg",
+      "license": "CC BY 2.0",
+      "expect_rules": [
+        "F-TRD-003"
+      ],
+      "ground_truth": "Просеивание муки на кухонной столе (категория «Flour»). Ожидается flour_dust → TRD-003.",
+      "trace_type": "trade",
+      "image": "eval/real/images/flour-kitchen.jpg",
+      "license_resolved": "CC BY 2.0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Corn_flour_being_sifted_in_a_wooden_bowl_used_for_baking_on_a_kitchen_counter.jpg"
+    },
+    {
+      "id": "footprints-mud",
+      "commons_title": "File:Footprints in the Mud - geograph.org.uk - 630528.jpg",
+      "license": "CC BY-SA 2.0",
+      "expect_rules": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы в грязи (категория «Footprints in mud»). Ожидается footprint → BIO-001.",
+      "trace_type": "presence",
+      "image": "eval/real/images/footprints-mud.jpg",
+      "license_resolved": "CC BY-SA 2.0",
+      "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.geograph.org.uk/profile/307\">Andy Beecroft</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Footprints_in_the_Mud_-_geograph.org.uk_-_630528.jpg"
+    },
+    {
+      "id": "footprints-cow",
+      "commons_title": "File:Footprints of a cow and its calf Tamilnadu, India.jpg",
+      "license": "CC0",
+      "expect_rules": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы коровы и телёнка (категории «Footprints», «Footprints on sand»). Ожидается footprint → BIO-001.",
+      "trace_type": "presence",
+      "image": "eval/real/images/footprints-cow.jpg",
+      "license_resolved": "CC0",
+      "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Sindugab&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Footprints_of_a_cow_and_its_calf_Tamilnadu,_India.jpg"
+    },
+    {
+      "id": "footprints-sand",
+      "commons_title": "File:Järvspår i våt sand.jpg",
+      "license": "CC BY-SA 3.0",
+      "expect_rules": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы на мокром песке (категории «Footprints on sand», «Animal tracks on mud»). Ожидается footprint → BIO-001.",
+      "trace_type": "presence",
+      "image": "eval/real/images/footprints-sand.jpg",
+      "license_resolved": "CC BY-SA 3.0",
+      "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Irreducibel&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"Us",
+      "page_url": "https://commons.wikimedia.org/wiki/File:J%C3%A4rvsp%C3%A5r_i_v%C3%A5t_sand.jpg"
+    },
+    {
+      "id": "clean-mixer-table",
+      "commons_title": "File:A hand mixer is placed on a wooden table.jpg",
+      "license": "CC BY 2.0",
+      "expect_rules": [],
+      "ground_truth": "Чистый стол с миксером. Следов ремесла и присутствия быть не должно.",
+      "trace_type": "clean",
+      "image": "eval/real/images/clean-mixer-table.jpg",
+      "license_resolved": "CC BY 2.0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:A_hand_mixer_is_placed_on_a_wooden_table.jpg"
+    },
+    {
+      "id": "clean-kitchen-dining",
+      "commons_title": "File:2025-05-08 11 54 00 Kitchen and dining area within Playpad Bucks in Middletown Township, Bucks County, Pennsylvania.jpg",
+      "license": "CC BY-SA 4.0",
+      "expect_rules": [],
+      "ground_truth": "Обычная кухня-гостиная. Ложных срабатываний быть не должно.",
+      "trace_type": "clean",
+      "image": "eval/real/images/clean-kitchen-dining.jpg",
+      "license_resolved": "CC BY-SA 4.0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:2025-05-08_11_54_00_Kitchen_and_dining_area_within_Playpad_Bucks_in_Middletown_Township,_Bucks_County,_Pennsylvania.jpg"
+    },
+    {
+      "id": "clean-kitchen-window",
+      "commons_title": "File:A couple stands by a window in a kitchen, preparing coffee with an espresso machine.jpg",
+      "license": "CC BY 2.0",
+      "expect_rules": [],
+      "ground_truth": "Кухня с кофемашиной. Ложных срабатываний быть не должно.",
+      "trace_type": "clean",
+      "image": "eval/real/images/clean-kitchen-window.jpg",
+      "license_resolved": "CC BY 2.0",
+      "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shixart1985\" title=\"User:Shixart1985\">Shixart1985</a>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:A_couple_stands_by_a_window_in_a_kitchen,_preparing_coffee_with_an_espresso_machine.jpg"
+    },
+    {
+      "id": "clean-kitchen-500px",
+      "commons_title": "File:500px photo (79809733).jpeg",
+      "license": "CC BY-SA 3.0",
+      "expect_rules": [],
+      "ground_truth": "Кухня без следов ремесла. Ложных срабатываний быть не должно.",
+      "trace_type": "clean",
+      "image": "eval/real/images/clean-kitchen-500px.jpg",
+      "license_resolved": "CC BY-SA 3.0",
+      "artist": "<div class=\"fn value\"> <a rel=\"nofollow\" class=\"external text\" href=\"https://500px.com/threar\">Makia Minich</a></div>",
+      "page_url": "https://commons.wikimedia.org/wiki/File:500px_photo_(79809733).jpeg"
+    }
+  ]
+}

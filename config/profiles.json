@@ -27,7 +27,8 @@
         "core",
         "absence",
         "puzzle",
-        "presence"
+        "presence",
+        "trade"
       ],
       "mode": "detective",
       "persona": "doyle",
@@ -53,7 +54,8 @@
         "core",
         "absence",
         "water",
-        "biology"
+        "biology",
+        "trade"
       ],
       "mode": "forensic",
       "persona": "forensic",
@@ -69,7 +71,8 @@
         "core",
         "absence",
         "puzzle",
-        "presence"
+        "presence",
+        "trade"
       ],
       "mode": "detective",
       "persona": "doyle",

@@ -348,6 +348,87 @@ class FixtureTests(unittest.TestCase):
         self.assertGreater(len(data), 100)
 
 
+class TradeTests(unittest.TestCase):
+    def test_paint_splash_gives_activity(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "wall"}],
+            "objects": [],
+            "regions": [{"id": "r1", "kind": "paint_splash"}],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        finding = next(f for f in findings if f["rule_id"] == "TRD-001")
+        self.assertEqual(finding["step"], "activity")
+        self.assertIn("painting", finding["tags"])
+
+    def test_sawdust_and_oil_give_role(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "floor"}],
+            "objects": [],
+            "regions": [
+                {"id": "r1", "kind": "sawdust"},
+                {"id": "r2", "kind": "oil_trace"},
+            ],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        finding = next(f for f in findings if f["rule_id"] == "TRD-009")
+        self.assertEqual(finding["step"], "role")
+        self.assertIn("workshop", finding["tags"])
+
+    def test_role_needs_both_traces(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "floor"}],
+            "objects": [],
+            "regions": [{"id": "r1", "kind": "sawdust"}],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        self.assertNotIn("TRD-009", {f["rule_id"] for f in findings})
+
+    def test_fingerprint_beside_paint_links_the_same_hand(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "wall"}],
+            "objects": [],
+            "regions": [
+                {"id": "r1", "kind": "paint_splash"},
+                {"id": "r2", "kind": "fingerprint"},
+            ],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        finding = next(f for f in findings if f["rule_id"] == "TRD-010")
+        self.assertEqual(finding["step"], "role")
+        self.assertLessEqual(finding["confidence_ceiling"], 0.6)
+
+
+class LadderTests(unittest.TestCase):
+    def test_role_step_is_between_presence_and_action(self):
+        from elementarno.ledger import LADDER_ORDER
+
+        self.assertLess(LADDER_ORDER["presence"], LADDER_ORDER["role"])
+        self.assertLess(LADDER_ORDER["role"], LADDER_ORDER["action"])
+
+    def test_role_claim_supported_by_presence_evidence(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "floor"}],
+            "objects": [],
+            "regions": [
+                {"id": "r1", "kind": "sawdust"},
+                {"id": "r2", "kind": "oil_trace"},
+            ],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        report = validate(findings, {"claims": [{
+            "claim_id": "C-1", "kind": "inference", "text": "здесь ремонтировали",
+            "support": [{"finding_id": "F-TRD-009"}], "confidence": 0.4, "provisional": True,
+            "step": "role",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertNotIn("ladder_break", codes)
+
+
 class McpTests(unittest.TestCase):
     def test_stdio_client_roundtrip(self):
         client = StdioMcpClient(sys.executable, [str(ROOT / "tools/mcp/demo_server.py")])

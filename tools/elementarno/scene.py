@@ -10,7 +10,9 @@ VALID_REGIONS = {
     "dust_outline", "empty_hook", "unfaded_patch", "stain", "scratch", "crack",
     "dent", "burn", "water_line", "mold_patch", "footprint", "tyre_mark",
     "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint",
-    "fingerprint", "other",
+    "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
+    "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
+    "metal_swarf", "other",
 }
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}

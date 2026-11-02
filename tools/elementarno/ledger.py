@@ -30,7 +30,7 @@ PERSONALITY_TERMS = (
 )
 
 
-LADDER_ORDER = {"scene": 0, "activity": 1, "presence": 2, "action": 3}
+LADDER_ORDER = {"scene": 0, "activity": 1, "presence": 2, "role": 3, "action": 4}
 
 
 def _has_term(text, terms):
@@ -108,12 +108,12 @@ def validate(findings, ledger):
                     "detail": "interpretation confidence must be <= 0.4",
                 })
 
-        claim_step = LADDER_ORDER.get(claim.get("step") or "action", 3)
+        claim_step = LADDER_ORDER.get(claim.get("step") or "action", 4)
         for support in support:
             finding = findings_by_id.get(support["finding_id"])
             if not finding:
                 continue
-            finding_step = LADDER_ORDER.get(finding.get("step") or "action", 3)
+            finding_step = LADDER_ORDER.get(finding.get("step") or "action", 4)
             if finding_step > claim_step:
                 errors.append({
                     "claim_id": claim["claim_id"],
