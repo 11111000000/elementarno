@@ -1,0 +1,90 @@
+{
+  "pack": "semiotics",
+  "title": "Символический слой: знаки, артефакты, отсылки",
+  "rules": [
+    {
+      "id": "SEM-001",
+      "version": 1,
+      "pack": "semiotics",
+      "title": "Узнаваемый знак на предмете",
+      "domain": "semiotics",
+      "layer": "interpretive",
+      "severity": "info",
+      "requires": ["objects"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "objects[category=logo].visible",
+        "value": true
+      },
+      "inference": {
+        "claim": "На предмете опознан знак — по нему можно судить о происхождении и принадлежности вещи",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.4,
+        "tags": ["provenance", "symbolic"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Знак может быть декоративным и ничего не сообщать о владельце",
+        "Опознание знака может быть ошибочным"
+      ],
+      "exceptions": [
+        "Знак относится к производителю, а не к сцене"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Увеличить знак и сверить с каталогом: ошибка опознания исключается"
+      },
+      "sources": [
+        {
+          "ref": "NL-Eye: Abductive NLI for Images, 2024",
+          "note": "категория cultural reasoning: символическое прочтение сцены",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "SEM-002",
+      "version": 1,
+      "pack": "semiotics",
+      "title": "Книга на полке как отсылка",
+      "domain": "semiotics",
+      "layer": "interpretive",
+      "severity": "info",
+      "requires": ["objects"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "objects[category=book].visible",
+        "value": true
+      },
+      "inference": {
+        "claim": "В сцене видна книга — вероятно, она что-то значит для хозяина помещения",
+        "confidence_prior": 0.25,
+        "confidence_ceiling": 0.35,
+        "tags": ["symbolic", "character"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Книга может быть частью декора или не читаемой",
+        "Одна книга ничего не говорит о владельце"
+      ],
+      "exceptions": [
+        "Книга лежит стопкой для строительства или в мусор"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Прочитать заголовок и дату: только тогда отсылка становится проверяемой"
+      },
+      "sources": [
+        {
+          "ref": "NL-Eye: Abductive NLI for Images, 2024",
+          "note": "категория social reasoning: предметы как отсылки к персонажу",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

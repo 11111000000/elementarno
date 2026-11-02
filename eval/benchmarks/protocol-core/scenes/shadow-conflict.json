@@ -1,0 +1,14 @@
+{
+  "meta": {"image_id": "shadow-conflict", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "floor", "material": "boards"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "chair", "material": "wood", "on": "s1", "shadow_dir": "west"}
+  ],
+  "regions": [],
+  "observations": [],
+  "light": [
+    {"id": "l1", "kind": "window", "direction": "east"}
+  ]
+}

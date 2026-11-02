@@ -1,0 +1,13 @@
+{
+  "meta": {"image_id": "water-and-mold", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "wall", "material": "plaster", "wet": true},
+    {"id": "s2", "name": "floor", "material": "laminate", "wet": true}
+  ],
+  "objects": [],
+  "regions": [
+    {"id": "r1", "kind": "water_line", "shape": "horizontal", "area_m2": 0.8, "contrast": 0.2},
+    {"id": "r2", "kind": "mold_patch", "shape": "irregular", "area_m2": 0.3, "contrast": 0.25}
+  ],
+  "observations": []
+}

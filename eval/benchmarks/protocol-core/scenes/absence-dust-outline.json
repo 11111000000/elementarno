@@ -1,0 +1,11 @@
+{
+  "meta": {"image_id": "dust-outline", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": true, "dust_state": "even"}
+  ],
+  "objects": [],
+  "regions": [
+    {"id": "r1", "kind": "dust_outline", "shape": "round", "area_m2": 0.04, "contrast": 0.12, "freshness": "sharp", "edges": "concave"}
+  ],
+  "observations": []
+}

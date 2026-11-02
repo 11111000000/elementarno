@@ -1,0 +1,175 @@
+{
+  "pack": "core",
+  "title": "Универсальные проверки, применимые к любой сцене",
+  "rules": [
+    {
+      "id": "PHY-001",
+      "version": 1,
+      "pack": "core",
+      "title": "Объект опирается на отсутствующую поверхность",
+      "domain": "consistency",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["objects", "surfaces"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "dangling",
+        "path": "objects.on",
+        "collection": "surfaces"
+      },
+      "inference": {
+        "claim": "В описании сцены есть объект, заявленный на поверхности, которой в графе нет — описание неполно",
+        "confidence_prior": 0.9,
+        "confidence_ceiling": 0.95,
+        "tags": ["scene_inconsistency"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Поверхность могла быть вне кадра и не попала в граф",
+        "Объект может касаться края кадра, где опора не видна"
+      ],
+      "exceptions": [
+        "Объект действительно висит: в графе нет поля опоры"
+      ],
+      "falsification": {
+        "refuted_by": ["PHY-002"],
+        "physical_test": "Снять сцену шире: если поверхность видна и графа нет — ошибка разметки, а не сцены"
+      },
+      "sources": [
+        {
+          "ref": "Схема сцены-графа ЭЛЕМЕНТАРНО, schemas/scene-graph.schema.json",
+          "note": "целостность ссылок — свойство описания, а не физики",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PHY-002",
+      "version": 1,
+      "pack": "core",
+      "title": "Тень не совпадает с источником света",
+      "domain": "consistency",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["objects", "light"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "mismatch",
+        "left": "objects.shadow_dir",
+        "right": "light.direction"
+      },
+      "inference": {
+        "claim": "Направление тени не совпадает с направлением источника света — либо в сцене второй источник, либо кадр скомпонован",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "tags": ["light_conflict", "tampering"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Тень может падать от предмета, не попавшего в кадр",
+        "Волнистая поверхность искривляет тень",
+        "Направление тени определено по глазу и может быть ошибочным"
+      ],
+      "exceptions": [
+        "В сцене два и более источника света (журнал light содержит несколько записей)"
+      ],
+      "falsification": {
+        "refuted_by": ["PHY-003"],
+        "physical_test": "Проверить число источников: если в кадре два окна, расхождение объяснимо"
+      },
+      "sources": [
+        {
+          "ref": "Serway & Jewett, Physics for Scientists and Engineers, 10th ed., Cengage 2019",
+          "note": "направление тени противоположно направлению на источник",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PHY-003",
+      "version": 1,
+      "pack": "core",
+      "title": "Тени разных направлений при одном источнике",
+      "domain": "consistency",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["objects"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "distinct",
+        "path": "objects.shadow_dir",
+        "gte": 2
+      },
+      "inference": {
+        "claim": "В кадре наблюдаются тени как минимум двух направлений — либо источников больше одного, либо кадр собран из разных снимков",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "tags": ["light_conflict", "composite"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Тень от точечного источника на сложной геометрии расходится",
+        "Ориентация разных поверхностей даёт разное направление падающей тени"
+      ],
+      "exceptions": [
+        "В сцене явно несколько источников света"
+      ],
+      "falsification": {
+        "refuted_by": ["PHY-002"],
+        "physical_test": "Пересчитать направление тени от фактического положения источника в каждом случае отдельно"
+      },
+      "sources": [
+        {
+          "ref": "Serway & Jewett, Physics for Scientists and Engineers, 10th ed., Cengage 2019",
+          "note": "геометрия теней",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PHY-004",
+      "version": 1,
+      "pack": "core",
+      "title": "Заполнение у материала, который не содержит жидкости",
+      "domain": "consistency",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["objects"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "max",
+        "path": "objects[material=paper].fill_level",
+        "gt": 0
+      },
+      "inference": {
+        "claim": "У объекта из бумаги зафиксировано заполнение — ошибка разметки либо предмет намок",
+        "confidence_prior": 0.75,
+        "confidence_ceiling": 0.85,
+        "tags": ["scene_inconsistency", "moisture"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Поле fill_level могли заполнить вручную как «заполнено содержимым»",
+        "Это может быть папка с документами, а не ёмкость"
+      ],
+      "exceptions": [
+        "Категория объекта действительно ёмкость (коробка, банка), даже при материале paper"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Посмотреть на объект крупно: папка с бумагами или открытая ёмкость"
+      },
+      "sources": [
+        {
+          "ref": "Схема сцены-графа ЭЛЕМЕНТАРНО, schemas/scene-graph.schema.json",
+          "note": "fill_level определён как доля объёма жидкости",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

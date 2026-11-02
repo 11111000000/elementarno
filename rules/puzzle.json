@@ -1,0 +1,305 @@
+{
+  "pack": "puzzle",
+  "title": "Разбор загадок: различия между кадрами как основание для вывода",
+  "rules": [
+    {
+      "id": "PUZ-001",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Предмет исчез, след на месте остался",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "changes[kind=object_removed]", "gte": 1},
+          {"kind": "count", "path": "changes[kind=object_removed].matched_region", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "Между кадрами исчез предмет, и на его месте сохранился след — исчезновение произошло незадолго до съёмки второго кадра",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "tags": ["removal", "recent_movement"]
+      },
+      "anchors": ["changes[kind=object_removed].matched_region"],
+      "confounds": [
+        "Предмет мог унести кто-то посторонний",
+        "След мог быть оставлен задолго до исчезновения"
+      ],
+      "exceptions": [
+        "Между кадрами прошла уборка, а не событие"
+      ],
+      "falsification": {
+        "refuted_by": ["PUZ-002"],
+        "physical_test": "Проверить совпадение площади следа и основания предмета"
+      },
+      "sources": [
+        {
+          "ref": "Sherlock: A Dataset for Visual Abductive Reasoning, Hessel et al., ECCV 2022",
+          "note": "формат «улика → вывод» с локализацией улики",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-002",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Предмет убран вместе со следом",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "changes[kind=object_removed]", "gte": 1},
+          {"kind": "absent", "path": "changes[kind=object_removed].matched_region"}
+        ]
+      },
+      "inference": {
+        "claim": "Предмет исчез, но след за собой не оставил — место зачистили, а ведь обычное исчезновение оставляет след",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "tags": ["removal", "staged", "cleaned"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Предмет стоял на гладкой поверхности без пыли",
+        "След был стёрт обувью при уборке",
+        "Кадры сняты в разных местах, а не в одном"
+      ],
+      "exceptions": [
+        "Поверхность не собирает следов: стекло, ковёр без ворса"
+      ],
+      "falsification": {
+        "refuted_by": ["PUZ-001"],
+        "physical_test": "Найти на поверхности следы того же предмета в других местах"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "зачистка места как признак сокрытия",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-003",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Появился мокрый след",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "changes[kind=object_added].wet",
+        "value": true
+      },
+      "inference": {
+        "claim": "Между кадрами появился мокрый след: кто-то вошёл в помещение, принеся воду с собой",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "tags": ["wet_boots", "came_from_outside"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Мокрый след мог оставить протечка, а не человек",
+        "Влажность воздуха могла сконденсироваться на холодном месте"
+      ],
+      "exceptions": [
+        "След совпадает по форме с плечом протечки над ним"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить форму следа: ступня, капля или полоса от потёка"
+      },
+      "sources": [
+        {
+          "ref": "Sherlock: A Dataset for Visual Abductive Reasoning, Hessel et al., ECCV 2022",
+          "note": "абдуктивные связки «признак → бытовое объяснение»",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-004",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Появился след грязи",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "changes[kind=object_added].category",
+        "value": "mud_footprint"
+      },
+      "inference": {
+        "claim": "Между кадрами появился грязный след: человек пришёл с улицы и прошёл через комнату",
+        "confidence_prior": 0.75,
+        "confidence_ceiling": 0.9,
+        "tags": ["muddy_boots", "came_from_outside"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Грязь могла попасть с грузом или с инструментом, а не с обуви",
+        "След может принадлежать животному"
+      ],
+      "exceptions": [
+        "Размер и рисунок следа не соответствуют обуви человека"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить рисунок подошвы с обувью подозреваемых"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
+          "note": "следы обуви как индивидуализирующий признак",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-005",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Обстановка переставлена",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "changes[kind=object_moved]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Между кадрами переместили предмет мебели — сцену готовили или приводили в порядок после события",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "tags": ["staged", "rearranged"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Перестановка могла быть обычным бытовым делом",
+        "Кадры могли сняты в разных комнатах"
+      ],
+      "exceptions": [
+        "Кадры сняты с разных точек съёмки, положение меняется из-за перспективы"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить положение предмета с тенью и стеной, чтобы исключить разницу ракурса"
+      },
+      "sources": [
+        {
+          "ref": "Sherlock: A Dataset for Visual Abductive Reasoning, Hessel et al., ECCV 2022",
+          "note": "изменение обстановки как абдуктивная улика",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-006",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Состояние пыли изменилось",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "changes[kind=surface_changed].field",
+        "value": "dust_state"
+      },
+      "inference": {
+        "claim": "Между кадрами изменился характер пыли на поверхности — по ней прошли или что-то двигали",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.75,
+        "tags": ["disturbed_dust", "walked"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Разница в освещении меняет видимость пыли",
+        "Кадры могли сняты в разное время суток"
+      ],
+      "exceptions": [
+        "Пыль могла осесть за разное время или её убрали"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Переснять сцену при том же освещении и сравнить"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "следы перемещения по сцене",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PUZ-007",
+      "version": 1,
+      "pack": "puzzle",
+      "title": "Появился новый предмет",
+      "domain": "change",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["changes"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "changes[kind=object_added]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Между кадрами в сцене появился новый предмет",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "tags": ["added_object"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Предмет мог быть в кадре, но не распознан в первом кадре",
+        "Разница ракурса"
+      ],
+      "exceptions": [
+        "Предмет принесён посторонним, не связанным с событием"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Пересмотреть первый кадр в том же приближении"
+      },
+      "sources": [
+        {
+          "ref": "Sherlock: A Dataset for Visual Abductive Reasoning, Hessel et al., ECCV 2022",
+          "note": "изменение состава сцены между наблюдениями",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

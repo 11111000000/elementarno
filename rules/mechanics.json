@@ -1,0 +1,90 @@
+{
+  "pack": "mechanics",
+  "title": "Механика: следы шин, инструмента, износ",
+  "rules": [
+    {
+      "id": "MECH-001",
+      "version": 1,
+      "pack": "mechanics",
+      "title": "След шин на поверхности",
+      "domain": "mechanics",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=tyre_mark]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности сохранился след шин — по сцене проезжало транспортное средство",
+        "confidence_prior": 0.8,
+        "confidence_ceiling": 0.9,
+        "tags": ["vehicle", "movement"]
+      },
+      "anchors": ["regions[kind=tyre_mark].id"],
+      "confounds": [
+        "След мог остаться от давней парковки",
+        "Протектор может принадлежать другому автомобилю"
+      ],
+      "exceptions": [
+        "След относится к тележке или иному безмоторному транспорту"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить рисунок протектора с моделью автомобиля"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Vehicle Collision and Automotive Standards",
+          "note": "следы шин как след транспортного средства",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "MECH-002",
+      "version": 1,
+      "pack": "mechanics",
+      "title": "След инструмента",
+      "domain": "mechanics",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=tool_mark]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности след инструмента — здесь что-то вскрывали, разбирали или отгибали",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "tags": ["tool_use", "tampering"]
+      },
+      "anchors": ["regions[kind=tool_mark].id"],
+      "confounds": [
+        "След мог быть оставлен при сборке или ремонте",
+        "След может принадлежать отвёртке или шурупу, а не взлому"
+      ],
+      "exceptions": [
+        "След совпадает с крепежом, установленным при монтаже"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить геометрию следа с рабочим инструментом из обстановки"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Toolmark and Trace Evidence",
+          "note": "следы орудия как индивидуализирующий признак",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

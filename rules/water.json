@@ -1,0 +1,134 @@
+{
+  "pack": "water",
+  "title": "Залив, протечка, влага",
+  "rules": [
+    {
+      "id": "WAT-001",
+      "version": 1,
+      "pack": "water",
+      "title": "След уровня воды",
+      "domain": "water",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=water_line]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности сохранилась граница прежнего уровня воды — помещение заливали",
+        "confidence_prior": 0.8,
+        "confidence_ceiling": 0.9,
+        "tags": ["flood", "water"]
+      },
+      "anchors": ["regions[kind=water_line].id"],
+      "confounds": [
+        "Границу мог оставить иной раствор или клей",
+        "След конденсата на холодной поверхности"
+      ],
+      "exceptions": [
+        "Граница совпадает с высотой мебели, а не с заливом"
+      ],
+      "falsification": {
+        "refuted_by": ["WAT-002"],
+        "physical_test": "Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали"
+      },
+      "sources": [
+        {
+          "ref": "IIC S500: Standard for Professional Water Damage Restoration",
+          "note": "признаки залива и категории повреждения",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "WAT-002",
+      "version": 1,
+      "pack": "water",
+      "title": "Плесень в месте прежнего намокания",
+      "domain": "water",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": ["WAT-001"],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=mold_patch]", "gte": 1},
+          {"kind": "rule", "id": "WAT-001"}
+        ]
+      },
+      "inference": {
+        "claim": "Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера",
+        "confidence_prior": 0.75,
+        "confidence_ceiling": 0.9,
+        "tags": ["mold", "after_water", "damp"]
+      },
+      "anchors": ["regions[kind=mold_patch].id"],
+      "confounds": [
+        "Плесень может быть от сырости без залива",
+        "Плесень могла быть до залива и расти в другом месте"
+      ],
+      "exceptions": [
+        "Очаг плесени не пересекается с зоной прежнего намокания"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить площадь очага плесени с зоной намокания"
+      },
+      "sources": [
+        {
+          "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+          "note": "связь влаги и роста плесени",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "WAT-003",
+      "version": 1,
+      "pack": "water",
+      "title": "Лужа ещё не высохла",
+      "domain": "water",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=puddle]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На полу осталась лужа — вода поступила незадолго до съёмки",
+        "confidence_prior": 0.8,
+        "confidence_ceiling": 0.9,
+        "tags": ["flood", "recent_water"]
+      },
+      "anchors": ["regions[kind=puddle].id"],
+      "confounds": [
+        "Лужа могла быть вымыта уборкой и оказаться здесь после",
+        "Поверхность может быть постоянно влажной"
+      ],
+      "exceptions": [
+        "Лужа стоит под текущей протечкой"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Переснять через час: лужа уменьшилась — вода свежая"
+      },
+      "sources": [
+        {
+          "ref": "IIC S500: Standard for Professional Water Damage Restoration",
+          "note": "свежесть повреждения как признак",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

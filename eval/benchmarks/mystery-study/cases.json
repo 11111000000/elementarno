@@ -1,0 +1,15 @@
+{
+  "benchmark": "mystery-study",
+  "description": "Загадка по серии кадров: исчезновение предмета, следы, кто приходил.",
+  "cases": [
+    {
+      "id": "study-01",
+      "puzzle": "puzzle.json",
+      "expect": {
+        "finding_ids": ["F-PUZ-001", "F-PUZ-003", "F-PUZ-004", "F-ABS-001"],
+        "suspect": "s1",
+        "verdict": "sufficient_evidence"
+      }
+    }
+  ]
+}
