@@ -1,0 +1,282 @@
+{
+  "summary": {
+    "cases": 12,
+    "processed": 12,
+    "trace_cases": 6,
+    "advisory_cases": 2,
+    "trace_hits": 4,
+    "recall": 0.667,
+    "clean_cases": 4,
+    "false_positives_on_clean": 2.0,
+    "extra_rules_on_trace": 5,
+    "latency_mean_s": 12.9,
+    "latency_max_s": 26.8,
+    "unstable_cases": []
+  },
+  "results": [
+    {
+      "id": "mold-wall",
+      "trace_type": "presence",
+      "advisory": false,
+      "expected": [
+        "F-BIO-002"
+      ],
+      "ground_truth": "Плесень на стенах (категория «Mold on buildings»). Ожидается region kind=mold_patch → BIO-002.",
+      "status": "ok",
+      "fired": [],
+      "missing": [
+        "F-BIO-002"
+      ],
+      "extra": [],
+      "recall": 0.0,
+      "recall_stable": true,
+      "false_pos": 0.0,
+      "latency_s": 12.8,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "paint-splatter-table",
+      "trace_type": "trade",
+      "advisory": false,
+      "expected": [
+        "F-TRD-001"
+      ],
+      "ground_truth": "Брызги краски на столе (категория «Paint splashes»). Ожидается paint_splash → TRD-001.",
+      "status": "ok",
+      "fired": [
+        "F-TRD-001"
+      ],
+      "missing": [],
+      "extra": [],
+      "recall": 1.0,
+      "recall_stable": true,
+      "false_pos": 0.0,
+      "latency_s": 26.8,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "paint-splattered-white",
+      "trace_type": "trade",
+      "advisory": false,
+      "expected": [
+        "F-TRD-001"
+      ],
+      "ground_truth": "Забрызганная белая краска (категория «White paint»). Ожидается paint_splash или paint_trace.",
+      "status": "ok",
+      "fired": [
+        "F-TRD-001"
+      ],
+      "missing": [],
+      "extra": [],
+      "recall": 1.0,
+      "recall_stable": true,
+      "false_pos": 0.0,
+      "latency_s": 11.3,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "saw-workshop",
+      "trace_type": "trade",
+      "advisory": true,
+      "expected": [
+        "F-TRD-002",
+        "F-TRD-009"
+      ],
+      "ground_truth": "Категория файла — «Circular saw blades»: распил виден, но наличие именно стружки из категории не следует. Ожидание совещательное и не входит в recall.",
+      "status": "ok",
+      "fired": [
+        "F-MECH-002"
+      ],
+      "missing": [
+        "F-TRD-002",
+        "F-TRD-009"
+      ],
+      "extra": [
+        "F-MECH-002"
+      ],
+      "recall": 0.0,
+      "recall_stable": true,
+      "false_pos": 2.0,
+      "latency_s": 12.6,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "flour-kitchen",
+      "trace_type": "trade",
+      "advisory": true,
+      "expected": [
+        "F-TRD-003"
+      ],
+      "ground_truth": "Мука на тёмной столешнице: истина допускает две законные трактовки — «мучная пыль» и «пылевой след». Модель читает вторую; ожидание совещательное и не входит в recall.",
+      "status": "ok",
+      "fired": [],
+      "missing": [
+        "F-TRD-003"
+      ],
+      "extra": [],
+      "recall": 0.0,
+      "recall_stable": true,
+      "false_pos": 1.0,
+      "latency_s": 9.4,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "footprints-mud",
+      "trace_type": "presence",
+      "advisory": false,
+      "expected": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы в грязи (категория «Footprints in mud»). Ожидается footprint → BIO-001.",
+      "status": "ok",
+      "fired": [
+        "F-BIO-001",
+        "F-GRD-003",
+        "F-WAT-001"
+      ],
+      "missing": [],
+      "extra": [
+        "F-GRD-003",
+        "F-WAT-001"
+      ],
+      "recall": 1.0,
+      "recall_stable": true,
+      "false_pos": 1.5,
+      "latency_s": 14.1,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "footprints-cow",
+      "trace_type": "presence",
+      "advisory": false,
+      "expected": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы коровы и телёнка (категории «Footprints», «Footprints on sand»). Ожидается footprint → BIO-001.",
+      "status": "ok",
+      "fired": [
+        "F-ABS-004",
+        "F-HOME-001"
+      ],
+      "missing": [
+        "F-BIO-001"
+      ],
+      "extra": [
+        "F-ABS-004",
+        "F-HOME-001"
+      ],
+      "recall": 0.0,
+      "recall_stable": true,
+      "false_pos": 1.0,
+      "latency_s": 12.9,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "footprints-sand",
+      "trace_type": "presence",
+      "advisory": false,
+      "expected": [
+        "F-BIO-001"
+      ],
+      "ground_truth": "Следы на мокром песке (категории «Footprints on sand», «Animal tracks on mud»). Ожидается footprint → BIO-001.",
+      "status": "ok",
+      "fired": [
+        "F-BIO-001",
+        "F-GRD-003"
+      ],
+      "missing": [],
+      "extra": [
+        "F-GRD-003"
+      ],
+      "recall": 1.0,
+      "recall_stable": true,
+      "false_pos": 1.0,
+      "latency_s": 9.9,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "clean-mixer-table",
+      "trace_type": "clean",
+      "advisory": false,
+      "expected": [],
+      "ground_truth": "Чистый стол с миксером. Следов ремесла и присутствия быть не должно.",
+      "status": "ok",
+      "fired": [],
+      "missing": [],
+      "extra": [],
+      "recall": null,
+      "recall_stable": null,
+      "false_pos": 0.0,
+      "latency_s": 7.4,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "clean-kitchen-dining",
+      "trace_type": "clean",
+      "advisory": false,
+      "expected": [],
+      "ground_truth": "Обычная кухня-гостиная. Ложных срабатываний быть не должно.",
+      "status": "ok",
+      "fired": [],
+      "missing": [],
+      "extra": [],
+      "recall": null,
+      "recall_stable": null,
+      "false_pos": 0.0,
+      "latency_s": 9.6,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "clean-kitchen-window",
+      "trace_type": "clean",
+      "advisory": false,
+      "expected": [],
+      "ground_truth": "Кухня с кофемашиной. Ложных срабатываний быть не должно.",
+      "status": "ok",
+      "fired": [
+        "F-HOME-002",
+        "F-OFF-003",
+        "F-PRES-002"
+      ],
+      "missing": [],
+      "extra": [
+        "F-HOME-002",
+        "F-OFF-003",
+        "F-PRES-002"
+      ],
+      "recall": null,
+      "recall_stable": null,
+      "false_pos": 1.5,
+      "latency_s": 13.4,
+      "attempts": 2,
+      "errors": []
+    },
+    {
+      "id": "clean-kitchen-500px",
+      "trace_type": "clean",
+      "advisory": false,
+      "expected": [],
+      "ground_truth": "Кухня без следов ремесла. Ложных срабатываний быть не должно.",
+      "status": "ok",
+      "fired": [],
+      "missing": [],
+      "extra": [],
+      "recall": null,
+      "recall_stable": null,
+      "false_pos": 0.5,
+      "latency_s": 14.4,
+      "attempts": 2,
+      "errors": []
+    }
+  ]
+}
