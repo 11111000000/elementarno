@@ -9,3 +9,6 @@ venv/
 *.egg-info/
 out/
 tmp/
+
+# артефакты прогонов на реальных фото
+eval/real/runs/

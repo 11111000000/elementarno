@@ -1,0 +1,237 @@
+{
+  "pack": "home",
+  "title": "Быт: следы домашней работы и уборки",
+  "rules": [
+    {
+      "id": "HOME-001",
+      "version": 2,
+      "pack": "home",
+      "title": "Пыль в углах и вдоль плинтуса не сбита",
+      "domain": "household",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "surfaces"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "regions[kind=disturbed_dust]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "surfaces[dust_present=true]",
+            "gte": 1
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "any",
+              "conditions": [
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=soil]",
+                  "value": true
+                },
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=sand]",
+                  "value": true
+                },
+                {
+                  "kind": "present",
+                  "path": "surfaces[material=gravel]",
+                  "value": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "inference": {
+        "claim": "В помещении недавно убирали: пыль сдвинута узкой полосой, а в углах осталась нетронутой",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.65,
+        "step": "activity",
+        "tags": [
+          "cleaning",
+          "household_habit"
+        ]
+      },
+      "anchors": [
+        "regions[kind=disturbed_dust].id"
+      ],
+      "confounds": [
+        "Полосу могли оставить щётка, тряпка или пилец",
+        "Пыль могла сдуться сквозняком",
+        "Уборка могла быть в другой комнате, а след принесён на обуви"
+      ],
+      "exceptions": [
+        "След совпадает с направлением естественного сквозняка"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить полосу с направлением щётки при уборке и с розой ветров в комнате"
+      },
+      "sources": [
+        {
+          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
+          "note": "следы перемещения и работы в помещении",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "HOME-002",
+      "version": 1,
+      "pack": "home",
+      "title": "Кольцо от горячей кружки",
+      "domain": "household",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=cup_ring]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности виден след от горячей кружки: кольцо без пыли внутри означает, что кружку поставили недавно",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.6,
+        "step": "activity",
+        "tags": [
+          "drinking",
+          "recent_use"
+        ]
+      },
+      "anchors": [
+        "regions[kind=cup_ring].id"
+      ],
+      "confounds": [
+        "След мог быть оставлен при уборке или перестановке мебели",
+        "Светлый круг может быть пятном от протечки, а не от кружки"
+      ],
+      "exceptions": [
+        "Круг совпадает по форме с пятном влаги на другой поверхности"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Поставить рядом такую же кружку и сравнить форму и размер кольца"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "HOME-003",
+      "version": 1,
+      "pack": "home",
+      "title": "Продукты в холодильнике вынуты",
+      "domain": "household",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[category=open_container]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Открытые ёмкости на виду: продукты или посуду вынули и оставили открытой",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "step": "activity",
+        "tags": [
+          "household_habit"
+        ]
+      },
+      "anchors": [],
+      "confounds": [
+        "Открытая банка может стоять так месяцами",
+        "На фотографии мог просто быть снят открытый контейнер без связи со сценой"
+      ],
+      "exceptions": [
+        "Контейнер пуст и давно вымыт"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить остатки содержимого и свежесть: у открытого продукта есть следы использования"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "HOME-004",
+      "version": 1,
+      "pack": "home",
+      "title": "Мокрые следы от ботинок у порога",
+      "domain": "household",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=wet_trace]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "У порога мокрые следы: кто-то вошёл с улицы и прошёл по полу",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.7,
+        "step": "presence",
+        "tags": [
+          "wet_boots",
+          "came_from_outside"
+        ]
+      },
+      "anchors": [
+        "regions[kind=wet_trace].id"
+      ],
+      "confounds": [
+        "След могла оставить протечка или тряпка",
+        "Мокрый след мог быть из разлитой жидкости"
+      ],
+      "exceptions": [
+        "След начинается от стоящей лужи или протечки"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проследить направление от следа к порогу и проверить, есть ли входная дверь рядом"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
+          "note": "следы обуви и текстиля как индивидуализирующий признак",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

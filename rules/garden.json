@@ -1,0 +1,196 @@
+{
+  "pack": "garden",
+  "title": "Сад и участок: земля, инструмент, вода",
+  "rules": [
+    {
+      "id": "GRD-001",
+      "version": 2,
+      "pack": "garden",
+      "title": "Взрыхлённый грунт",
+      "domain": "garden",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "regions[kind=disturbed_dust]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "surfaces[material=soil]",
+            "gte": 1
+          },
+          {
+            "kind": "absent",
+            "path": "regions[kind=footprint]"
+          }
+        ]
+      },
+      "inference": {
+        "claim": "Грунт разрыхлён и перекопан: здесь работали с землёй",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.65,
+        "step": "activity",
+        "tags": [
+          "gardening",
+          "soil_work"
+        ]
+      },
+      "anchors": [
+        "regions[kind=disturbed_dust].id"
+      ],
+      "confounds": [
+        "Полосы могли оставить дождевые потоки или когти животного",
+        "Землю могли перекопать давно и забыть",
+        "Следы животных и размытые края тоже оставляют «взрыхлённый» вид грунта"
+      ],
+      "exceptions": [
+        "Полосы извилистые и без параллельной структуры"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить шаг и ширину полос с рабочим инструментом"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GRD-003",
+      "version": 2,
+      "pack": "garden",
+      "title": "Следы по грунту, в стороне от дорожки",
+      "domain": "garden",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "regions[kind=footprint]",
+            "gte": 1
+          },
+          {
+            "kind": "any",
+            "conditions": [
+              {
+                "kind": "count",
+                "path": "surfaces[material=soil]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "surfaces[material=sand]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "surfaces[material=gravel]",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "inference": {
+        "claim": "По грунту или песку идут следы ног: по участку ходили не по дорожке",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.75,
+        "step": "presence",
+        "tags": [
+          "two_people",
+          "garden_work"
+        ]
+      },
+      "anchors": [
+        "regions[kind=footprint].id"
+      ],
+      "confounds": [
+        "Следы могли остаться от прошлого сезона и сохраниться в пересухшей земле",
+        "След может принадлежать животному"
+      ],
+      "exceptions": [
+        "Следы не пересекаются с дорожкой и ведут в глубину грядки"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сверить рисунок протектора с обувью: совпадение подтверждает размер и модель"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
+          "note": "следы обуви и текстиля как индивидуализирующий признак",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GRD-004",
+      "version": 1,
+      "pack": "garden",
+      "title": "Свежая вода в борозде",
+      "domain": "garden",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=wet_trace]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В борозде стоит вода: полив был недавно, земля ещё не впитала",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.75,
+        "step": "activity",
+        "tags": [
+          "watering",
+          "garden_habit"
+        ]
+      },
+      "anchors": [
+        "regions[kind=wet_trace].id"
+      ],
+      "confounds": [
+        "Вода могла остаться от дождя",
+        "Борозда может быть наполнена грунтовыми водами"
+      ],
+      "exceptions": [
+        "Вода стоит в месте, куда дождь не попадает"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Переснять через час: при поливе лужа уменьшается, после дождя — нет"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

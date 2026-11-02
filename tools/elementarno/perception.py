@@ -1,18 +1,27 @@
 """Восприятие: изображение → сцена-граф через мультимодальную модель.
 
-Слой намеренно тонкий. Он не «понимает сцену» — он переводит пиксели в
-типизированный граф, потому что дальше работают правила с цитатами. Модель
-не имеет права придумывать отсутствующие объекты, поэтому промпт отдельно
-требует фиксировать отсутствие.
+Три прохода, и различаются они не промптом, а ВОПРОСОМ:
 
-Сырой ответ модели сохраняется рядом со сценой: он часть цепочки доказательств
-и должен быть перечитываем.
+1. **Инвентаризация** — что есть: объекты, поверхности, свет. Регионов здесь
+   нет намеренно: если просить модель классифицировать следы по нашей
+   таксономии, она подгоняет видимое под ближайший bucket («брызги краски»
+   → «stain», «следы ног» → «disturbed_dust») и выдумывает отсутствие там,
+   где его нет.
+2. **Чек-лист** — бинарный вопрос по каждому типу следа: «есть ли брызги
+   краски? да/нет». Классификацию выполняет не модель, а сама таблица
+   вопросов. Ответ «нет» — нормальный результат, а не провал.
+3. **Допрос кропа** — проверка спорных находок на малом контексте: «в этом
+   кропе действительно видны брызги краски?». Снимает ложные срабатывания.
+
+Сырой ответ модели сохраняется рядом со сценой: он часть цепочки
+доказательств и должен быть перечитываем.
 """
 
 import base64
 import json
 import mimetypes
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -23,70 +32,133 @@ from .scene import validate_scene
 DEFAULT_ENDPOINT = "https://api.minimaxi.chat/anthropic/v1/messages"
 DEFAULT_MODEL = "MiniMax-M3"
 
-PROMPT = """Ты — эксперт по осмотру сцены. Твоя задача — перевести фотографию в СТРУКТУРИРОВАННЫЙ ОПИСАТЕЛЬНЫЙ ГРАФ.
+INVENTORY_PROMPT = """Ты — эксперт по осмотру сцены. Переведи фотографию в СТРУКТУРИРОВАННУЮ ОПИСАТЕЛЬНУЮ ИНVENTORY-ЗАПИСЬ.
 
-ПРАВИЛА ОТВЕТА:
-1. Ответ — ТОЛЬКО валидный JSON, без пояснений, без markdown-ограждений.
+ПРАВИЛА:
+1. Ответ — ТОЛЬКО валидный JSON, без пояснений и без markdown-ограждений.
 2. Описывай только то, что реально видно. Не додумывай предметы.
-3. Ключевой навык — ЗАМЕЧАТЬ ОТСУТСТВИЕ. Обязательно ищи: пылевой контур от убранного предмета,
-   пустой крючок, невыцветший участок среди запылённой поверхности, нарушенный слой пыли,
-   следы ног, разводы воды, посторонние следы (грязь, вода). Отсутствие — главная улика.
-4. Координаты bbox — нормализованные [x1,y1,x2,y2], 0..1, начало — левый верхний угол.
-5. size_m — ориентировочный размер объекта в метрах, если оценивается; иначе null.
-6. Не выдумывай то, чего нет. Лучше пустой массив, чем правдоподобная деталь.
+3. Следы, пятна и прочие локальные признаки НЕ описывай — их спросят отдельно.
+3a. Кратко и компактно: не более 20 объектов, не более 5 наблюдений, поля заполняй только когда видно.
+4. size_m — ориентировочный размер объекта в метрах; если не оценивается — не включай поле.
+5. on должен ссылаться на id одной из surfaces. Если объекту не на чем стоять — не включай поле.
 
 ФОРМАТ JSON:
 {
-  "surfaces": [{"id":"s1","name":"table","material":"wood","dust_present":true,"dust_state":"even|uneven|patchy|none","wet":false,"sunlit":false,"region":"rX"}],
-  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"shadow_dir":"west|east|north|south|unknown","visible":true,"region":"rX","bbox":[0.1,0.1,0.2,0.2]}],
-  "regions": [{"id":"r1","kind":"dust_outline|empty_hook|unfaded_patch|stain|scratch|crack|dent|burn|water_line|mold_patch|footprint|tyre_mark|tool_mark|puddle|condensation|disturbed_dust|mud_footprint|other","shape":"round|rect|irregular","area_m2":0.04,"contrast":0.12,"freshness":"sharp|soft|erased|unknown","edges":"concave|convex|flat|ragged|unknown","bbox":[0.1,0.1,0.2,0.2],"note":"что видно"}],
-  "observations": [{"id":"x1","about":"r1","feature":"v_pattern|dust_path|shadow_edge|other","value":true,"confidence":0.8}],
-  "light": [{"id":"l1","kind":"window|lamp|sun|unknown","direction":"west|east|north|south","position":"left|right|above|behind"}],
-  "anomalies": ["что выглядит необычно или отсутствует"]
+  "surfaces": [{"id":"s1","name":"table","material":"wood|floor|tile|soil|sand|gravel|concrete|stone|metal|cloth","dust_present":true,"dust_state":"none|even|uneven|patchy","wet":false,"sunlit":false}],
+  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|stale|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"visible":true,"bbox":[0.1,0.1,0.2,0.2]}],
+  "light": [{"id":"l1","kind":"window|lamp|sun|unknown","position":"left|right|above|behind"}],
+  "observations": [{"id":"x1","about":"o1","feature":"open|closed|tilted|full|empty|damaged|new|old","value":"что видно"}],
+  "anomalies": ["что выглядит необычным"]
 }
 
 Верни JSON."""
 
+# (kind, вопрос). kind попадает в сцена-граф только при положительном ответе.
+TRACE_CHECKLIST = [
+    ("dust_outline", "контур от убранного предмета: светлая или чистая середина и следы пыли по краям"),
+    ("empty_hook", "пустой крючок или вешалка со следом крепления"),
+    ("unfaded_patch", "участок без пыли среди запылённой поверхности"),
+    ("disturbed_dust", "полоса или полосы нарушенного слоя пыли"),
+    ("footprint", "следы ног или животных: ступни, подошвы, лапы, копыта, отпечатки обуви"),
+    ("mud_footprint", "след грязи или земли на поверхности"),
+    ("wet_trace", "мокрый след или лужа"),
+    ("water_line", "ровная граница прежнего уровня воды"),
+    ("mold_patch", "очаг плесени или грибного поражения"),
+    ("burn", "ожог, обугливание, след огня"),
+    ("paint_splash", "брызги краски на поверхности"),
+    ("paint_trace", "задетые следы краски на предмете или одежде"),
+    ("sawdust", "стружка или опилки"),
+    ("metal_swarf", "металлическая стружка или абразивная пыль"),
+    ("flour_dust", "мука или мучная пыль"),
+    ("oil_trace", "пятно масла, смазки или технической жидкости"),
+    ("weld_spatter", "следы сварки, брызги металла"),
+    ("plaster_dust", "штукатурная или цементная пыль"),
+    ("ink_trace", "пятно чернил или тонера"),
+    ("cup_ring", "след кружки или стакана на поверхности"),
+    ("fingerprint", "отпечаток пальца или ладони"),
+    ("tool_mark", "след от инструмента: царапина, выбоина, след зубила"),
+    ("tyre_mark", "след шин"),
+    ("scratch", "царапины или потёртости на поверхности"),
+    ("crack", "трещина"),
+]
+
+CHECKLIST_PROMPT = """Ты — эксперт по следовому анализу. Перечисли следы, которые ты ВИДИШЬ на фотографии.
+
+ФОРМАТ (только JSON, без markdown):
+{"found":[{"kind":"<один из списка ниже>","bbox":[x1,y1,x2,y2],"note":"что именно видно, своими словами"}]}
+
+ПРАВИЛА:
+1. Перечисляй ТОЛЬКО то, что действительно видишь. Не выдумывай.
+2. kind — строго один из идентификаторов в списке ниже. Своими словами пиши только в note.
+3. bbox — область находки в нормализованных координатах 0..1. Если область не уверенная, bbox [0,0,0,0].
+4. note — 5–15 слов по-русски: что видно и где.
+5. Если следов нет — верни {"found":[]}. Это нормальный и правильный ответ.
+6. Один след — одна запись. Один и тот же вид в двух местах — две записи.
+
+СПИСОК ВИДОВ И ЧТО ЭТО ЗНАЧИТ:
+{checklist}
+
+Верни JSON."""
+
+VERIFY_PROMPT = """Ты эксперт по следовому анализу. Перед тобой та же фотография, которую уже смотрели.
+
+Наблюдение, которое требует подтверждения:
+«{description}»
+
+Подтверди наблюдение по самой фотографии: видно ли именно это?
+Ответь ТОЛЬКО JSON: {{"yes":true,"confidence":0.0,"note":""}}
+yes=false только если ты уверен, что такого на фотографии НЕТ.
+Сомневаешься — true с невысокой уверенностью."""
+
+
+def normalize_kind(raw, known):
+    """Привести название вида к нашему идентификатору.
+
+    Модель пишет почти точные ключи, но иногда с синонимом или опечаткой.
+    Несовпадение — это отсутствие улики, а не повод выдумывать вид.
+    """
+    if not raw:
+        return None
+    value = str(raw).strip().lower().replace(" ", "_").replace("-", "_")
+    if value in known:
+        return value
+    aliases = {
+        "mud_prints": "mud_footprint", "footprints": "footprint", "foot_print": "footprint",
+        "paint_spatter": "paint_splash", "paint_splashes": "paint_splash",
+        "paint_splatter": "paint_splash", "wood_dust": "sawdust", "shavings": "sawdust",
+        "mold": "mold_patch", "mould": "mold_patch", "mildew": "mold_patch",
+        "water_stain": "water_line", "waterline": "water_line", "flood_line": "water_line",
+        "oil": "oil_trace", "grease": "oil_trace", "grease_trace": "oil_trace",
+        "burn_mark": "burn", "burnt": "burn", "char": "burn",
+        "dust_mark": "dust_outline", "outline": "dust_outline", "dust_ring": "dust_outline",
+        "hook": "empty_hook", "empty_hanger": "empty_hook",
+        "unfaded": "unfaded_patch", "clean_patch": "unfaded_patch",
+        "wet_floor": "wet_trace", "wet_mark": "wet_trace", "puddle": "wet_trace",
+        "fingerprint_mark": "fingerprint", "prints": "fingerprint",
+        "flour": "flour_dust", "flour_powder": "flour_dust",
+        "plaster": "plaster_dust", "cement_dust": "plaster_dust",
+        "metal_shavings": "metal_swarf", "swarf": "metal_swarf", "grinding_dust": "metal_swarf",
+        "cup_mark": "cup_ring", "coffee_ring": "cup_ring", "mug_ring": "cup_ring",
+        "ink": "ink_trace", "toner": "ink_trace",
+    }
+    if value in aliases:
+        return aliases[value]
+    for candidate in known:
+        if candidate in value or value in candidate:
+            return candidate
+    return None
+
+
+def _build_checklist_prompt():
+    lines = [f"- {kind}: {question}" for kind, question in TRACE_CHECKLIST]
+    return CHECKLIST_PROMPT.replace("{checklist}", "\n".join(lines))
+
+
+CHECKLIST_READY = _build_checklist_prompt()
+
 
 class PerceptionError(RuntimeError):
     pass
-
-
-ABSENCE_SWEEP_PROMPT = """Ты эксперт по следовому анализу. Рассмотри фотографию и найди ТОЛЬКО СЛЕДЫ ОТСУТСТВИЯ и необычные локальные признаки.
-
-Что искать:
-- dust_outline — контур от предмета, который убрали (пыль заполнила середину, но не края)
-- empty_hook — крючок/вешалка, на которой ничего не висит
-- unfaded_patch — участок без пыли среди запылённой поверхности
-- disturbed_dust — полоса нарушенного слоя пыли
-- footprint / mud_footprint — след ноги, особенно грязный или мокрый
-- water_line — граница прежнего уровня воды
-- mold_patch — очаг плесени
-- stain / scratch / tool_mark — пятно, царапина, след инструмента
-
-ВАЖНО: не пересказывай то, что и так очевидно. Нужны только локальные следы.
-Если ничего не нашёл — верни пустой массив. Ложная находка хуже пропуска.
-
-ФОРМАТ JSON (только JSON):
-{"candidates":[{"kind":"dust_outline","bbox":[0.1,0.1,0.2,0.2],"shape":"rect","area_m2":0.04,"freshness":"sharp","edges":"concave","contrast":0.12,"confidence":0.6,"why":"почему так"}]}
-
-bbox нормализован [x1,y1,x2,y2], 0..1."""
-
-CROP_QUESTION_PROMPT = """Ты эксперт по следовому анализу. Перед тобой КРОП одной области исходной фотографии.
-
-Найди ТОЛЬКО следы ОТСУТСТВИЯ в этом кропе:
-- dust_outline — контур от убранного предмета: видна граница, внутри заметно чище, по краям осталась пыль
-- unfaded_patch — участок чище окружающей запылённой поверхности
-- disturbed_dust — полоса, где слой пыли нарушен
-- empty_hook — пустой крючок
-- footprint / mud_footprint — след ноги, грязный или мокрый
-- water_line — ровная граница прежнего уровня воды
-- mold_patch — очаг плесени
-
-Если в кропе ничего из этого нет — верни пустой массив. Ложная находка хуже пропуска.
-
-ФОРМАТ JSON (только JSON):
-{"candidates":[{"kind":"dust_outline","confidence":0.0-1.0,"why":"что видно","edges":"concave|convex|flat","freshness":"sharp|soft|erased"}]}"""
 
 
 def resolve_api_key(explicit=None):
@@ -102,9 +174,10 @@ def resolve_api_key(explicit=None):
 def normalize_scene(scene):
     """Мягкая нормализация типовых огрехов модели.
 
-    Ничего не выдумывается: невалидные ссылки снимаются, факт снятия
-    записывается в anomalies. Лучше граф без одной ссылки, чем выдуманная
-    поверхность, на которой «стоял» предмет.
+    Ничего не выдумывается: неизвестные значения переводятся в «unknown»,
+    невалидные ссылки снимаются, а факт снятия записывается в anomalies.
+    Лучше граф без одной детали, чем выдуманная поверхность, на которой
+    «стоял» предмет.
     """
     notes = []
     surfaces = scene.get("surfaces") or []
@@ -133,20 +206,32 @@ def normalize_scene(scene):
             obj.pop("on")
         region = obj.get("region")
         if region and region not in region_ids:
-            obj.pop("region")
-        if obj.get("fill_level") is None:
-            obj.pop("fill_level", None)
-        if obj.get("size_m") is None:
-            obj.pop("size_m", None)
+            obj.pop("region", None)
+        for field in ("fill_level", "size_m"):
+            if obj.get(field) is None:
+                obj.pop(field, None)
+        if obj.get("state") not in VALID_OBJECT_STATES:
+            if obj.get("state"):
+                notes.append(f"объект «{obj.get('id')}»: состояние «{obj['state']}» неизвестно — заменено на unknown")
+            obj["state"] = "unknown"
         if not obj.get("shadow_dir"):
             obj["shadow_dir"] = "unknown"
 
     for surface in surfaces:
         region = surface.get("region")
         if region and region not in region_ids:
-            surface.pop("region")
+            surface.pop("region", None)
+        if surface.get("dust_state") not in VALID_DUST_STATES:
+            surface["dust_state"] = "none"
+        if surface.get("dust_present") is None:
+            surface["dust_present"] = False
 
     for region in regions:
+        if region.get("kind") not in VALID_REGION_KINDS:
+            region["kind"] = "other"
+        for field in ("freshness", "edges"):
+            if region.get(field) not in VALID_REGION_FIELDS.get(field, set()):
+                region[field] = "unknown"
         for field in ("area_m2", "contrast"):
             if region.get(field) is None:
                 region.pop(field, None)
@@ -157,33 +242,51 @@ def normalize_scene(scene):
     return scene, notes
 
 
+VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
+VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
+VALID_REGION_FIELDS = {
+    "freshness": {"sharp", "soft", "erased", "unknown"},
+    "edges": {"concave", "convex", "flat", "ragged", "unknown"},
+}
+VALID_REGION_KINDS = {
+    "dust_outline", "empty_hook", "unfaded_patch", "stain", "scratch", "crack",
+    "dent", "burn", "water_line", "mold_patch", "footprint", "tyre_mark",
+    "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint",
+    "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
+    "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
+    "metal_swarf", "other",
+}
+
+
 class MiniMaxPerception:
     def __init__(self, model=DEFAULT_MODEL, endpoint=DEFAULT_ENDPOINT, api_key=None, timeout=180,
-                 think=False, sweep_absence=True, interrogate_regions=True):
+                 think=False, min_confidence=0.5, verify_crops=True, votes=1):
         self.model = model
         self.endpoint = endpoint
         self.api_key = resolve_api_key(api_key)
         self.timeout = timeout
         self.think = think
-        self.sweep_absence = sweep_absence
-        self.interrogate_regions = interrogate_regions
+        self.min_confidence = min_confidence
+        self.verify_crops = verify_crops
+        self.votes = max(1, votes)
 
-    def _payload(self, image_b64, media_type, prompt):
+    def _payload(self, image_b64, media_type, prompt, max_tokens=3000):
         content = [
             {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_b64}},
             {"type": "text", "text": prompt},
         ]
         body = {
             "model": self.model,
-            "max_tokens": 4000,
+            "max_tokens": max_tokens,
+            "temperature": 0,
             "messages": [{"role": "user", "content": content}],
         }
         if self.think:
             body["thinking"] = {"type": "enabled", "budget_tokens": 2048}
         return body
 
-    def call(self, image_b64, media_type, prompt):
-        body = json.dumps(self._payload(image_b64, media_type, prompt)).encode("utf-8")
+    def call(self, image_b64, media_type, prompt, max_tokens=3000):
+        body = json.dumps(self._payload(image_b64, media_type, prompt, max_tokens)).encode("utf-8")
         request = urllib.request.Request(
             self.endpoint,
             data=body,
@@ -203,8 +306,41 @@ class MiniMaxPerception:
             raise PerceptionError(f"MiniMax API {exc.code}: {detail}") from exc
         except urllib.error.URLError as exc:
             raise PerceptionError(f"не удалось обратиться к MiniMax API: {exc.reason}") from exc
-        latency = round((time.monotonic() - started) * 1000)
-        return payload, latency
+        return payload, round((time.monotonic() - started) * 1000)
+
+    def call_text(self, prompt, max_tokens=4000):
+        body = json.dumps(self._text_payload(prompt, max_tokens)).encode("utf-8")
+        request = urllib.request.Request(
+            self.endpoint,
+            data=body,
+            headers={
+                "content-type": "application/json",
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01",
+            },
+            method="POST",
+        )
+        started = time.monotonic()
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", "replace")[:400]
+            raise PerceptionError(f"MiniMax API {exc.code}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            raise PerceptionError(f"не удалось обратиться к MiniMax API: {exc.reason}") from exc
+        return payload, round((time.monotonic() - started) * 1000)
+
+    def _text_payload(self, prompt, max_tokens=4000):
+        payload = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "temperature": 0,
+            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
+        }
+        if self.think:
+            payload["thinking"] = {"type": "enabled", "budget_tokens": 2048}
+        return payload
 
     @staticmethod
     def text_of(payload):
@@ -215,6 +351,40 @@ class MiniMaxPerception:
         return "\n".join(parts).strip()
 
     @staticmethod
+    def repair_json(text):
+        """Починить обрезанный JSON: закрыть скобки и убрать висячую запятую."""
+        text = text.strip()
+        if text.startswith("```"):
+            text = text.strip("`")
+            if text.lower().startswith("json"):
+                text = text[4:]
+        stack = []
+        in_string = False
+        escaped = False
+        for char in text:
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == '"':
+                in_string = True
+            elif char in "{[":
+                stack.append(char)
+            elif char in "}]":
+                if stack:
+                    stack.pop()
+        if in_string:
+            text += '"'
+        for opener in reversed(stack):
+            text += "}" if opener == "{" else "]"
+        text = re.sub(r",\s*([}\]])", r"\1", text)
+        return text
+
+    @staticmethod
     def extract_json(text):
         if text.startswith("```"):
             text = text.strip("`")
@@ -222,169 +392,193 @@ class MiniMaxPerception:
                 text = text[4:]
         start = text.find("{")
         end = text.rfind("}")
-        if start == -1 or end == -1:
+        if start == -1:
             raise PerceptionError("в ответе модели нет JSON")
-        return json.loads(text[start:end + 1])
+        candidate = text[start:end + 1] if end > start else text[start:]
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            repaired = MiniMaxPerception.repair_json(candidate)
+            try:
+                return json.loads(repaired)
+            except json.JSONDecodeError as exc:
+                raise PerceptionError(f"JSON не разобран даже после починки: {exc}") from exc
 
-    def scene_graph(self, image_path, save_raw=None, max_attempts=2):
+    def scene_graph(self, image_path, save_raw=None, max_attempts=3):
         path = Path(image_path)
         media_type = mimetypes.guess_type(path.name)[0] or "image/jpeg"
         image_b64 = base64.b64encode(path.read_bytes()).decode("ascii")
 
-        prompt = PROMPT
-        last_error = None
         raw_calls = []
+        prompt = INVENTORY_PROMPT
+        last_error = None
+        scene = None
+
         for attempt in range(1, max_attempts + 1):
-            payload, latency = self.call(image_b64, media_type, prompt)
+            payload, latency = self.call(image_b64, media_type, prompt, max_tokens=6000)
             text = self.text_of(payload)
-            raw_calls.append({"prompt": prompt, "payload": payload, "latency_ms": latency})
+            raw_calls.append({"pass": "inventory", "prompt": prompt, "payload": payload, "latency_ms": latency})
             try:
-                scene = self.extract_json(text)
+                candidate = self.extract_json(text)
             except (json.JSONDecodeError, PerceptionError) as exc:
                 last_error = f"JSON не разобран: {exc}"
-                prompt = PROMPT + f"\n\nПредыдущий ответ не распознан ({last_error}). Верни ТОЛЬКО корректный JSON."
+                prompt = INVENTORY_PROMPT + f"\n\nПредыдущий ответ не распознан ({last_error}). Верни ТОЛЬКО корректный JSON."
                 continue
 
-            scene.setdefault("surfaces", [])
-            scene.setdefault("objects", [])
-            scene.setdefault("regions", [])
-            scene.setdefault("observations", [])
-            problems = validate_scene(scene)
+            candidate.setdefault("surfaces", [])
+            candidate.setdefault("objects", [])
+            candidate.setdefault("observations", [])
+            candidate["regions"] = []
+            candidate, notes = normalize_scene(candidate)
+            candidate.setdefault("anomalies", [])
+            candidate["anomalies"] = list(candidate["anomalies"]) + notes
+
+            problems = validate_scene(candidate)
             if problems:
                 last_error = "; ".join(f"{p['code']}: {p['detail']}" for p in problems[:6])
                 prompt = (
-                    PROMPT
-                    + "\n\nТвой предыдущий граф нарушает схему: "
-                    + last_error
+                    INVENTORY_PROMPT
+                    + "\n\nТвой предыдущий ответ нарушает схему: " + last_error
                     + "\nИсправь и верни ТОЛЬКО корректный JSON."
                 )
                 continue
+            scene = candidate
+            break
 
-            anomalies = scene.pop("anomalies", [])
-            normalized, notes = normalize_scene(scene)
-            anomalies.extend(notes)
-            scene = normalized
+        if scene is None:
+            raise PerceptionError(f"не удалось получить корректный сцена-граф: {last_error}")
 
-            sweep = None
-            if self.sweep_absence:
-                sweep_payload, sweep_regions, sweep_latency = self._absence_sweep(image_b64, media_type)
-                raw_calls.append({"prompt": ABSENCE_SWEEP_PROMPT, "payload": sweep_payload,
-                                  "latency_ms": sweep_latency})
-                scene["regions"].extend(sweep_regions)
+        regions, checklist_calls = self._checklist(image_b64, media_type)
+        raw_calls.extend(checklist_calls)
+        scene["regions"].extend(regions)
 
-            interrogation = None
-            if self.interrogate_regions:
-                interrogation, interrogation_raw = self._interrogate(image_path, scene)
-                raw_calls.extend(interrogation_raw)
-                known = {(r.get("kind"), tuple(r.get("bbox") or ())) for r in scene["regions"]}
-                for region in interrogation:
-                    key = (region.get("kind"), tuple(region.get("bbox") or ()))
-                    if key not in known:
-                        scene["regions"].append(region)
-                        known.add(key)
+        if self.verify_crops:
+            verified, verify_calls = self._verify(image_b64, media_type, regions)
+            raw_calls.extend(verify_calls)
+            if verified is not None:
+                scene["regions"] = verified
 
-            usage = (raw_calls[0]["payload"].get("usage") or {}) if raw_calls else {}
-            meta = {
-                "model": self.model,
-                "latency_ms": sum(c["latency_ms"] for c in raw_calls),
-                "input_tokens": usage.get("input_tokens"),
-                "output_tokens": usage.get("output_tokens"),
-                "attempts": attempt,
-                "anomalies": anomalies,
-                "absence_sweep": bool(self.sweep_absence),
-                "interrogation": bool(self.interrogate_regions),
-                "normalized": bool(notes),
-            }
-            scene["meta"] = {**scene.get("meta", {}), "perception": meta}
-            if save_raw:
-                raw_path = Path(save_raw)
-                raw_path.parent.mkdir(parents=True, exist_ok=True)
-                raw_path.write_text(
-                    json.dumps({"calls": raw_calls, "scene": scene}, ensure_ascii=False, indent=2),
-                    encoding="utf-8",
-                )
-                scene["meta"]["perception"]["raw"] = str(raw_path)
-            return scene, meta
+        usage = (raw_calls[0]["payload"].get("usage") or {}) if raw_calls else {}
+        meta = {
+            "model": self.model,
+            "latency_ms": sum(c["latency_ms"] for c in raw_calls),
+            "input_tokens": usage.get("input_tokens"),
+            "output_tokens": usage.get("output_tokens"),
+            "calls": len(raw_calls),
+            "anomalies": scene.get("anomalies", []),
+            "regions_found": len(scene.get("regions", [])),
+        }
+        scene["meta"] = {**scene.get("meta", {}), "perception": meta}
+        if save_raw:
+            raw_path = Path(save_raw)
+            raw_path.parent.mkdir(parents=True, exist_ok=True)
+            raw_path.write_text(
+                json.dumps({"calls": raw_calls, "scene": scene}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            scene["meta"]["perception"]["raw"] = str(raw_path)
+        return scene, meta
 
-        raise PerceptionError(f"не удалось получить корректный сцена-граф: {last_error}")
+    def _checklist(self, image_b64, media_type):
+        """Перечисление следов, при необходимости — голосованием.
 
-    def _interrogate(self, image_path, scene, max_crops=4, min_confidence=0.5):
-        """Покадровый допрос: кроп + узкий вопрос про следы отсутствия."""
-        from .crops import HAS_PIL, crop_normalized
-
-        if not HAS_PIL:
-            return [], []
-
-        candidates = []
-        for region in scene.get("regions", []):
-            bbox = region.get("bbox")
-            if not bbox or len(bbox) < 4:
-                continue
-            area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
-            if area < 0.002 or area > 0.6:
-                continue
-            candidates.append(region)
-        candidates.sort(key=lambda r: (r.get("contrast") or 0.0), reverse=True)
-        candidates = candidates[:max_crops]
-
-        regions = []
-        raw_calls = []
-        for index, region in enumerate(candidates, start=1):
-            crop_path = Path(f"/tmp/elementarno-crop-{index}.png")
+        Ответы модели различаются от сессии к сессии даже при temperature=0,
+        поэтому число голосов сделано параметром: один голос — скорость,
+        три голоса — устойчивость. Вид попадает в сцену, если набрал
+        большинство голосов.
+        """
+        raw = []
+        votes = []
+        for _ in range(self.votes):
+            payload, latency = self.call(image_b64, media_type, CHECKLIST_READY, max_tokens=4000)
+            raw.append({"pass": "checklist", "prompt": CHECKLIST_READY, "payload": payload,
+                        "latency_ms": latency})
             try:
-                cropped = crop_normalized(image_path, crop_path, region["bbox"])
-            except Exception:  # noqa: BLE001 — кроп не обязателен
-                cropped = None
-            if not cropped:
-                continue
-            with open(cropped, "rb") as handle:
-                data = base64.b64encode(handle.read()).decode("ascii")
-            payload, latency = self.call(data, "image/png", CROP_QUESTION_PROMPT)
-            raw_calls.append({"prompt": CROP_QUESTION_PROMPT, "payload": payload,
-                              "latency_ms": latency, "crop_of": region.get("id")})
-            try:
-                parsed = self.extract_json(self.text_of(payload))
+                data = self.extract_json(self.text_of(payload))
             except (json.JSONDecodeError, PerceptionError):
                 continue
-            for found in parsed.get("candidates", []) or []:
-                confidence = float(found.get("confidence") or 0.0)
-                kind = found.get("kind")
-                if confidence < min_confidence or not kind:
-                    continue
-                regions.append({
-                    "id": f"i{index}_{len(regions) + 1}",
-                    "kind": kind,
-                    "shape": region.get("shape", "unknown"),
-                    "freshness": found.get("freshness", region.get("freshness", "unknown")),
-                    "edges": found.get("edges", region.get("edges", "unknown")),
-                    "bbox": region.get("bbox"),
-                    "note": found.get("why", ""),
-                })
-        return regions, raw_calls
+            votes.append(data.get("found", []) or [])
 
-    def _absence_sweep(self, image_b64, media_type):
-        payload, latency = self.call(image_b64, media_type, ABSENCE_SWEEP_PROMPT)
-        text = self.text_of(payload)
-        try:
-            data = self.extract_json(text)
-        except (json.JSONDecodeError, PerceptionError):
-            return payload, [], latency
+        if not votes:
+            return [], raw
+
+        known = {kind for kind, _ in TRACE_CHECKLIST}
+        questions = dict(TRACE_CHECKLIST)
+        tally = {}
+        for found in votes:
+            seen_in_vote = set()
+            for item in found:
+                kind = normalize_kind(item.get("kind"), known)
+                if not kind or kind in seen_in_vote:
+                    continue
+                seen_in_vote.add(kind)
+                entry = tally.setdefault(kind, {"count": 0, "item": item})
+                entry["count"] += 1
+
+        needed = (len(votes) // 2) + 1
         regions = []
-        for index, candidate in enumerate(data.get("candidates", []) or [], start=1):
-            kind = candidate.get("kind")
-            if not kind:
+        for index, (kind, entry) in enumerate(tally.items(), start=1):
+            if entry["count"] < needed:
                 continue
-            region = {
-                "id": f"a{index}",
+            item = entry["item"]
+            bbox = item.get("bbox") or [0, 0, 0, 0]
+            if not isinstance(bbox, list) or len(bbox) != 4:
+                bbox = [0, 0, 0, 0]
+            try:
+                confidence = float(item.get("confidence") or 0.7)
+            except (TypeError, ValueError):
+                confidence = 0.7
+            regions.append({
+                "id": f"c{index}",
                 "kind": kind,
-                "shape": candidate.get("shape", "unknown"),
-                "contrast": candidate.get("contrast", 0.1),
-                "freshness": candidate.get("freshness", "unknown"),
-                "edges": candidate.get("edges", "unknown"),
-                "bbox": candidate.get("bbox", [0, 0, 0, 0]),
-                "note": candidate.get("why", ""),
-            }
-            if candidate.get("area_m2") is not None:
-                region["area_m2"] = candidate["area_m2"]
-            regions.append(region)
-        return payload, regions, latency
+                "bbox": bbox,
+                "note": item.get("note", ""),
+                "confidence": min(confidence, 0.95),
+                "votes": entry["count"],
+                "votes_total": len(votes),
+                "question": questions.get(kind, ""),
+            })
+        return regions, raw
+
+    def _verify(self, image_b64, media_type, regions, max_regions=6):
+        """Подтверждение находки по её собственному описанию.
+
+        Кроп-проверка отвергнута намеренно: координаты, которые модель отдаёт
+        для bbox, ненадёжны, и кроп по ним сбивается с реальной областью —
+        верная находка при этом терялась. Описание же модель формулирует
+        своими словами, и его можно проверить на всей фотографии.
+        """
+        if not regions:
+            return None, []
+
+        raw = []
+        verified = []
+        ranked = sorted(regions, key=lambda r: -(r.get("confidence") or 0.0))
+        for region in ranked[:max_regions]:
+            description = region.get("note") or region.get("question") or region.get("kind")
+            prompt = VERIFY_PROMPT.format(description=description)
+            payload, latency = self.call(image_b64, media_type, prompt, max_tokens=600)
+            raw.append({"pass": "verify", "prompt": prompt, "payload": payload,
+                        "latency_ms": latency, "region": region["id"]})
+            try:
+                answer = self.extract_json(self.text_of(payload))
+            except (json.JSONDecodeError, PerceptionError):
+                verified.append(region)
+                continue
+            confidence = float(answer.get("confidence") or 0.0)
+            if answer.get("yes"):
+                region = dict(region)
+                region["verified"] = True
+                region["confidence"] = min(region.get("confidence", 0.0), max(confidence, 0.5))
+                region["note"] = answer.get("note") or region.get("note", "")
+                verified.append(region)
+            elif confidence >= 0.8:
+                continue
+            else:
+                region = dict(region)
+                region["verified"] = False
+                region["confidence"] = round((region.get("confidence") or 0.0) * 0.6, 3)
+                region["note"] = (region.get("note", "") + " | проверка не подтвердила: "
+                                  + (answer.get("note") or "")).strip()
+                verified.append(region)
+        return verified, raw

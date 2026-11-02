@@ -1,0 +1,204 @@
+{
+  "pack": "office",
+  "title": "Офис и рабочее место: следы рук, бумаги, печати",
+  "rules": [
+    {
+      "id": "OFF-001",
+      "version": 1,
+      "pack": "office",
+      "title": "Кольца от кружек на рабочем столе",
+      "domain": "office",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=cup_ring]",
+        "gte": 2
+      },
+      "inference": {
+        "claim": "На рабочем столе несколько следов кружек: за этим местом регулярно кто-то работает",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.6,
+        "step": "role",
+        "tags": [
+          "coffee_habit",
+          "regular_place"
+        ]
+      },
+      "anchors": [
+        "regions[kind=cup_ring].id"
+      ],
+      "confounds": [
+        "Круги могли остаться от разных людей или от уборки",
+        "Одинаковые круги в ряд — просевшая посуда, а не привычка"
+      ],
+      "exceptions": [
+        "Круги в ряд и на одном уровне — след просадки стопки"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить диаметры: одинаковые круги при разном рисунке — разные кружки"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "OFF-002",
+      "version": 1,
+      "pack": "office",
+      "title": "Следы чернил на столе",
+      "domain": "office",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=ink_trace]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности следы чернил или тонера: здесь печатали или пачкали",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.65,
+        "step": "activity",
+        "tags": [
+          "printing",
+          "office_habit"
+        ]
+      },
+      "anchors": [
+        "regions[kind=ink_trace].id"
+      ],
+      "confounds": [
+        "Пятно могло остаться от подписи или от протечки с pensila",
+        "Тонер и чернила на фото неразличимы"
+      ],
+      "exceptions": [
+        "Пятно совпадает с подписью на бумаге рядом"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, проницает ли пятно в бумагу: тонер не проникает, чернила проникают"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Ink and Paper)",
+          "note": "чернила и бумага как следовые материалы",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "OFF-003",
+      "version": 1,
+      "pack": "office",
+      "title": "След пальца на стеклянной перегородке",
+      "domain": "office",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=fingerprint]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На стекле виден отпечаток ладони: к перегородке прикасались, когда на ней была пыль",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.7,
+        "step": "role",
+        "tags": [
+          "touched",
+          "office_habit"
+        ]
+      },
+      "anchors": [
+        "regions[kind=fingerprint].id"
+      ],
+      "confounds": [
+        "Отпечаток мог быть оставлен при монтаже или уборке",
+        "След на стекле может быть заводским загрязнением"
+      ],
+      "exceptions": [
+        "Отпечаток совпадает по форме с отпечатком другой поверхности в сцене"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Просмотреть, перекрывает ли отпечаток слои пыли: касание было после оседания"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "OFF-004",
+      "version": 1,
+      "pack": "office",
+      "title": "Кабель уведён в сторону от розетки",
+      "domain": "office",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "dangling",
+        "path": "objects.on",
+        "collection": "surfaces"
+      },
+      "inference": {
+        "claim": "Оборудование стоит не там, где его можно запитать: в сцене переставляли или подключали заново",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.5,
+        "step": "activity",
+        "tags": [
+          "rearranged",
+          "office_habit"
+        ]
+      },
+      "anchors": [],
+      "confounds": [
+        "Оборудование может питаться от удлинителя или скрытой розетки",
+        "Граф сцены может быть неполным, и розетка в него не попала"
+      ],
+      "exceptions": [
+        "В сцене есть удлинитель или напольная розетка"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проследить кабель до источника питания вживую"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

@@ -8,7 +8,7 @@
 содержание: утверждения, уверенности и цитаты остаются теми же.
 """
 
-LADDER = ["scene", "activity", "presence", "action"]
+LADDER = ["scene", "activity", "presence", "role", "action"]
 
 PERSONAS = {}
 
@@ -29,6 +29,7 @@ def _doyle():
             "scene": "Место действия:",
             "activity": "Чем здесь занимались:",
             "presence": "Кто был в сцене:",
+            "role": "Чем он занимался:",
             "action": "Что именно делали:",
         },
         "fact": "{title} — доказательство [{rule_id}], уверенность {confidence:.0%}. Отсюда следует: {claim}",
@@ -49,6 +50,7 @@ def _plain():
             "scene": "Место:",
             "activity": "Активность:",
             "presence": "Присутствовали:",
+            "role": "Чем занимались:",
             "action": "Действия:",
         },
         "fact": "{claim} (основание: {title} [{rule_id}], уверенность {confidence:.0%})",
@@ -69,6 +71,7 @@ def _forensic():
             "scene": "Объект съёмки:",
             "activity": "Активность:",
             "presence": "Присутствовали:",
+            "role": "Чем занимались:",
             "action": "Действия:",
         },
         "fact": "{claim} Основание: {title} [{rule_id}], достоверность {confidence:.0%}.",

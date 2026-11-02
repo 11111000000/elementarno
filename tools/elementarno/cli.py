@@ -198,14 +198,15 @@ def cmd_mcp_list(args):
 def cmd_perceive(args):
     from .perception import MiniMaxPerception
 
-    perception = MiniMaxPerception(model=args.model, think=args.think)
+    perception = MiniMaxPerception(model=args.model, think=args.think,
+                                   votes=getattr(args, "votes", 1))
     scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
     if args.out:
         Path(args.out).write_text(json.dumps(scene, ensure_ascii=False, indent=2), encoding="utf-8")
     if args.json:
         dump(scene)
         return 0
-    print(f"сцена-граф получен: {meta['model']}, {meta['latency_ms']} мс, попыток: {meta['attempts']}")
+    print(f"сцена-граф получен: {meta['model']}, {meta['latency_ms']} мс, вызовов: {meta.get('calls')}")
     print(f"  объектов: {len(scene['objects'])}, поверхностей: {len(scene['surfaces'])}, "
           f"регионов: {len(scene['regions'])}")
     for anomaly in scene["meta"]["perception"].get("anomalies", []):
@@ -216,7 +217,8 @@ def cmd_perceive(args):
 def cmd_analyze(args):
     from .perception import MiniMaxPerception
 
-    perception = MiniMaxPerception(model=args.model, think=args.think)
+    perception = MiniMaxPerception(model=args.model, think=args.think,
+                                   votes=getattr(args, "votes", 1))
     scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
@@ -226,9 +228,105 @@ def cmd_analyze(args):
                if not any(e.get("claim_id") == c["claim_id"] for e in report["errors"])]
     hypotheses = score_hypotheses(findings, usable, [])
     state = decide_verdict(findings, usable, args.min_findings, args.mode)
-    print(f"восприятие: {meta['model']}, {meta['latency_ms']} мс, токенов: "
-          f"{meta['input_tokens']}→{meta['output_tokens']}")
+    print(f"восприятие: {meta['model']}, {meta['latency_ms']} мс, вызовов: {meta.get('calls')}, "
+          f"токенов: {meta.get('input_tokens')}→{meta.get('output_tokens')}")
     print(render(args.mode, findings, usable, hypotheses, state, args.persona, report))
+    return 0
+
+
+def cmd_reason(args):
+    from .reasoning import MiniMaxReasoner
+
+    scene = load_json(args.scene)
+    rules = selected_rules(args.rules, args.pack)
+    findings = evaluate_all(rules, scene)
+    reasoner = MiniMaxReasoner(model=args.model, think=not args.no_think)
+    ledger, meta = reasoner.reason(scene, findings, extra_instruction=args.instruction)
+    report = validate(findings, ledger)
+    usable = [c for c in ledger["claims"]
+               if not any(e.get("claim_id") == c["claim_id"] for e in report["errors"])]
+    hypotheses = score_hypotheses(findings, usable, ledger.get("hypotheses", []))
+    state = decide_verdict(findings, usable, args.min_findings, args.mode)
+    if args.out:
+        Path(args.out).write_text(json.dumps(ledger, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"рассуждение: {meta['model']}, {meta['latency_ms']} мс, вызовов: {meta.get('calls')}")
+    if meta.get("dropped"):
+        print(f"отброшено протоколом: {meta['dropped']}")
+    print(render(args.mode, findings, usable, hypotheses, state, args.persona, report))
+    return 0
+
+
+def cmd_nextshot(args):
+    from .nextshot import hypothesis_tags, kind_tags_from_rules, rank_questions
+
+    scene = load_json(args.scene)
+    rules = selected_rules(args.rules, args.pack)
+    findings = evaluate_all(rules, scene)
+    claims = build_claims(findings)
+    hypotheses = score_hypotheses(findings, claims, load_json(args.hypotheses)["hypotheses"]
+                                 if args.hypotheses else [])
+    found_kinds = {r.get("kind") for r in scene.get("regions", [])}
+    questions = rank_questions(
+        hypotheses,
+        hypothesis_tags(hypotheses, findings),
+        kind_tags_from_rules(rules),
+        found_kinds,
+        limit=args.limit,
+    )
+    if args.json:
+        dump(questions)
+        return 0
+    if not questions:
+        print("Спросить нечего: версий, которые можно различить, нет.")
+        return 0
+    print("Что снять дальше (по ценности информации):")
+    for index, question in enumerate(questions, start=1):
+        print(f"\n{index}. {question['question']}")
+        print(f"   зачем: {question['why']}")
+        print(f"   ценность информации: {question['eig']:.3f} бит; следы: {', '.join(question['kinds']) or '—'}")
+    return 0
+
+
+def cmd_session(args):
+    from .dialog import Session
+
+    rules = selected_rules(args.rules, args.pack)
+    if args.state and Path(args.state).exists():
+        session = Session.load(args.state, rules)
+    else:
+        participants = []
+        if args.participants:
+            participants = load_json(args.participants).get("participants", [])
+        session = Session(rules, participants)
+
+    for image in args.image or []:
+        from .perception import MiniMaxPerception
+
+        perception = MiniMaxPerception(model=args.model)
+        scene, _ = perception.scene_graph(image)
+        session.add_scene(scene, source=image)
+
+    result = session.analyze()
+    if args.state:
+        session.save(args.state)
+
+    if args.json:
+        dump({
+            "verdict": result["verdict"],
+            "findings": [f["rule_id"] for f in result["findings"]],
+            "claims": [c["claim_id"] for c in result["claims"]],
+            "hypotheses": [h["text"] for h in result["hypotheses"]],
+            "questions": result["questions"],
+        })
+        return 0
+
+    print(f"раундов в сессии: {len(session.rounds)}; улик: {len(result['findings'])}; вердикт: {result['verdict']}")
+    for finding in result["findings"]:
+        print(f"  [{finding['rule_id']}] {finding['inference']} (≤ {finding['confidence_ceiling']:.2f})")
+    if result["questions"]:
+        print("\nЧто снять или уточнить дальше:")
+        for question in result["questions"]:
+            print(f"  • {question['question']}  (ценность {question['eig']:.3f} бит)")
     return 0
 
 
@@ -296,6 +394,8 @@ def build_parser():
     perceive.add_argument("--think", action="store_true", help="включить расширенное мышление")
     perceive.add_argument("--raw", help="куда сохранить сырой ответ модели")
     perceive.add_argument("--out", help="куда сохранить сцена-граф")
+    perceive.add_argument("--votes", type=int, default=1,
+                          help="сколько раз спросить перечисление следов: больше голосов — устойчивее")
     perceive.add_argument("--json", action="store_true")
     perceive.set_defaults(func=cmd_perceive)
 
@@ -308,7 +408,37 @@ def build_parser():
     analyze.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
     analyze.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
     analyze.add_argument("--min-findings", type=int, default=1)
+    analyze.add_argument("--votes", type=int, default=1)
     analyze.set_defaults(func=cmd_analyze)
+
+    reason = sub.add_parser("reason", help="слой рассуждения: связать улики в утверждения и версии")
+    reason.add_argument("scene")
+    reason.add_argument("--model", default="MiniMax-M3")
+    reason.add_argument("--no-think", action="store_true")
+    reason.add_argument("--instruction", help="дополнительное условие от пользователя")
+    reason.add_argument("--out", help="куда сохранить леджер")
+    reason.add_argument("--pack", action="append")
+    reason.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic"])
+    reason.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
+    reason.add_argument("--min-findings", type=int, default=1)
+    reason.set_defaults(func=cmd_reason)
+
+    nextshot = sub.add_parser("nextshot", help="какой следующий кадр различит версии")
+    nextshot.add_argument("scene")
+    nextshot.add_argument("--hypotheses", help="файл с гипотезами")
+    nextshot.add_argument("--pack", action="append")
+    nextshot.add_argument("--limit", type=int, default=3)
+    nextshot.add_argument("--json", action="store_true")
+    nextshot.set_defaults(func=cmd_nextshot)
+
+    session = sub.add_parser("session", help="серия фото: накопление улик и уточняющие вопросы")
+    session.add_argument("--image", action="append", help="кадр для добавления (можно повторять)")
+    session.add_argument("--state", help="файл состояния сессии")
+    session.add_argument("--participants", help="файл со списком участников")
+    session.add_argument("--model", default="MiniMax-M3")
+    session.add_argument("--pack", action="append")
+    session.add_argument("--json", action="store_true")
+    session.set_defaults(func=cmd_session)
 
     return parser
 

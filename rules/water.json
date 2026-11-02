@@ -144,7 +144,7 @@
         "step": "scene"
       },
       "anchors": [
-        "regions[kind=puddle].id"
+        "regions[kind=wet_trace].id"
       ],
       "confounds": [
         "Лужа могла быть вымыта уборкой и оказаться здесь после",

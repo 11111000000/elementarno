@@ -1,0 +1,486 @@
+{
+  "pack": "trade",
+  "title": "Следы ремесла и привычек: краска, стружка, мука, масло",
+  "rules": [
+    {
+      "id": "TRD-001",
+      "version": 1,
+      "pack": "trade",
+      "title": "Брызги краски",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=paint_splash]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене брызги краски: здесь красили — пульверизатором или кистью",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "step": "activity",
+        "tags": ["painting", "renovation"]
+      },
+      "anchors": ["regions[kind=paint_splash].id"],
+      "confounds": [
+        "Брызги могли попасть из банки или с одежды",
+        "Пятно краски на фотографии может быть цифровым артефактом"
+      ],
+      "exceptions": [
+        "Брызги равномерно окрашены и без брызговых капель — это фон, а не след"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, есть ли капли с чёткими краями: брызги имеют капли, а потёки — нет"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Paint)",
+          "note": "брызги и следы краски как следовой материал; конкретный стандарт уточняет эксперт",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-002",
+      "version": 1,
+      "pack": "trade",
+      "title": "Стружка и опилки",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=sawdust]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене стружка и опилки: здесь пилили, сверлили или шлифовали дерево",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "step": "activity",
+        "tags": ["carpentry", "woodwork"]
+      },
+      "anchors": ["regions[kind=sawdust].id"],
+      "confounds": [
+        "Стружка могла попасть с одежды или из мешка",
+        "В мастерской стружка может лежать месяцами"
+      ],
+      "exceptions": [
+        "Стружка сложена в контейнер или мешок — это склад, а не след работы"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить толщину стружки с инструментом: циркулярная пила даёт дугообразную стружку, рубанок — плоскую"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate: Wood)",
+          "note": "древесные частицы как следовой материал",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-003",
+      "version": 1,
+      "pack": "trade",
+      "title": "Мука и мучная пыль",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=flour_dust]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене мучная пыль: здесь месили тесто или работали с мукой",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.65,
+        "step": "activity",
+        "tags": ["baking", "kitchen_habit"]
+      },
+      "anchors": ["regions[kind=flour_dust].id"],
+      "confounds": [
+        "Мука в мешке или на полке — не след работы",
+        "Белый налёт может быть пылью, известкой или краской"
+      ],
+      "exceptions": [
+        "Налёт сосредоточен в мешке, банке или в одном месте — это хранение"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить распространение: мука от просевки размазана тонким слоем, от работы — комками и наростами"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate)",
+          "note": "частицы как следовой материал; бытовая специфика муки требует экспертной проверки",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-004",
+      "version": 1,
+      "pack": "trade",
+      "title": "Следы машинного масла и смазки",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=oil_trace]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене следы масла или смазки: здесь работали с механизмом или обслуживали технику",
+        "confidence_prior": 0.65,
+        "confidence_ceiling": 0.8,
+        "step": "activity",
+        "tags": ["mechanic", "maintenance"]
+      },
+      "anchors": ["regions[kind=oil_trace].id"],
+      "confounds": [
+        "Масляное пятно может быть от автомобиля или от батареи",
+        "Пятно могло остаться от ремонта, который закончился давно"
+      ],
+      "exceptions": [
+        "Пятно под стоящим агрегатом — это норма для гаража"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, есть ли в пятне металлическая стружка или следы инструмента: это работа по механике"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Lubricants, Metal)",
+          "note": "смазочные материалы и металл как следовые вещества",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-005",
+      "version": 1,
+      "pack": "trade",
+      "title": "Металлическая стружка от шлифовки",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=metal_swarf]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене металлическая стружка: шлифовали или точили металл",
+        "confidence_prior": 0.7,
+        "confidence_ceiling": 0.85,
+        "step": "activity",
+        "tags": ["metalwork", "grinding"]
+      },
+      "anchors": ["regions[kind=metal_swarf].id"],
+      "confounds": [
+        "Стружка могла попасть с инструмента или с одежды",
+        "В производственном цехе это норма, а не след работы"
+      ],
+      "exceptions": [
+        "Стружка собрана в лоток — признак организованного производства, а не единичной работы"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Отличить стружку от шлифовки по форме: абразивная пыль матовая, стружка металлическая и блестящая"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Metal)",
+          "note": "металлические частицы как следовой материал",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-006",
+      "version": 1,
+      "pack": "trade",
+      "title": "Штукатурная пыль",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=plaster_dust]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене штукатурная пыль: шлифовали стены или потолок",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.7,
+        "step": "activity",
+        "tags": ["renovation", "plastering"]
+      },
+      "anchors": ["regions[kind=plaster_dust].id"],
+      "confounds": [
+        "Пыль от штукатурки может быть старой, из прошлого ремонта",
+        "Белый налёт бывает от извести или от мела"
+      ],
+      "exceptions": [
+        "Пыль осела на упаковочной плёнке и защищённых поверхностях — следы шлифовки"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить слой: свежая штукатурная пыль рыхлая и осыпается, старая впиталась в поверхность"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate: Construction Dust)",
+          "note": "строительная пыль как следовой материал",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-007",
+      "version": 1,
+      "pack": "trade",
+      "title": "Повторяющиеся следы кружки",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=cup_ring]",
+        "gte": 2
+      },
+      "inference": {
+        "claim": "Следы кружки повторяются в одном месте: за этим столом постоянно кто-то сидит и пьёт",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.6,
+        "step": "role",
+        "tags": ["coffee_habit", "regular_place"]
+      },
+      "anchors": ["regions[kind=cup_ring].id"],
+      "confounds": [
+        "Круги могли оставить разные люди",
+        "Круги в ряд — это не привычка, а просевшая посуда"
+      ],
+      "exceptions": [
+        "Круги совпадают по форме и размеру с одной кружкой — тогда это один человек"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить диаметры: одинаковые круги при разном рисунке — разные кружки"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Surface Patterns)",
+          "note": "следы на поверхностях; бытовая интерпретация кружек требует экспертной проверки",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-008",
+      "version": 1,
+      "pack": "trade",
+      "title": "Следы чернил",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": ["regions"],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=ink_trace]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене следы чернил: здесь печатали, писали или работали с принтером",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.65,
+        "step": "activity",
+        "tags": ["printing", "office_habit"]
+      },
+      "anchors": ["regions[kind=ink_trace].id"],
+      "confounds": [
+        "Пятно чернил могло остаться от подписи документа",
+        "Тонер и чернила различаются, а на фото путаются"
+      ],
+      "exceptions": [
+        "Пятно совпадает с подписью на бумаге рядом"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, пахнет ли пятно растворителем и проницает ли бумагу: тонер не проницает"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Ink)",
+          "note": "чернила и тонер как следовые материалы",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-009",
+      "version": 1,
+      "pack": "trade",
+      "title": "Мастерская: стружка вместе с маслом",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "critical",
+      "requires": ["regions"],
+      "depends_on": ["TRD-002", "TRD-004"],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=sawdust]", "gte": 1},
+          {"kind": "count", "path": "regions[kind=oil_trace]", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "Стружка и следы масла в одной сцене: это рабочее помещение, а не жилая комната — участник здесь ремонтирует",
+        "confidence_prior": 0.6,
+        "confidence_ceiling": 0.8,
+        "step": "role",
+        "tags": ["workshop", "handyman", "repair"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Следы могли попасть с одежды мастера, пришедшего в гости",
+        "Стружка и масло могли попасть в сцену разными путями и в разное время"
+      ],
+      "exceptions": [
+        "Предметы сложены вместе к продаже, а не использовались"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить время следов: свежая стружка на слое пыли означает работу после того, как пыль осела"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "комбинирование следов разных материалов для вывода о месте работы",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-010",
+      "version": 1,
+      "pack": "trade",
+      "title": "Отпечаток рядом со следами краски",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": ["TRD-001"],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=paint_splash]", "gte": 1},
+          {"kind": "count", "path": "regions[kind=fingerprint]", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "Отпечаток пальца рядом с брызгами краски: вероятно, красил тот же человек, чья рука оставила отпечаток",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.6,
+        "step": "role",
+        "tags": ["painter", "same_hand"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Отпечаток мог быть оставлен раньше или позже краски",
+        "В сцене могли работать двое",
+        "Близость на фото не означает физической близости"
+      ],
+      "exceptions": [
+        "Отпечаток и брызги находятся на разных предметах в разных концах комнаты"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проверить, перекрывает ли отпечаток брызги: если краска лежит поверх отпечатка, сначала отпечаток"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
+          "note": "соотнесение следов разных материалов по последовательности наложения",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "TRD-011",
+      "version": 1,
+      "pack": "trade",
+      "title": "Ремонт: краска и штукатурная пыль вместе",
+      "domain": "trade",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": ["regions"],
+      "depends_on": ["TRD-001", "TRD-006"],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {"kind": "count", "path": "regions[kind=paint_splash]", "gte": 1},
+          {"kind": "count", "path": "regions[kind=plaster_dust]", "gte": 1}
+        ]
+      },
+      "inference": {
+        "claim": "Брызги краски вместе со штукатурной пылью: шёл ремонт с отделкой, и отделку делал участник сцены",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.7,
+        "step": "role",
+        "tags": ["renovation", "painter", "handyman"]
+      },
+      "anchors": [],
+      "confounds": [
+        "Краску и пыль могли оставить разные люди в разные дни",
+        "Оба следа могли быть от прошлого ремонта"
+      ],
+      "exceptions": [
+        "Пыль и краска лежат в разных помещениях и не пересекаются"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить свежесть следов: разная свежесть означает разные ремонты"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry, NIST — Trace Evidence",
+          "note": "комбинирование материалов для вывода о характере работ",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

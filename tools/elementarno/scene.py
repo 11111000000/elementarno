@@ -9,8 +9,10 @@ confident nonsense.
 VALID_REGIONS = {
     "dust_outline", "empty_hook", "unfaded_patch", "stain", "scratch", "crack",
     "dent", "burn", "water_line", "mold_patch", "footprint", "tyre_mark",
-    "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint",
-    "fingerprint", "other",
+    "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint", "wet_trace",
+    "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
+    "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
+    "metal_swarf", "other",
 }
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
@@ -88,12 +90,13 @@ def validate_scene(scene):
                 "detail": f"region {region.get('id')}: bbox must have 4 numbers",
             })
 
+    known_vertices = region_ids | surface_ids | {o.get("id") for o in scene.get("objects", []) or []}
     for obs in scene.get("observations", []) or []:
         about = obs.get("about")
-        if about and about not in region_ids:
+        if about and about not in known_vertices:
             problems.append({
                 "code": "dangling_observation",
-                "detail": f"observation {obs.get('id')} about unknown region {about}",
+                "detail": f"observation {obs.get('id')} about unknown element {about}",
             })
 
     for surface in scene.get("surfaces", []) or []:
