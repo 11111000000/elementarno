@@ -1,6 +1,8 @@
 import unittest
 
 from elementarno.dialog import Session, merge_scenes
+from elementarno.puzzle import build_claims
+from elementarno.rules import evaluate_all
 from elementarno.nextshot import (hypothesis_tags, information_gain, kind_tags_from_rules,
                                   rank_questions)
 from elementarno.reasoning import sanitize_claims, sanitize_hypotheses
@@ -43,14 +45,14 @@ class ReasoningTests(unittest.TestCase):
     def test_confidence_is_capped_by_ceiling(self):
         claims, _ = sanitize_claims([
             {"claim_id": "C-1", "kind": "observation", "text": "что-то",
-             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.95, "step": "action"},
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.95, "step": "activity"},
         ], [make_finding("F-ABS-001", ceiling=0.5)])
         self.assertEqual(claims[0]["confidence"], 0.5)
 
     def test_draft_rule_caps_at_half(self):
         claims, _ = sanitize_claims([
             {"claim_id": "C-1", "kind": "observation", "text": "что-то",
-             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.9, "step": "action"},
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.9, "step": "activity"},
         ], [make_finding("F-ABS-001", ceiling=0.85, provisional=True)])
         self.assertEqual(claims[0]["confidence"], 0.5)
         self.assertTrue(claims[0]["provisional"])
@@ -67,7 +69,7 @@ class ReasoningTests(unittest.TestCase):
     def test_personality_claim_is_dropped(self):
         claims, dropped = sanitize_claims([
             {"claim_id": "C-1", "kind": "inference", "text": "по фото виден характер",
-             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.3, "step": "action"},
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.3, "step": "activity"},
         ], [make_finding("F-ABS-001")])
         self.assertEqual(claims, [])
         self.assertEqual(dropped["personality_inference"], 1)
@@ -83,7 +85,7 @@ class ReasoningTests(unittest.TestCase):
     def test_interpretation_is_capped_and_marked(self):
         claims, _ = sanitize_claims([
             {"claim_id": "C-1", "kind": "interpretation", "text": "книга значит что-то",
-             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.9, "step": "action"},
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.9, "step": "activity"},
         ], [make_finding("F-ABS-001", ceiling=0.85)])
         self.assertEqual(claims[0]["confidence"], 0.4)
         self.assertTrue(claims[0]["speculative"])
@@ -106,7 +108,7 @@ class ReasoningTests(unittest.TestCase):
     def test_valid_ledger_survives(self):
         claims, _ = sanitize_claims([
             {"claim_id": "C-1", "kind": "inference", "text": "предмет убрали недавно",
-             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "step": "action",
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "step": "activity",
              "falsification": "посветить"},
         ], [make_finding("F-ABS-001")])
         self.assertEqual(len(claims), 1)
@@ -212,3 +214,77 @@ class SessionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AuditFixTests(unittest.TestCase):
+    """Проверки исправлений по итогам аудита (docs/AUDIT-2026-11.md)."""
+
+    def test_audit_mode_differs_from_detective(self):
+        from elementarno.render import render
+
+        scene = {"surfaces": [{"id": "s1", "name": "table", "dust_present": True}],
+                 "objects": [], "regions": [{"id": "r1", "kind": "dust_outline"}], "observations": []}
+        findings = evaluate_all(RULES, scene)
+        claims = build_claims(findings)
+        audit = render("audit", findings, claims, [], "sufficient_evidence", "doyle")
+        detective = render("detective", findings, claims, [], "sufficient_evidence", "doyle")
+        self.assertNotEqual(audit, detective)
+        self.assertNotIn("Уотсон", audit)
+
+    def test_hypothesis_without_evidence_cannot_lead(self):
+        from elementarno.ledger import score_hypotheses
+
+        finding = make_finding("F-X", ceiling=0.5)
+        finding["confidence_prior"] = 0.4
+        claims = [{"claim_id": "C-1", "kind": "inference", "text": "x",
+                   "support": [{"finding_id": "F-X"}], "confidence": 0.4, "step": "action"}]
+        hypotheses = [{"hypothesis_id": "H-1", "text": "с уликами", "claims": ["C-1"], "status": "open"},
+                      {"hypothesis_id": "H-2", "text": "без улик", "claims": [], "status": "open"}]
+        scored = score_hypotheses([finding], claims, hypotheses)
+        self.assertEqual(scored[0]["hypothesis_id"], "H-1")
+        self.assertIsNone(scored[1]["log_odds"])
+
+    def test_ladder_allows_only_one_rung_jump(self):
+        finding = make_finding("F-1", step="scene")
+        claims, dropped = sanitize_claims([
+            {"claim_id": "C-1", "kind": "inference", "text": "здесь кто-то был",
+             "support": [{"finding_id": "F-1"}], "confidence": 0.3, "step": "presence"},
+        ], [finding])
+        self.assertEqual(claims, [])
+        self.assertEqual(dropped["ladder_break"], 1)
+
+    def test_ladder_allows_adjacent_rung(self):
+        finding = make_finding("F-1", step="activity")
+        claims, dropped = sanitize_claims([
+            {"claim_id": "C-1", "kind": "inference", "text": "здесь кто-то был",
+             "support": [{"finding_id": "F-1"}], "confidence": 0.3, "step": "presence"},
+        ], [finding])
+        self.assertEqual(len(claims), 1)
+        self.assertNotIn("ladder_break", dropped)
+
+    def test_personality_check_is_context_aware(self):
+        from elementarno.ledger import mentions_personality
+
+        self.assertTrue(mentions_personality("по фото виден характер"))
+        self.assertFalse(mentions_personality("изменился характер пыли"))
+        self.assertFalse(mentions_personality("характер следа изменился"))
+
+    def test_grounding_precision_checks_anchors(self):
+        from elementarno.ledger import grounding_precision
+
+        scene = {"surfaces": [], "objects": [], "regions": [{"id": "r1"}]}
+        finding = make_finding("F-1")
+        finding["anchors"] = ["r1"]
+        claims = [{"claim_id": "C-1", "support": [{"finding_id": "F-1"}]}]
+        self.assertEqual(grounding_precision(scene, claims, [finding]), 1.0)
+        finding["anchors"] = ["r_missing"]
+        self.assertEqual(grounding_precision(scene, claims, [finding]), 0.0)
+
+    def test_shadow_unknown_is_not_a_direction(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "floor"}],
+            "objects": [{"id": "o1", "shadow_dir": "unknown"}, {"id": "o2", "shadow_dir": "west"}],
+            "regions": [], "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        self.assertNotIn("PHY-003", {f["rule_id"] for f in findings})

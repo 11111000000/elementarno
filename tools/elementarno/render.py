@@ -83,8 +83,32 @@ def _forensic():
     }
 
 
+AUDIT_TEMPLATES = {
+    "label": "аудит",
+    "open": "Протокол осмотра фотографии. Ниже — только то, что подтверждается уликами.",
+    "steps": {
+        "scene": "Объект съёмки:",
+        "activity": "Активность:",
+        "presence": "Присутствовали:",
+        "role": "Чем занимались:",
+        "action": "Действия:",
+    },
+    "fact": "{claim} [{rule_id}], уверенность {confidence:.0%}",
+    "caveat": "Оговорки: {confounds}.",
+    "hypothesis": "{text} [{rule_id}]",
+    "refused": "Совокупность улик недостаточна для формулирования вывода.",
+    "close": "Итого {count} улик(и).",
+    "footer": "Режим аудита: без гипотез и без персонажа — только утверждения со ссылками на правила.",
+}
+
+
 def render(mode, findings, claims, hypotheses, verdict, persona=None, validation=None):
-    templates = PERSONAS[persona]() if persona in PERSONAS else PERSONAS["plain"]()
+    if mode == "audit":
+        templates = AUDIT_TEMPLATES
+        claims = [c for c in claims if c.get("kind") in ("observation", "inference")]
+        hypotheses = []
+    else:
+        templates = PERSONAS[persona]() if persona in PERSONAS else PERSONAS["plain"]()
     findings_by_id = {f["finding_id"]: f for f in findings}
     lines = [templates["open"], ""]
 

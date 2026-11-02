@@ -116,6 +116,12 @@ def normalize_kind(raw, known):
 
     Модель пишет почти точные ключи, но иногда с синонимом или опечаткой.
     Несовпадение — это отсутствие улики, а не повод выдумывать вид.
+
+    Перебор упорядочен: порядок множества зависел от хеш-сида процесса,
+    и один и тот же ответ модели давал разный вид следа от запуска к
+    запуску. При нескольких совпадениях берётся самое специфичное
+    (mud_footprint, а не footprint); равные по длине — отбрасываются как
+    неоднозначные.
     """
     if not raw:
         return None
@@ -143,10 +149,12 @@ def normalize_kind(raw, known):
     }
     if value in aliases:
         return aliases[value]
-    for candidate in known:
-        if candidate in value or value in candidate:
-            return candidate
-    return None
+    matches = sorted((candidate for candidate in known if candidate in value), key=len, reverse=True)
+    if not matches:
+        return None
+    if len(matches) > 1 and len(matches[0]) == len(matches[1]):
+        return None
+    return matches[0]
 
 
 def _build_checklist_prompt():

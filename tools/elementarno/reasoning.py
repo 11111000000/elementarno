@@ -12,7 +12,7 @@
 import json
 import time
 
-from .ledger import ACCUSATORY_TERMS, LADDER_ORDER, PERSONALITY_TERMS
+from .ledger import ACCUSATORY_TERMS, LADDER_ORDER, ladder_jump, mentions_personality
 from .perception import MiniMaxPerception, PerceptionError
 
 REASONING_PROMPT = """Ты — аналитик, который восстанавливает картину по найденным уликам.
@@ -116,7 +116,7 @@ def sanitize_claims(claims, findings):
         if _has_term(claim.get("text"), ACCUSATORY_TERMS):
             drop("accusatory_framing")
             continue
-        if _has_term(claim.get("text"), PERSONALITY_TERMS):
+        if mentions_personality(claim.get("text")):
             if claim.get("kind") != "interpretation" or not claim.get("speculative"):
                 drop("personality_inference")
                 continue
@@ -126,8 +126,7 @@ def sanitize_claims(claims, findings):
         broken = False
         for support_item in known:
             finding = findings_by_id[support_item["finding_id"]]
-            finding_step = LADDER_ORDER.get(finding.get("step") or "action", 4)
-            if finding_step > claim_step:
+            if ladder_jump(step, finding.get("step") or "action") > (2 if claim_step == LADDER_ORDER["action"] else 1):
                 broken = True
                 break
         if broken:

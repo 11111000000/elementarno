@@ -24,18 +24,67 @@ ACCUSATORY_TERMS = (
     "совершил убийство", "совершил преступление", "замешан в",
 )
 
+# Свойства личности. Корни лексем + исключения: «характер» само по себе
+# может относиться к веществу («характер пыли»), и такое утверждение
+# отбрасывать нельзя. Поэтому проверка контекстная.
+PERSONALITY_ROOTS = (
+    "характер", "психика", "натура", "темперамент", "врождённ", "врожденн",
+    "нравственн", "душевн",
+)
+PERSONALITY_EXCEPTIONS = (
+    "характер пыли", "характер следов", "характер следа", "характер поверхности",
+    "характер вещества", "характер пятна", "характер почвы", "характер грязи",
+    "характер сцены", "характер помещения",
+)
 PERSONALITY_TERMS = (
-    "характер", "психика", "врождённый", "нравственность", "склонность к",
-    " тип человека", "натура",
+    "характер человека", "характер личности", "по характеру", "психика",
+    "врождённый", "врожденный", "нравственность", "склонность к",
+    "тип человека", "натура человека", "душевные качества", "темперамент",
 )
 
 
 LADDER_ORDER = {"scene": 0, "activity": 1, "presence": 2, "role": 3, "action": 4}
 
 
+def ladder_jump(claim_step, finding_step):
+    """На сколько ступеней утверждение опережает свою улику.
+
+    Общее правило — не более одной ступени: утверждение «кто-то был»
+    не может опираться на «это кухня». Исключение — ступень `action`:
+    вывод о действии («вошёл с улицы») по природе опирается на присутствие,
+    и требовать для этого ещё и роль значило бы запрещать нормальный вывод.
+    """
+    claim = LADDER_ORDER.get(claim_step, 4)
+    finding = LADDER_ORDER.get(finding_step, 4)
+    if finding > claim:
+        return 99
+    limit = 2 if claim == LADDER_ORDER["action"] else 1
+    return claim - finding
+
+
 def _has_term(text, terms):
     lowered = (text or "").lower()
     return [term for term in terms if term in lowered]
+
+
+def mentions_personality(text):
+    """Упоминание свойств личности человека.
+
+    Контекстная проверка: «изменился характер пыли» — утверждение о
+    веществе и должно проходить; «по фото виден характер» — вывод о
+    человеке, и проходить не должен.
+    """
+    lowered = (text or "").lower()
+    hits = _has_term(lowered, PERSONALITY_TERMS)
+    if hits:
+        return hits
+    roots = _has_term(lowered, PERSONALITY_ROOTS)
+    if not roots:
+        return []
+    exceptions = _has_term(lowered, PERSONALITY_EXCEPTIONS)
+    if exceptions:
+        return []
+    return roots
 
 
 def validate(findings, ledger):
@@ -130,14 +179,13 @@ def validate(findings, ledger):
                 "detail": f"вывод о вине недопустим: {accusatory}",
             })
 
-        personality = _has_term(claim.get("text"), PERSONALITY_TERMS)
+        personality = mentions_personality(claim.get("text"))
         if personality:
-            if claim.get("kind") != "interpretation" or not claim.get("speculative"):
-                errors.append({
-                    "claim_id": claim["claim_id"],
-                    "code": "personality_inference",
-                    "detail": f"свойства личности не выводятся из изображения: {personality}",
-                })
+            errors.append({
+                "claim_id": claim["claim_id"],
+                "code": "personality_inference",
+                "detail": f"свойства личности не выводятся из изображения: {personality}",
+            })
 
     for hypothesis in ledger.get("hypotheses", []):
         for claim_id in hypothesis.get("claims", []):
@@ -191,32 +239,51 @@ def score_hypotheses(findings, claims, hypotheses):
                 finding = findings_by_id.get(support["finding_id"])
                 if finding and finding not in support_findings:
                     support_findings.append(finding)
+        if not support_findings:
+            scored.append({
+                **hypothesis,
+                "log_odds": None,
+                "support_findings": [],
+                "note": "нет улик: версия не может возглавлять рейтинг",
+            })
+            continue
         total = sum(logit(f["confidence_prior"]) for f in support_findings)
-        confound_penalty = 0.25 * sum(len(f.get("confounds", [])) for f in support_findings)
+        confound_penalty = 0.15 * sum(len(f.get("confounds", [])) for f in support_findings)
         scored.append({
             **hypothesis,
             "log_odds": round(max(-6.0, min(6.0, total - confound_penalty)), 3),
             "support_findings": [f["finding_id"] for f in support_findings],
         })
-    scored.sort(key=lambda h: h["log_odds"], reverse=True)
+    scored.sort(key=lambda h: (h["log_odds"] is not None, h["log_odds"] or -99.0), reverse=True)
     return scored
 
 
-def grounding_precision(scene, claims):
-    """Fraction of claims whose anchors all exist in the scene graph."""
+def grounding_precision(scene, claims, findings=None):
+    """Доля утверждений, якоря которых действительно есть в графе сцены.
+
+    Проверяется не «есть ли ссылка», а разрешается ли якорь в конкретную
+    вершину: иначе утверждение о «пылевом контуре» может опираться на
+    правило, сработавшее не там.
+    """
     known = set()
     for collection in ("surfaces", "objects", "regions"):
-        for item in scene.get(collection, []):
+        for item in scene.get(collection, []) or []:
             if isinstance(item, dict) and item.get("id"):
                 known.add(item["id"])
     if not claims:
         return 1.0
+    findings_by_id = {f["finding_id"]: f for f in (findings or [])}
     grounded = 0
     for claim in claims:
-        anchors = set()
-        for support in claim.get("support", []):
-            anchors.add(support["finding_id"])
-        if anchors:
+        support = claim.get("support") or []
+        if not support:
+            continue
+        anchors = []
+        for item in support:
+            finding = findings_by_id.get(item.get("finding_id"))
+            if finding is not None:
+                anchors.extend(finding.get("anchors", []))
+        if anchors and all(anchor in known for anchor in anchors):
             grounded += 1
     return grounded / len(claims)
 

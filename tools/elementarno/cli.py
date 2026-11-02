@@ -25,12 +25,23 @@ def dump(data):
     print(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=False))
 
 
-def selected_rules(rules_dir, packs):
+def selected_rules(rules_dir, packs, profile=None):
     rules = load_packs(rules_dir)
+    if not packs and profile:
+        packs = profile.get("packs")
     if not packs:
         return rules
     wanted = set(packs)
     return [rule for rule in rules if rule.pack in wanted]
+
+
+def profile_for(args):
+    """Профиль из --config/--profile: пакеты, режим, персона, пороги."""
+    try:
+        config = cfg.load_config(args.config)
+        return cfg.get_profile(config, getattr(args, "profile", None))
+    except (FileNotFoundError, KeyError):
+        return None
 
 
 def cmd_check(args):
@@ -109,6 +120,11 @@ def cmd_verify(args):
 
 
 def cmd_tell(args):
+    profile = profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
+        args.persona = args.persona if args.persona != "plain" else (profile.get("persona") or args.persona)
+        args.min_findings = profile.get("min_findings", args.min_findings)
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
@@ -217,6 +233,13 @@ def cmd_perceive(args):
 def cmd_analyze(args):
     from .perception import MiniMaxPerception
 
+    profile = profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
+        args.mode = args.mode if args.mode != "detective" else profile.get("mode", args.mode)
+        args.persona = args.persona if args.persona != "plain" else (profile.get("persona") or args.persona)
+        args.min_findings = profile.get("min_findings", args.min_findings)
+
     perception = MiniMaxPerception(model=args.model, think=args.think,
                                    votes=getattr(args, "votes", 1))
     scene, meta = perception.scene_graph(args.image, save_raw=args.raw)
@@ -236,6 +259,10 @@ def cmd_analyze(args):
 
 def cmd_reason(args):
     from .reasoning import MiniMaxReasoner
+
+    profile = profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
 
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
@@ -258,6 +285,10 @@ def cmd_reason(args):
 
 def cmd_nextshot(args):
     from .nextshot import hypothesis_tags, kind_tags_from_rules, rank_questions
+
+    profile = profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
 
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
@@ -289,6 +320,10 @@ def cmd_nextshot(args):
 
 def cmd_session(args):
     from .dialog import Session
+
+    profile = profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
 
     rules = selected_rules(args.rules, args.pack)
     if args.state and Path(args.state).exists():
@@ -348,6 +383,7 @@ def build_parser():
     findings.add_argument("scene")
     findings.add_argument("--pack", action="append", help="ограничить паки (можно повторять)")
     findings.add_argument("--json", action="store_true")
+    findings.add_argument("--profile", help="профиль из config/profiles.json")
     findings.set_defaults(func=cmd_findings)
 
     diff = sub.add_parser("diff", help="различия между двумя кадрами")
@@ -361,6 +397,7 @@ def build_parser():
     verify.add_argument("--ledger", help="файл с утверждениями и гипотезами")
     verify.add_argument("--pack", action="append")
     verify.add_argument("--json", action="store_true")
+    verify.add_argument("--profile", help="профиль из config/profiles.json")
     verify.set_defaults(func=cmd_verify)
 
     tell = sub.add_parser("tell", help="рассказать по сцене")
@@ -370,6 +407,7 @@ def build_parser():
     tell.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
     tell.add_argument("--persona", default="plain", choices=["plain", "doyle", "forensic"])
     tell.add_argument("--min-findings", type=int, default=1)
+    tell.add_argument("--profile", help="профиль из config/profiles.json")
     tell.set_defaults(func=cmd_tell)
 
     puzzle = sub.add_parser("puzzle", help="разобрать загадку по серии кадров")
@@ -378,6 +416,7 @@ def build_parser():
     puzzle.add_argument("--mode", default="detective")
     puzzle.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
     puzzle.add_argument("--json", action="store_true")
+    puzzle.add_argument("--profile", help="профиль из config/profiles.json")
     puzzle.set_defaults(func=cmd_puzzle)
 
     bench = sub.add_parser("bench", help="прогнать бенчмарки")
@@ -397,6 +436,7 @@ def build_parser():
     perceive.add_argument("--votes", type=int, default=1,
                           help="сколько раз спросить перечисление следов: больше голосов — устойчивее")
     perceive.add_argument("--json", action="store_true")
+    perceive.add_argument("--profile", help="профиль из config/profiles.json")
     perceive.set_defaults(func=cmd_perceive)
 
     analyze = sub.add_parser("analyze", help="изображение → улики → версия (всё сразу)")
@@ -409,6 +449,7 @@ def build_parser():
     analyze.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
     analyze.add_argument("--min-findings", type=int, default=1)
     analyze.add_argument("--votes", type=int, default=1)
+    analyze.add_argument("--profile", help="профиль из config/profiles.json")
     analyze.set_defaults(func=cmd_analyze)
 
     reason = sub.add_parser("reason", help="слой рассуждения: связать улики в утверждения и версии")
@@ -421,6 +462,7 @@ def build_parser():
     reason.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic"])
     reason.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
     reason.add_argument("--min-findings", type=int, default=1)
+    reason.add_argument("--profile", help="профиль из config/profiles.json")
     reason.set_defaults(func=cmd_reason)
 
     nextshot = sub.add_parser("nextshot", help="какой следующий кадр различит версии")
@@ -429,6 +471,7 @@ def build_parser():
     nextshot.add_argument("--pack", action="append")
     nextshot.add_argument("--limit", type=int, default=3)
     nextshot.add_argument("--json", action="store_true")
+    nextshot.add_argument("--profile", help="профиль из config/profiles.json")
     nextshot.set_defaults(func=cmd_nextshot)
 
     session = sub.add_parser("session", help="серия фото: накопление улик и уточняющие вопросы")
@@ -438,6 +481,7 @@ def build_parser():
     session.add_argument("--model", default="MiniMax-M3")
     session.add_argument("--pack", action="append")
     session.add_argument("--json", action="store_true")
+    session.add_argument("--profile", help="профиль из config/profiles.json")
     session.set_defaults(func=cmd_session)
 
     return parser

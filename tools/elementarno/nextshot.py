@@ -94,9 +94,10 @@ def _entropy(weights):
 
 
 def _to_probabilities(log_odds):
-    if not log_odds:
+    values = [value for value in log_odds if value is not None]
+    if not values:
         return []
-    shifted = [value - max(log_odds) for value in log_odds]
+    shifted = [value - max(values) for value in values]
     exponentials = [math.exp(value) for value in shifted]
     total = sum(exponentials)
     return [value / total for value in exponentials]
@@ -133,16 +134,17 @@ def information_gain(hypotheses, kind, tags_by_hypothesis, tags_by_kind, base_ra
     правил, срабатывающих на этом следе. Несовместимые версии и делают
     вопрос полезным: ответ «след есть» резко перекашивает массу в их пользу.
     """
-    if len(hypotheses) < 2:
+    scored = [h for h in hypotheses if h.get("log_odds") is not None]
+    if len(scored) < 2:
         return 0.0
-    prior = _to_probabilities([h.get("log_odds", 0.0) for h in hypotheses])
+    prior = _to_probabilities([h.get("log_odds") for h in scored])
     if not prior:
         return 0.0
     prior_entropy = _entropy(prior)
 
     kind_labels = tags_by_kind.get(kind, set())
     yes_likelihoods = []
-    for hypothesis in hypotheses:
+    for hypothesis in scored:
         compatible = bool(tags_by_hypothesis.get(hypothesis.get("hypothesis_id"), set()) & kind_labels)
         yes_likelihoods.append(0.85 if compatible else base_rate)
 
@@ -161,6 +163,7 @@ def information_gain(hypotheses, kind, tags_by_hypothesis, tags_by_kind, base_ra
 
 def rank_questions(hypotheses, tags_by_hypothesis, tags_by_kind, found_kinds=None, limit=3):
     """Ранжированный список вопросов с ценностью информации."""
+    hypotheses = [h for h in hypotheses if h.get("log_odds") is not None]
     found_kinds = found_kinds or set()
     catalogue = list(QUESTIONS) + [
         {"id": key, "question": entry["question"], "why": entry["why"], "kinds": entry["kinds"]}

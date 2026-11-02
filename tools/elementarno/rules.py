@@ -5,10 +5,12 @@ without confounds is rejected at load time, not quietly tolerated.
 """
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from .paths import resolve, values_equal
+from .scene import VALID_OBJECT_STATES, VALID_REGIONS
 
 REQUIRED_FIELDS = (
     "id",
@@ -136,6 +138,50 @@ def load_packs(rules_dir):
     return rules
 
 
+KNOWN_COLLECTIONS = {
+    "surfaces", "objects", "regions", "observations", "light", "facts", "changes",
+}
+
+
+def _validate_paths(raw, path):
+    """Проверить пути правила: коллекция должна существовать, фильтры — нет.
+
+    Опечатка в пути раньше просто отключала правило молча: предикат
+    разрешался в пустой список, и «улика» не появлялась. Теперь такая
+    ошибка ломает загрузку.
+    """
+    problems = []
+
+    def check_path(value, label):
+        collection = value.split("[")[0].split(".")[0]
+        if collection not in KNOWN_COLLECTIONS:
+            problems.append(f"{label}={value!r}: неизвестная коллекция {collection!r}")
+            return
+        for key, item in re.findall(r"\[([a-z_]+)=([^\]]*)\]", value):
+            if key == "kind" and collection == "regions" and item not in VALID_REGIONS:
+                problems.append(f"{label}={value!r}: неизвестный вид региона {item!r}")
+            if key == "state" and collection == "objects" and item not in VALID_OBJECT_STATES:
+                problems.append(f"{label}={value!r}: неизвестное состояние объекта {item!r}")
+
+    def check(p):
+        if not isinstance(p, dict):
+            return
+        for key in ("path", "left", "right"):
+            value = p.get(key)
+            if isinstance(value, str):
+                check_path(value, key)
+        for child in p.get("conditions", []) or []:
+            check(child)
+        if isinstance(p.get("condition"), dict):
+            check(p["condition"])
+
+    check(raw.get("predicate", {}))
+    for anchor in raw.get("anchors", []) or []:
+        check_path(anchor, "anchor")
+    if problems:
+        raise RuleError(f"{path.name}: rule {raw.get('id', '?')}: " + "; ".join(problems))
+
+
 def _validate(raw, path):
     missing = [f for f in REQUIRED_FIELDS if f not in raw]
     if missing:
@@ -148,6 +194,7 @@ def _validate(raw, path):
         raise RuleError(f"{path.name}: rule {raw['id']} has no sources")
     if raw["review_status"] not in ("draft", "reviewed"):
         raise RuleError(f"{path.name}: rule {raw['id']} has unknown review_status")
+    _validate_paths(raw, path)
 
 
 def order_rules(rules):
@@ -217,7 +264,9 @@ def evaluate_predicate(predicate, scene, fired):
             return False
         return True
     if kind == "distinct":
-        values = [str(v).lower() for v in resolve(scene, predicate["path"])]
+        excluded = {str(v).lower() for v in predicate.get("exclude", [])}
+        values = [str(v).lower() for v in resolve(scene, predicate["path"])
+                  if str(v).lower() not in excluded]
         if "gte" in predicate:
             return len(set(values)) >= predicate["gte"]
         if "lte" in predicate:
