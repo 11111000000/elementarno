@@ -10,7 +10,10 @@
       "domain": "consistency",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["objects", "surfaces"],
+      "requires": [
+        "objects",
+        "surfaces"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "dangling",
@@ -21,7 +24,10 @@
         "claim": "В описании сцены есть объект, заявленный на поверхности, которой в графе нет — описание неполно",
         "confidence_prior": 0.9,
         "confidence_ceiling": 0.95,
-        "tags": ["scene_inconsistency"]
+        "tags": [
+          "scene_inconsistency"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [
@@ -32,7 +38,9 @@
         "Объект действительно висит: в графе нет поля опоры"
       ],
       "falsification": {
-        "refuted_by": ["PHY-002"],
+        "refuted_by": [
+          "PHY-002"
+        ],
         "physical_test": "Снять сцену шире: если поверхность видна и графа нет — ошибка разметки, а не сцены"
       },
       "sources": [
@@ -52,7 +60,10 @@
       "domain": "consistency",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["objects", "light"],
+      "requires": [
+        "objects",
+        "light"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "mismatch",
@@ -63,7 +74,11 @@
         "claim": "Направление тени не совпадает с направлением источника света — либо в сцене второй источник, либо кадр скомпонован",
         "confidence_prior": 0.7,
         "confidence_ceiling": 0.85,
-        "tags": ["light_conflict", "tampering"]
+        "tags": [
+          "light_conflict",
+          "tampering"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [
@@ -75,7 +90,9 @@
         "В сцене два и более источника света (журнал light содержит несколько записей)"
       ],
       "falsification": {
-        "refuted_by": ["PHY-003"],
+        "refuted_by": [
+          "PHY-003"
+        ],
         "physical_test": "Проверить число источников: если в кадре два окна, расхождение объяснимо"
       },
       "sources": [
@@ -95,7 +112,9 @@
       "domain": "consistency",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["objects"],
+      "requires": [
+        "objects"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "distinct",
@@ -106,7 +125,11 @@
         "claim": "В кадре наблюдаются тени как минимум двух направлений — либо источников больше одного, либо кадр собран из разных снимков",
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
-        "tags": ["light_conflict", "composite"]
+        "tags": [
+          "light_conflict",
+          "composite"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [
@@ -117,7 +140,9 @@
         "В сцене явно несколько источников света"
       ],
       "falsification": {
-        "refuted_by": ["PHY-002"],
+        "refuted_by": [
+          "PHY-002"
+        ],
         "physical_test": "Пересчитать направление тени от фактического положения источника в каждом случае отдельно"
       },
       "sources": [
@@ -137,7 +162,9 @@
       "domain": "consistency",
       "layer": "epistemic",
       "severity": "info",
-      "requires": ["objects"],
+      "requires": [
+        "objects"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "max",
@@ -148,7 +175,11 @@
         "claim": "У объекта из бумаги зафиксировано заполнение — ошибка разметки либо предмет намок",
         "confidence_prior": 0.75,
         "confidence_ceiling": 0.85,
-        "tags": ["scene_inconsistency", "moisture"]
+        "tags": [
+          "scene_inconsistency",
+          "moisture"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [

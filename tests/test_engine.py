@@ -166,20 +166,125 @@ class RenderTests(unittest.TestCase):
         text = render("audit", self.findings, self.claims, [], "sufficient_evidence", "forensic")
         self.assertNotIn("Уотсон", text)
 
+    def test_ladder_goes_from_general_to_particular(self):
+        claims = [
+            {"claim_id": "C-1", "kind": "inference", "text": "сцена — кабинет",
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "step": "scene"},
+            {"claim_id": "C-2", "kind": "inference", "text": "здесь переставляли вещи",
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "step": "activity"},
+            {"claim_id": "C-3", "kind": "inference", "text": "здесь ходили",
+             "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "step": "presence"},
+        ]
+        text = render("detective", self.findings, claims, [], "sufficient_evidence", "plain")
+        positions = [text.index(label) for label in ("Место:", "Активность:", "Присутствовали:")]
+        self.assertEqual(positions, sorted(positions))
+
 
 class PuzzleTests(unittest.TestCase):
-    def test_suspect_is_ranked_by_matching_tags(self):
+    def test_participant_is_ranked_by_matching_tags(self):
         puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
         result = solve(puzzle, scenes, RULES)
         self.assertTrue(result["evaluation"]["correct"])
-        self.assertEqual(result["suspects"][0]["suspect_id"], "s1")
-        self.assertTrue(result["suspects"][1]["score"] < result["suspects"][0]["score"])
+        self.assertEqual(result["participants"][0]["participant_id"], "s1")
+        self.assertLess(result["participants"][1]["score"], result["participants"][0]["score"])
 
-    def test_suspect_without_matching_tags_scores_zero(self):
+    def test_participant_without_matching_tags_scores_zero(self):
         puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
         result = solve(puzzle, scenes, RULES)
-        butler = next(s for s in result["suspects"] if s["suspect_id"] == "s2")
-        self.assertEqual(butler["score"], 0.0)
+        other = next(p for p in result["participants"] if p["participant_id"] == "s2")
+        self.assertEqual(other["score"], 0.0)
+
+    def test_legacy_suspects_key_is_accepted(self):
+        puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
+        puzzle["suspects"] = puzzle.pop("participants")
+        result = solve(puzzle, scenes, RULES)
+        self.assertEqual(len(result["participants"]), 3)
+
+    def test_hypothesis_states_presence_not_guilt(self):
+        puzzle, scenes = load_puzzle(BENCH / "mystery-study/puzzle.json")
+        result = solve(puzzle, scenes, RULES)
+        for hypothesis in result["hypotheses"]:
+            self.assertIn("Присутствовал", hypothesis["text"])
+
+
+class PresenceTests(unittest.TestCase):
+    def test_two_shoe_sizes_imply_two_people(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "floor"}],
+            "objects": [],
+            "regions": [
+                {"id": "r1", "kind": "footprint", "size_m": 0.24},
+                {"id": "r2", "kind": "footprint", "size_m": 0.29},
+            ],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        ids = {f["rule_id"] for f in findings}
+        self.assertIn("PRES-001", ids)
+        finding = next(f for f in findings if f["rule_id"] == "PRES-001")
+        self.assertEqual(finding["step"], "presence")
+
+    def test_fingerprint_in_dust_is_recent_touch(self):
+        scene = {
+            "surfaces": [{"id": "s1", "name": "shelf", "dust_present": True}],
+            "objects": [],
+            "regions": [{"id": "r1", "kind": "fingerprint"}],
+            "observations": [],
+        }
+        findings = evaluate_all(RULES, scene)
+        ids = {f["rule_id"] for f in findings}
+        self.assertIn("PRES-003", ids)
+
+
+class FramingTests(unittest.TestCase):
+    def setUp(self):
+        self.scene = load(BENCH / "protocol-core/scenes/absence-dust-outline.json")
+        self.findings = evaluate_all(RULES, self.scene)
+
+    def test_accusatory_claim_is_rejected(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "hypothesis", "text": "Дворецкий виновен в краже",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+            "falsification": "проверить алиби",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("accusatory_framing", codes)
+
+    def test_personality_claim_is_rejected(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "inference", "text": "По фотографии виден характер человека",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("personality_inference", codes)
+
+    def test_presence_claim_passes(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "hypothesis", "text": "Присутствовал в сцене: садовник",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+            "falsification": "сверить след с обувью",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertNotIn("accusatory_framing", codes)
+        self.assertNotIn("personality_inference", codes)
+
+    def test_ladder_break_is_rejected(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "inference", "text": "это кабинет",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+            "step": "scene",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("ladder_break", codes)
+
+    def test_ladder_connectivity_passes(self):
+        report = validate(self.findings, {"claims": [{
+            "claim_id": "C-1", "kind": "inference", "text": "здесь переставляли вещи",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4, "provisional": True,
+            "step": "presence",
+        }]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertNotIn("ladder_break", codes)
 
 
 class SceneTests(unittest.TestCase):

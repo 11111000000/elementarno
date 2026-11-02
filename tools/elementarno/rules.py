@@ -103,6 +103,11 @@ class Rule:
         return self.raw.get("layer", "epistemic")
 
     @property
+    def step(self):
+        """Ступень обобщения: scene → activity → presence → action."""
+        return self.inference.get("step", "action")
+
+    @property
     def is_provisional(self):
         return self.review_status != "reviewed" or not all(s.get("verified") for s in self.sources)
 
@@ -246,6 +251,7 @@ def evaluate(rule, scene, fired):
         "pack": rule.pack,
         "title": rule.title,
         "layer": rule.layer,
+        "step": rule.step,
         "inference": rule.inference["claim"],
         "anchors": anchors,
         "tags": rule.tags,

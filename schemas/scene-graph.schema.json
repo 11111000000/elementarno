@@ -69,11 +69,12 @@
               "dust_outline", "empty_hook", "unfaded_patch", "stain", "scratch",
               "crack", "dent", "burn", "water_line", "mold_patch", "footprint",
               "tyre_mark", "tool_mark", "puddle", "condensation", "disturbed_dust",
-              "mud_footprint", "other"
+              "mud_footprint", "fingerprint", "other"
             ]
           },
           "shape": {"type": "string"},
           "area_m2": {"type": "number"},
+          "size_m": {"type": "number"},
           "contrast": {"type": "number", "minimum": 0, "maximum": 1},
           "freshness": {"type": "string", "enum": ["sharp", "soft", "erased", "unknown"]},
           "edges": {"type": "string", "enum": ["concave", "convex", "flat", "ragged", "unknown"]},

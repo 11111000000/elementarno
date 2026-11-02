@@ -10,7 +10,9 @@
       "domain": "mechanics",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -21,9 +23,15 @@
         "claim": "На поверхности сохранился след шин — по сцене проезжало транспортное средство",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
-        "tags": ["vehicle", "movement"]
+        "tags": [
+          "vehicle",
+          "movement"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=tyre_mark].id"],
+      "anchors": [
+        "regions[kind=tyre_mark].id"
+      ],
       "confounds": [
         "След мог остаться от давней парковки",
         "Протектор может принадлежать другому автомобилю"
@@ -52,7 +60,9 @@
       "domain": "mechanics",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -63,9 +73,15 @@
         "claim": "На поверхности след инструмента — здесь что-то вскрывали, разбирали или отгибали",
         "confidence_prior": 0.7,
         "confidence_ceiling": 0.85,
-        "tags": ["tool_use", "tampering"]
+        "tags": [
+          "tool_use",
+          "tampering"
+        ],
+        "step": "activity"
       },
-      "anchors": ["regions[kind=tool_mark].id"],
+      "anchors": [
+        "regions[kind=tool_mark].id"
+      ],
       "confounds": [
         "След мог быть оставлен при сборке или ремонте",
         "След может принадлежать отвёртке или шурупу, а не взлому"

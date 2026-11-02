@@ -15,6 +15,29 @@ class Verdict:
     CONFLICT = "conflicting_evidence"
 
 
+# Формулировки, которые приложение не имеет права производить: вывод о вине
+# или о свойствах характера не следует из изображения и не является
+# абдукцией. Проверка грубая, но она ловит самую частую ошибку — подменить
+# наблюдение обвинением.
+ACCUSATORY_TERMS = (
+    "виновен", "виноват", "винов", "убийц", "преступник", "причастен к убийству",
+    "совершил убийство", "совершил преступление", "замешан в",
+)
+
+PERSONALITY_TERMS = (
+    "характер", "психика", "врождённый", "нравственность", "склонность к",
+    " тип человека", "натура",
+)
+
+
+LADDER_ORDER = {"scene": 0, "activity": 1, "presence": 2, "action": 3}
+
+
+def _has_term(text, terms):
+    lowered = (text or "").lower()
+    return [term for term in terms if term in lowered]
+
+
 def validate(findings, ledger):
     findings_by_id = {f["finding_id"]: f for f in findings}
     errors = []
@@ -83,6 +106,37 @@ def validate(findings, ledger):
                     "claim_id": claim["claim_id"],
                     "code": "interpretation_too_confident",
                     "detail": "interpretation confidence must be <= 0.4",
+                })
+
+        claim_step = LADDER_ORDER.get(claim.get("step") or "action", 3)
+        for support in support:
+            finding = findings_by_id.get(support["finding_id"])
+            if not finding:
+                continue
+            finding_step = LADDER_ORDER.get(finding.get("step") or "action", 3)
+            if finding_step > claim_step:
+                errors.append({
+                    "claim_id": claim["claim_id"],
+                    "code": "ladder_break",
+                    "detail": f"улика {finding['rule_id']} относится к более частной ступени, "
+                              f"чем утверждение ({claim.get('step') or 'action'})",
+                })
+
+        accusatory = _has_term(claim.get("text"), ACCUSATORY_TERMS)
+        if accusatory:
+            errors.append({
+                "claim_id": claim["claim_id"],
+                "code": "accusatory_framing",
+                "detail": f"вывод о вине недопустим: {accusatory}",
+            })
+
+        personality = _has_term(claim.get("text"), PERSONALITY_TERMS)
+        if personality:
+            if claim.get("kind") != "interpretation" or not claim.get("speculative"):
+                errors.append({
+                    "claim_id": claim["claim_id"],
+                    "code": "personality_inference",
+                    "detail": f"свойства личности не выводятся из изображения: {personality}",
                 })
 
     for hypothesis in ledger.get("hypotheses", []):

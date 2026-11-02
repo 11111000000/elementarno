@@ -56,6 +56,7 @@ def build_claims(findings):
             "provisional": finding["provisional"],
             "confounds": finding.get("confounds", []),
             "falsification": finding.get("falsification", {}).get("physical_test"),
+            "step": finding.get("step", "action"),
         }
         if interpretive:
             claim["speculative"] = True
@@ -63,11 +64,11 @@ def build_claims(findings):
     return claims
 
 
-def score_suspects(suspects, findings):
-    """Trait tags are the only bridge between an observation and a suspect."""
+def score_participants(participants, findings):
+    """Мост от улики к участнику — только через явные метки."""
     scored = []
-    for suspect in suspects:
-        traits = set(suspect.get("traits", []))
+    for participant in participants:
+        traits = set(participant.get("traits", []))
         matched = []
         for finding in findings:
             overlap = traits & set(finding.get("tags", []))
@@ -80,8 +81,8 @@ def score_suspects(suspects, findings):
                 })
         score = sum(m["weight"] for m in matched)
         scored.append({
-            "suspect_id": suspect["id"],
-            "label": suspect.get("label", suspect["id"]),
+            "participant_id": participant["id"],
+            "label": participant.get("label", participant["id"]),
             "score": round(score, 3),
             "matches": matched,
             "explanation": "; ".join(
@@ -97,26 +98,27 @@ def solve(puzzle, scenes, rules, mode="detective"):
     merged = attach_changes(scenes[-1], changes)
     findings = evaluate_all(rules, merged)
     claims = build_claims(findings)
-    suspects = puzzle.get("suspects", [])
+    participants = puzzle.get("participants") or puzzle.get("suspects", [])
 
     hypotheses = []
-    for suspect in suspects:
+    for participant in participants:
         matched = [
             f for f in findings
-            if set(suspect.get("traits", [])) & set(f.get("tags", []))
+            if set(participant.get("traits", [])) & set(f.get("tags", []))
         ]
         hypothesis_claims = [f"C-{f['rule_id']}" for f in matched]
         hypotheses.append({
-            "hypothesis_id": f"H-{suspect['id']}",
-            "text": f"След ведёт к подозреваемому: {suspect.get('label', suspect['id'])}",
+            "hypothesis_id": f"H-{participant['id']}",
+            "text": f"Присутствовал в сцене: {participant.get('label', participant['id'])}",
             "claims": hypothesis_claims,
             "status": "open",
             "kill_log": [],
-            "suspect_id": suspect["id"],
+            "step": "presence",
+            "participant_id": participant["id"],
         })
 
     scored_hypotheses = score_hypotheses(findings, claims, hypotheses)
-    scored_suspects = score_suspects(suspects, findings)
+    scored_participants = score_participants(participants, findings)
 
     answer = puzzle.get("answer", {})
     result = {
@@ -126,12 +128,12 @@ def solve(puzzle, scenes, rules, mode="detective"):
         "findings": findings,
         "claims": claims,
         "hypotheses": scored_hypotheses,
-        "suspects": scored_suspects,
+        "participants": scored_participants,
         "answer": answer,
     }
-    if answer.get("suspect"):
-        expected = answer["suspect"]
-        top = scored_suspects[0]["suspect_id"] if scored_suspects else None
+    expected = answer.get("participant") or answer.get("suspect")
+    if expected:
+        top = scored_participants[0]["participant_id"] if scored_participants else None
         result["evaluation"] = {
             "expected": expected,
             "predicted": top,

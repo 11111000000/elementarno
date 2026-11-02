@@ -10,7 +10,9 @@
       "domain": "fire",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -21,9 +23,15 @@
         "claim": "На сцене есть ожог — здесь был открытый огонь или сильный нагрев",
         "confidence_prior": 0.85,
         "confidence_ceiling": 0.95,
-        "tags": ["fire", "heat"]
+        "tags": [
+          "fire",
+          "heat"
+        ],
+        "step": "scene"
       },
-      "anchors": ["regions[kind=burn].id"],
+      "anchors": [
+        "regions[kind=burn].id"
+      ],
       "confounds": [
         "Ожог может остаться от утюга, свечи или камина",
         "Пятно может быть копотью, а не ожогом"
@@ -52,7 +60,9 @@
       "domain": "fire",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["observations"],
+      "requires": [
+        "observations"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "present",
@@ -63,7 +73,12 @@
         "claim": "На полу V-образное обугливание — огонь шёл снизу вверх, очаг был у пола",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
-        "tags": ["fire", "origin", "low_burn"]
+        "tags": [
+          "fire",
+          "origin",
+          "low_burn"
+        ],
+        "step": "scene"
       },
       "anchors": [],
       "confounds": [

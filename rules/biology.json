@@ -10,7 +10,9 @@
       "domain": "biology",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -21,9 +23,15 @@
         "claim": "На сцене найден след животного — в помещении есть или был питомец либо грызун",
         "confidence_prior": 0.75,
         "confidence_ceiling": 0.85,
-        "tags": ["animal", "pest"]
+        "tags": [
+          "animal",
+          "pest"
+        ],
+        "step": "presence"
       },
-      "anchors": ["regions[kind=footprint].id"],
+      "anchors": [
+        "regions[kind=footprint].id"
+      ],
       "confounds": [
         "След может принадлежать человеку",
         "След может быть старым"
@@ -52,7 +60,9 @@
       "domain": "biology",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -63,9 +73,15 @@
         "claim": "На сцене есть очаг плесени — в помещении длительно держалась влага",
         "confidence_prior": 0.8,
         "confidence_ceiling": 0.9,
-        "tags": ["mold", "damp"]
+        "tags": [
+          "mold",
+          "damp"
+        ],
+        "step": "scene"
       },
-      "anchors": ["regions[kind=mold_patch].id"],
+      "anchors": [
+        "regions[kind=mold_patch].id"
+      ],
       "confounds": [
         "Плесень может быть свежей",
         "Очаг может быть локальным (попавшая влага)"

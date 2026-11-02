@@ -61,7 +61,7 @@ def run_benchmark(name, root="eval/benchmarks"):
             findings = result["findings"]
             claims = result["claims"]
             hypotheses = result["hypotheses"]
-            suspects = result["suspects"]
+            participants = result["participants"]
             state = "sufficient_evidence" if findings else "insufficient_evidence"
         else:
             scene = json.loads((base / case["scene"]).read_text(encoding="utf-8"))
@@ -71,7 +71,7 @@ def run_benchmark(name, root="eval/benchmarks"):
             findings = evaluate_all(_rules_for(packs), scene)
             claims = build_claims(findings)
             hypotheses = []
-            suspects = []
+            participants = []
             state = decide_verdict(findings, claims, 1, "detective")
 
         found_ids = {f["finding_id"] for f in findings}
@@ -85,7 +85,7 @@ def run_benchmark(name, root="eval/benchmarks"):
 
         if "suspect" in expect:
             suspect_total += 1
-            ranking = [s["suspect_id"] for s in suspects]
+            ranking = [p["participant_id"] for p in participants]
             if expect["suspect"] in ranking:
                 rank = ranking.index(expect["suspect"]) + 1
                 if rank == 1:
