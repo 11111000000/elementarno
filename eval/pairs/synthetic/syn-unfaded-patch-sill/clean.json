@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-sill/clean",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "контроль: здесь предмета никогда не было"
+  },
+  "surfaces": [
+    {
+      "id": "s9",
+      "name": "sill_other",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "patchy"
+    }
+  ],
+  "objects": [],
+  "regions": [
+    {
+      "id": "r9",
+      "kind": "crack",
+      "shape": "linear",
+      "area_m2": 0.001,
+      "contrast": 0.25,
+      "freshness": "soft",
+      "edges": "ragged",
+      "bbox": [
+        0.15,
+        0.52,
+        0.3,
+        0.56
+      ],
+      "note": "старая трещина, не связанная с уборкой"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

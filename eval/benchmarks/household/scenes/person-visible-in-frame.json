@@ -1,0 +1,12 @@
+{
+  "meta": {"image_id": "person-visible-in-frame", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": false, "dust_state": "none"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "person", "visible": true,
+     "note": "человек сидит за столом, виден в кадре"}
+  ],
+  "regions": [],
+  "observations": []
+}

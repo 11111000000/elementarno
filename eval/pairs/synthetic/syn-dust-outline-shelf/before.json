@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "image_id": "syn-dust-outline-shelf/before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет на месте, отрицательная улика читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "shelf",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "vase",
+      "material": "ceramic",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.24
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "dust_outline",
+      "shape": "round",
+      "area_m2": 0.03,
+      "contrast": 0.15,
+      "freshness": "sharp",
+      "edges": "concave",
+      "bbox": [
+        0.44,
+        0.56,
+        0.62,
+        0.74
+      ],
+      "note": "граница пыли у основания вазы"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

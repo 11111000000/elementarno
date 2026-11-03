@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "GRD-001",
-      "version": 2,
+      "version": 3,
       "pack": "garden",
       "title": "Взрыхлённый грунт",
       "domain": "garden",
@@ -49,7 +49,8 @@
       "confounds": [
         "Полосы могли оставить дождевые потоки или когти животного",
         "Землю могли перекопать давно и забыть",
-        "Следы животных и размытые края тоже оставляют «взрыхлённый» вид грунта"
+        "Следы животных и размытые края тоже оставляют «взрыхлённый» вид грунта",
+        "Основание — стандарты обращения с почвами как веществом; перекопка по «взрыхлённому» виду грунта в них не подтверждена"
       ],
       "exceptions": [
         "Полосы извилистые и без параллельной структуры"
@@ -60,8 +61,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "частицы и следы как следовой материал: ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ) и OSAC 2025-S-0011 (микроскопия почв в поляризованном свете) зарегистрированы в реестре OSAC под подкомитетом Trace Materials; вывод о перекопке по состоянию грунта в них не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -69,7 +70,7 @@
     },
     {
       "id": "GRD-003",
-      "version": 2,
+      "version": 3,
       "pack": "garden",
       "title": "Следы по грунту, в стороне от дорожки",
       "domain": "garden",
@@ -124,7 +125,8 @@
       ],
       "confounds": [
         "Следы могли остаться от прошлого сезона и сохраниться в пересухшей земле",
-        "След может принадлежать животному"
+        "След может принадлежать животному",
+        "Стандарты обуви и шин не описывают следы на грунте и песке: применимость к почве — допущение правила"
       ],
       "exceptions": [
         "Следы не пересекаются с дорожкой и ведут в глубину грядки"
@@ -135,8 +137,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
-          "note": "следы обуви и текстиля как индивидуализирующий признак",
+          "ref": "OSAC Registry (NIST), подкомитет Footwear & Tire: OSAC 2023-S-0017 (Standard for the Articulation of Footwear and Tire Interpretations), ANSI/ASB BPR 052-22 (Best Practice Recommendation for the Detection and Collection of Footwear and Tire Impression Evidence)",
+          "note": "след обуви как индивидуализирующий признак: OSAC 2023-S-0017 задаёт порядок формулирования выводов по следам обуви и шин, ANSI/ASB BPR 052-22 — обнаружение и сбор таких следов; следы на грунте и текстиль в этих документах не оговорены (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -144,7 +146,7 @@
     },
     {
       "id": "GRD-004",
-      "version": 1,
+      "version": 2,
       "pack": "garden",
       "title": "Свежая вода в борозде",
       "domain": "garden",
@@ -174,7 +176,8 @@
       ],
       "confounds": [
         "Вода могла остаться от дождя",
-        "Борозда может быть наполнена грунтовыми водами"
+        "Борозда может быть наполнена грунтовыми водами",
+        "Основание — стандарт сбора почв; связь стоящей воды с недавним поливом в нём не подтверждена"
       ],
       "exceptions": [
         "Вода стоит в месте, куда дождь не попадает"
@@ -185,8 +188,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; свежесть влаги в почве; ближайшее подтверждаемое — ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ): состояние почвы описывается как вещество, подлежащее фиксации, вывод о недавнем поливе не подтверждён",
           "verified": false
         }
       ],

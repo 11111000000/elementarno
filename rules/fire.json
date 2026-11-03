@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "FIRE-001",
-      "version": 1,
+      "version": 2,
       "pack": "fire",
       "title": "Ожог на поверхности",
       "domain": "fire",
@@ -34,7 +34,8 @@
       ],
       "confounds": [
         "Ожог может остаться от утюга, свечи или камина",
-        "Пятно может быть копотью, а не ожогом"
+        "Пятно может быть копотью, а не ожогом",
+        "NFPA 921 — платный стандарт: прочитан только текст издателя, поэтому подтверждено на уровне описания, а не текста"
       ],
       "exceptions": [
         "Ожог явно локальный и совпадает с нагревательным прибором"
@@ -45,8 +46,9 @@
       },
       "sources": [
         {
-          "ref": "NFPA 1033: Standard for Professional Fire Investigation, 2022",
-          "note": "методы осмотра места пожара",
+          "ref": "NFPA 921: Guide for Fire and Explosion Investigations, 2024 edition (National Fire Protection Association; в реестре OSAC — подкомитет Fire & Explosion Investigation)",
+          "url": "https://www.nfpa.org/product/nfpa-921-standard/p0921code",
+          "note": "методы осмотра места пожара: NFPA 921 — руководство по исследованию пожара; по описанию издателя охватывает «preliminary scene assessment and safety considerations … documentation, evidence handling, analysis, and reporting»; текст стандарта закрыт (NFPA LiNK), по тексту утверждение не сверено",
           "verified": false
         }
       ],
@@ -54,7 +56,7 @@
     },
     {
       "id": "FIRE-002",
-      "version": 1,
+      "version": 2,
       "pack": "fire",
       "title": "V-образное обугливание на полу",
       "domain": "fire",
@@ -83,7 +85,8 @@
       "anchors": [],
       "confounds": [
         "V-образный рисунок может дать истечение горящего потока сверху",
-        "Форма зависит от горючести материала"
+        "Форма зависит от горючести материала",
+        "V-паттерн не подтверждён ни одним прочитанным источником: правило опирается на бытовое представление о горении снизу вверх, которое нужно сверить с текстом NFPA 921"
       ],
       "exceptions": [
         "Обугливание вызвано падением горящего тела"
@@ -94,8 +97,9 @@
       },
       "sources": [
         {
-          "ref": "NFPA 921: Guide for Fire and Explosions Investigations, 2024",
-          "note": "V-паттерн как признак низко расположенного очага",
+          "ref": "NFPA 921: Guide for Fire and Explosion Investigations, 2024 edition (National Fire Protection Association; в реестре OSAC — подкомитет Fire & Explosion Investigation)",
+          "url": "https://www.nfpa.org/product/nfpa-921-standard/p0921code",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; V-паттерн как признак низко расположенного очага; ближайшее подтверждаемое — NFPA 921 (2024) как руководство по исследованию пожара (реестр OSAC, подкомитет Fire & Explosion Investigation): текст стандарта закрыт, утверждение о V-паттерне не сверено",
           "verified": false
         }
       ],

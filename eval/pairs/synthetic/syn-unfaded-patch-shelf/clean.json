@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-shelf/clean",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "контроль: здесь предмета никогда не было"
+  },
+  "surfaces": [
+    {
+      "id": "s9",
+      "name": "shelf_right",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    }
+  ],
+  "objects": [],
+  "regions": [
+    {
+      "id": "r9",
+      "kind": "dent",
+      "shape": "round",
+      "area_m2": 0.003,
+      "contrast": 0.16,
+      "freshness": "soft",
+      "edges": "convex",
+      "bbox": [
+        0.22,
+        0.46,
+        0.34,
+        0.56
+      ],
+      "note": "старая вмятина, не связанная с уборкой"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

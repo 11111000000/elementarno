@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-sill/after",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет убран, след не читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "sill",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "patchy"
+    }
+  ],
+  "objects": [],
+  "regions": [],
+  "observations": [],
+  "light": []
+}

@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "ABS-001",
-      "version": 1,
+      "version": 2,
       "pack": "absence",
       "title": "Пылевой контур от убранного предмета",
       "domain": "absence",
@@ -35,7 +35,8 @@
       "confounds": [
         "Влажная уборка может размазать контур и выдать его за свежий",
         "Контур может быть следом от декорации, которую убрали давно",
-        "Резкий свет из окна способен дать ложный контур"
+        "Резкий свет из окна способен дать ложный контур",
+        "Основание правила — общие стандарты документирования сцены; конкретный признак «пылевой контур» ни одним прочитанным источником не подтверждён"
       ],
       "exceptions": [
         "Контур появляется и без предметов: трещина, скол, вмятина в дереве",
@@ -49,8 +50,8 @@
       },
       "sources": [
         {
-          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
-          "note": "следы перемещения предметов как метод реконструкции сцены",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; пылевой контур как признак убранного предмета; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (реконструкция сцены), OSAC 2023-N-0002 (документирование сцены), OSAC 2021-N-0018 (сбор физических улик на месте): следы на месте фиксируются как часть описания сцены, сам признак «пылевой контур» не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -58,7 +59,7 @@
     },
     {
       "id": "ABS-002",
-      "version": 1,
+      "version": 2,
       "pack": "absence",
       "title": "Участок без пыли среди запылённой поверхности",
       "domain": "absence",
@@ -100,7 +101,8 @@
       "confounds": [
         "Участок могли протереть или вымыть",
         "Пыль могла не дойти до него из-за соседнего предмета",
-        "Солнечный свет может высушить и обесцветить участок"
+        "Солнечный свет может высушить и обесцветить участок",
+        "Основание правила — общие стандарты документирования сцены; утверждение об отсутствии следов как источнике информации не подтверждено ни одним прочитанным документом"
       ],
       "exceptions": [
         "Участок у края, где пыль сдувается воздухом",
@@ -114,8 +116,8 @@
       },
       "sources": [
         {
-          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
-          "note": "отсутствие следов как источник информации",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; отсутствие следов как источник информации; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены, включая отсутствие предметов) и ANSI/ASB 159-24 (реконструкция сцены): сцена описывается по наблюдаемому, утверждение об отсутствии следов как источнике информации не подтверждено (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -123,7 +125,7 @@
     },
     {
       "id": "ABS-003",
-      "version": 1,
+      "version": 2,
       "pack": "absence",
       "title": "Пустой крючок со следами крепления",
       "domain": "absence",
@@ -153,7 +155,8 @@
       ],
       "confounds": [
         "Крючок мог быть пустым изначально",
-        "След крепления может остаться от давнего использования"
+        "След крепления может остаться от давнего использования",
+        "Основание правила — стандарты сбора и документирования улик; вывод о цикле «снял-вернул» не подтверждён ни одним прочитанным источником"
       ],
       "exceptions": [
         "Крючок новый, след нанесён производителем"
@@ -164,8 +167,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (раздел о следах на месте)",
-          "note": "следы оставления и снятия предметов",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; следы оставления и снятия предметов; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2021-N-0018 (сбор и сохранение физических улик на месте) и OSAC 2023-N-0002 (документирование сцены): след крепления фиксируется как физическая улика, сам вывод о снятии и возврате предмета не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -173,7 +176,7 @@
     },
     {
       "id": "ABS-004",
-      "version": 2,
+      "version": 3,
       "pack": "absence",
       "title": "Нарушенный слой пыли",
       "domain": "absence",
@@ -238,7 +241,8 @@
         "Пыль могли сдуть сквозняком",
         "Уборка оставляет похожие полосы",
         "Домашнее животное проходит по поверхности",
-        "Мокрый грунт, песок или галька дают похожую картину и не являются пылью"
+        "Мокрый грунт, песок или галька дают похожую картину и не являются пылью",
+        "Основание правила — общие стандарты документирования сцены; признак «проход или протаскивание по пыли» не подтверждён ни одним прочитанным источником"
       ],
       "exceptions": [
         "Полоса совпадает с направлением потока воздуха из щели"
@@ -249,8 +253,8 @@
       },
       "sources": [
         {
-          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
-          "note": "следы перемещения по сцене",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; следы перемещения по сцене; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (реконструкция сцены) и OSAC 2023-N-0002 (документирование сцены): нарушение покрытия фиксируется при описании сцены, сам признак «проход по пыли» не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],

@@ -1,0 +1,12 @@
+{
+  "meta": {"image_id": "person-out-of-frame", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "floor", "material": "laminate"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "person", "visible": false,
+     "note": "человек за кадром: в сцене присутствует, но не виден"}
+  ],
+  "regions": [],
+  "observations": []
+}

@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "BIO-001",
-      "version": 2,
+      "version": 3,
       "pack": "biology",
       "title": "След животного",
       "domain": "biology",
@@ -34,7 +34,8 @@
       ],
       "confounds": [
         "След может принадлежать человеку",
-        "След может быть старым"
+        "След может быть старым",
+        "Основание правила — стандарты морфологической экспертизы следов животных; домашняя обстановка и различение питомца с грызуном в них не оговорены"
       ],
       "exceptions": [
         "Размер следа сопоставим с подошвой человека"
@@ -45,8 +46,15 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Wildlife and Biological Trace",
-          "note": "следы животных в жилой среде",
+          "ref": "OSAC Registry (NIST), подкомитет Wildlife Forensic Biology: ANSI/ASB 028-19 (Wildlife Forensics Morphology Standards)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "морфологическая идентификация следов животных: ANSI/ASB 028-19; бытовая обстановка как условие применения в нём не оговорена (текст стандарта платный, не открывался)",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Wildlife Forensic Biology: ANSI/ASB 029-19 (Report Writing in Wildlife Forensics: Morphology and Genetics)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "правила отчёта по морфологической и генетической экспертизе следов животных: ANSI/ASB 029-19; следы животных в жилой среде в нём не оговорены (текст стандарта платный, не открывался)",
           "verified": false
         }
       ],
@@ -96,8 +104,9 @@
       "sources": [
         {
           "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+          "url": "https://www.who.int/publications/i/item/9789289041683",
           "note": "признаки плесени и их связь с влажностью",
-          "verified": false
+          "verified": true
         }
       ],
       "review_status": "draft"

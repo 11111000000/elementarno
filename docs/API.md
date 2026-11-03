@@ -73,7 +73,7 @@ curl -s http://127.0.0.1:8733/health
 ```json
 {
   "ok": true,
-  "version": "0.2.0"
+  "version": "0.3.0"
 }
 ```
 

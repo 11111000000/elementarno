@@ -1,0 +1,51 @@
+{
+  "benchmark": "household",
+  "description": "Быт: следы еды и видимый человек. Еда даёт улику только по остаткам еды, человек — только по видимому в кадре человеку.",
+  "cases": [
+    {
+      "id": "food-remains-on-table",
+      "scene": "scenes/food-remains-on-table.json",
+      "packs": ["home"],
+      "expect": {
+        "finding_ids": ["F-HOME-005"],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "person-visible-in-frame",
+      "scene": "scenes/person-visible-in-frame.json",
+      "packs": ["presence"],
+      "expect": {
+        "finding_ids": ["F-PRES-004"],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "clean-dishes-no-food-trace",
+      "scene": "scenes/clean-dishes-no-food-trace.json",
+      "packs": ["home"],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    },
+    {
+      "id": "empty-room-no-person",
+      "scene": "scenes/empty-room-no-person.json",
+      "packs": ["presence"],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    },
+    {
+      "id": "person-out-of-frame",
+      "scene": "scenes/person-out-of-frame.json",
+      "packs": ["presence"],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    }
+  ]
+}

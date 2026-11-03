@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "HOME-001",
-      "version": 2,
+      "version": 3,
       "pack": "home",
       "title": "Пыль в углах и вдоль плинтуса не сбита",
       "domain": "household",
@@ -68,7 +68,8 @@
       "confounds": [
         "Полосу могли оставить щётка, тряпка или пилец",
         "Пыль могла сдуться сквозняком",
-        "Уборка могла быть в другой комнате, а след принесён на обуви"
+        "Уборка могла быть в другой комнате, а след принесён на обуви",
+        "Основание правила — общие стандарты документирования сцены; признак «пыль не сбита в углах» не подтверждён ни одним прочитанным источником"
       ],
       "exceptions": [
         "След совпадает с направлением естественного сквозняка"
@@ -79,8 +80,8 @@
       },
       "sources": [
         {
-          "ref": "Kirk's Fire Investigation, 8th ed., Pearson 2019",
-          "note": "следы перемещения и работы в помещении",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; следы уборки и работы в помещении; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены) и ANSI/ASB 159-24 (реконструкция сцены): состояние поверхностей фиксируется в описании сцены, сам признак «пыль сдвинута полосой» не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -88,7 +89,7 @@
     },
     {
       "id": "HOME-002",
-      "version": 1,
+      "version": 2,
       "pack": "home",
       "title": "Кольцо от горячей кружки",
       "domain": "household",
@@ -118,7 +119,8 @@
       ],
       "confounds": [
         "След мог быть оставлен при уборке или перестановке мебели",
-        "Светлый круг может быть пятном от протечки, а не от кружки"
+        "Светлый круг может быть пятном от протечки, а не от кружки",
+        "Основание правила — стандарт документирования сцены; связь кольца без пыли с горячей кружкой не подтверждена"
       ],
       "exceptions": [
         "Круг совпадает по форме с пятном влаги на другой поверхности"
@@ -129,8 +131,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; кольцевой след от горячей кружки; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены): след на поверхности фиксируется как наблюдение, истолкование кольца как следа горячей кружки документом не подтверждено",
           "verified": false
         }
       ],
@@ -138,7 +140,7 @@
     },
     {
       "id": "HOME-003",
-      "version": 2,
+      "version": 3,
       "pack": "home",
       "title": "Открытая ёмкость оставлена на виду",
       "domain": "household",
@@ -165,7 +167,8 @@
       "anchors": [],
       "confounds": [
         "Открытая банка может стоять так месяцами",
-        "На фотографии мог просто быть снят открытый контейнер без связи со сценой"
+        "На фотографии мог просто быть снят открытый контейнер без связи со сценой",
+        "Основание правила — стандарт документирования сцены; вывод о недавно вынутом содержимом не подтверждён"
       ],
       "exceptions": [
         "Контейнер пуст и давно вымыт"
@@ -176,8 +179,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; состояние оставленной открытой ёмкости; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены) и ANSI/ASB 159-24: расположение и состояние предметов описываются в сцене, вывод о вынутом содержимом не подтверждён",
           "verified": false
         }
       ],
@@ -185,7 +188,7 @@
     },
     {
       "id": "HOME-004",
-      "version": 1,
+      "version": 2,
       "pack": "home",
       "title": "Мокрые следы от ботинок у порога",
       "domain": "household",
@@ -215,7 +218,8 @@
       ],
       "confounds": [
         "След могла оставить протечка или тряпка",
-        "Мокрый след мог быть из разлитой жидкости"
+        "Мокрый след мог быть из разлитой жидкости",
+        "Основание — стандарты обуви и шин; связь мокрого следа у порога с приходом с улицы в них не оговорена"
       ],
       "exceptions": [
         "След начинается от стоящей лужи или протечки"
@@ -226,8 +230,63 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
-          "note": "следы обуви и текстиля как индивидуализирующий признак",
+          "ref": "OSAC Registry (NIST), подкомитет Footwear & Tire: OSAC 2023-S-0017 (Standard for the Articulation of Footwear and Tire Interpretations), ANSI/ASB BPR 052-22 (Best Practice Recommendation for the Detection and Collection of Footwear and Tire Impression Evidence)",
+          "note": "след обуви как индивидуализирующий признак: OSAC 2023-S-0017 (порядок формулирования выводов по следам обуви и шин), ANSI/ASB BPR 052-22 (обнаружение и сбор); связь мокрого следа с входом в помещение в них не оговорена",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "HOME-005",
+      "version": 2,
+      "pack": "home",
+      "title": "Следы еды на месте",
+      "domain": "household",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=food_remains]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене следы еды: здесь ели",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.5,
+        "step": "activity",
+        "tags": [
+          "meal",
+          "eating",
+          "food"
+        ]
+      },
+      "anchors": [
+        "regions[kind=food_remains].id"
+      ],
+      "confounds": [
+        "Крошки могли остаться от давнего приёма пищи",
+        "Еда могла быть принесена извне и не съедена здесь",
+        "Остатки еды могли быть декорацией или реквизитом",
+        "Остатки могли быть кормом для животного",
+        "Пищевые остатки как следовой материал в реестре OSAC не стандартизованы; FDA Food Code (санитарные требования к общепиту) снят с правила как неподходящее основание"
+      ],
+      "exceptions": [
+        "Остатки не связаны с приёмом пищи в этом месте"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Оценить свежесть остатков и наличие посуды рядом"
+      },
+      "sources": [
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials",
+          "url": "https://www.nist.gov/osac/subcommittees/trace-materials",
+          "note": "частицы еды как следовой материал: подкомитет Trace Materials реестра OSAC (34 стандарта по краске, стеклу, волокнам, волосам, почвам, плёнкам, полимерам); стандарта по пищевым частицам в реестре нет, бытовая специфика крошек и остатков еды требует экспертной проверки",
           "verified": false
         }
       ],

@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "WAT-001",
-      "version": 1,
+      "version": 2,
       "pack": "water",
       "title": "След уровня воды",
       "domain": "water",
@@ -34,7 +34,8 @@
       ],
       "confounds": [
         "Границу мог оставить иной раствор или клей",
-        "След конденсата на холодной поверхности"
+        "След конденсата на холодной поверхности",
+        "Основание — платный отраслевой стандарт, прочитано только его назначение; категории повреждения и их признаки не сверены"
       ],
       "exceptions": [
         "Граница совпадает с высотой мебели, а не с заливом"
@@ -47,8 +48,9 @@
       },
       "sources": [
         {
-          "ref": "IIC S500: Standard for Professional Water Damage Restoration",
-          "note": "признаки залива и категории повреждения",
+          "ref": "ANSI/IICRC S500, Standard and Reference Guide for Professional Water Damage Restoration, 4th ed. 2015 (IICRC)",
+          "url": "https://web.archive.org/web/20200127180511/https://webstore.iicrc.org/",
+          "note": "признаки залива и категории повреждения: ANSI/IICRC S500 (Standard and Reference Guide for Professional Water Damage Restoration, 4-е изд. 2015) — стандарт по восстановлению после залива; категории повреждения в тексте не сверены (стандарт платный), подтверждено только существование и назначение документа",
           "verified": false
         }
       ],
@@ -110,15 +112,16 @@
       "sources": [
         {
           "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+          "url": "https://www.who.int/publications/i/item/9789289041683",
           "note": "связь влаги и роста плесени",
-          "verified": false
+          "verified": true
         }
       ],
       "review_status": "draft"
     },
     {
       "id": "WAT-003",
-      "version": 1,
+      "version": 2,
       "pack": "water",
       "title": "Лужа ещё не высохла",
       "domain": "water",
@@ -148,7 +151,8 @@
       ],
       "confounds": [
         "Лужа могла быть вымыта уборкой и оказаться здесь после",
-        "Поверхность может быть постоянно влажной"
+        "Поверхность может быть постоянно влажной",
+        "Основание — платный отраслевой стандарт, прочитано только его назначение; связь свежести повреждения с временем поступления воды не сверена"
       ],
       "exceptions": [
         "Лужа стоит под текущей протечкой"
@@ -159,8 +163,9 @@
       },
       "sources": [
         {
-          "ref": "IIC S500: Standard for Professional Water Damage Restoration",
-          "note": "свежесть повреждения как признак",
+          "ref": "ANSI/IICRC S500, Standard and Reference Guide for Professional Water Damage Restoration, 4th ed. 2015 (IICRC)",
+          "url": "https://web.archive.org/web/20200127180511/https://webstore.iicrc.org/",
+          "note": "свежесть повреждения как признак: ANSI/IICRC S500 (4-е изд. 2015) — стандарт по восстановлению после залива; свежесть повреждения в тексте не сверена (стандарт платный), подтверждено только существование и назначение документа",
           "verified": false
         }
       ],

@@ -1,0 +1,13 @@
+{
+  "meta": {"image_id": "clean-dishes-no-food-trace", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": false, "dust_state": "none"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "plate", "material": "ceramic", "state": "clean", "on": "s1", "visible": true},
+    {"id": "o2", "category": "fork", "material": "steel", "state": "clean", "on": "s1", "visible": true},
+    {"id": "o3", "category": "mug", "material": "ceramic", "state": "clean", "on": "s1", "visible": true}
+  ],
+  "regions": [],
+  "observations": []
+}

@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "image_id": "syn-dust-outline-table/before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет на месте, отрицательная улика читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "table",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "uneven"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "tin",
+      "material": "metal",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.32
+    },
+    {
+      "id": "o2",
+      "category": "bowl",
+      "material": "ceramic",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.16
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "dust_outline",
+      "shape": "rectangular",
+      "area_m2": 0.05,
+      "contrast": 0.12,
+      "freshness": "sharp",
+      "edges": "concave",
+      "bbox": [
+        0.58,
+        0.5,
+        0.78,
+        0.68
+      ],
+      "note": "прямоугольная граница пыли на месте коробки"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

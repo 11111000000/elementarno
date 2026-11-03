@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "TRD-001",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Брызги краски",
       "domain": "trade",
@@ -27,7 +27,8 @@
       "anchors": ["regions[kind=paint_splash].id"],
       "confounds": [
         "Брызги могли попасть из банки или с одежды",
-        "Пятно краски на фотографии может быть цифровым артефактом"
+        "Пятно краски на фотографии может быть цифровым артефактом",
+        "Основание — стандарты анализа краски; брызги краски как таковые ими не описаны"
       ],
       "exceptions": [
         "Брызги равномерно окрашены и без брызговых капель — это фон, а не след"
@@ -38,8 +39,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Paint)",
-          "note": "брызги и следы краски как следовой материал; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E1610-18 (Standard Guide for Forensic Paint Analysis and Comparison), ANSI/ASTM E2808-21a (Standard Guide for Microspectrophotometry in Forensic Paint Analysis)",
+          "note": "брызги и следы краски как следовой материал: ANSI/ASTM E1610-18 (криминалистический анализ и сравнение краски) и ANSI/ASTM E2808-21a (микроспектрофотометрия в анализе краски) зарегистрированы в реестре OSAC под подкомитетом Trace Materials; брызги как таковые и связь с покраской в них не подтверждены (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -47,7 +48,7 @@
     },
     {
       "id": "TRD-002",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Стружка и опилки",
       "domain": "trade",
@@ -70,7 +71,8 @@
       "anchors": ["regions[kind=sawdust].id"],
       "confounds": [
         "Стружка могла попасть с одежды или из мешка",
-        "В мастерской стружка может лежать месяцами"
+        "В мастерской стружка может лежать месяцами",
+        "Основание — стандарты обращения с почвами и минеральными частицами; древесные частицы в них не описаны"
       ],
       "exceptions": [
         "Стружка сложена в контейнер или мешок — это склад, а не след работы"
@@ -81,8 +83,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate: Wood)",
-          "note": "древесные частицы как следовой материал",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; древесные частицы как следовой материал; ближайшее подтверждаемое — ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ) и OSAC 2025-S-0011 (микроскопия почв): класс минеральных частиц как следового вещества, древесина в них не оговорена",
           "verified": false
         }
       ],
@@ -90,7 +92,7 @@
     },
     {
       "id": "TRD-003",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Мука и мучная пыль",
       "domain": "trade",
@@ -113,7 +115,8 @@
       "anchors": ["regions[kind=flour_dust].id"],
       "confounds": [
         "Мука в мешке или на полке — не след работы",
-        "Белый налёт может быть пылью, известкой или краской"
+        "Белый налёт может быть пылью, известкой или краской",
+        "Основание — стандарты обращения с почвами и минеральными частицами; мука как материал в них не описана"
       ],
       "exceptions": [
         "Налёт сосредоточен в мешке, банке или в одном месте — это хранение"
@@ -124,8 +127,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate)",
-          "note": "частицы как следовой материал; бытовая специфика муки требует экспертной проверки",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; мука и мучная пыль; ближайшее подтверждаемое — ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ) и OSAC 2025-S-0011 (микроскопия почв): класс минеральных частиц, бытовая специфика муки требует экспертной проверки",
           "verified": false
         }
       ],
@@ -133,7 +136,7 @@
     },
     {
       "id": "TRD-004",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Следы машинного масла и смазки",
       "domain": "trade",
@@ -156,7 +159,8 @@
       "anchors": ["regions[kind=oil_trace].id"],
       "confounds": [
         "Масляное пятно может быть от автомобиля или от батареи",
-        "Пятно могло остаться от ремонта, который закончился давно"
+        "Пятно могло остаться от ремонта, который закончился давно",
+        "Основание — стандарт исследования полимеров; смазочные материалы и металл как классы следовых веществ в реестре OSAC не представлены"
       ],
       "exceptions": [
         "Пятно под стоящим агрегатом — это норма для гаража"
@@ -167,8 +171,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Lubricants, Metal)",
-          "note": "смазочные материалы и металл как следовые вещества",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3296-22 (Standard Guide for Forensic Examination of Polymers by Pyrolysis Gas Chromatography and Pyrolysis Gas Chromatography-Mass Spectrometry)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; смазочные материалы и металл как следовые вещества; ближайшее подтверждаемое — ANSI/ASTM E3296-22 (криминалистическое исследование полимеров) как класс веществ, исследуемых на следовом материале, смазки и металл в реестре отдельными стандартами не представлены",
           "verified": false
         }
       ],
@@ -176,7 +180,7 @@
     },
     {
       "id": "TRD-005",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Металлическая стружка от шлифовки",
       "domain": "trade",
@@ -199,7 +203,8 @@
       "anchors": ["regions[kind=metal_swarf].id"],
       "confounds": [
         "Стружка могла попасть с инструмента или с одежды",
-        "В производственном цехе это норма, а не след работы"
+        "В производственном цехе это норма, а не след работы",
+        "Основание — стандарты анализа минеральных (геологических) материалов; металлические частицы в них не выделены"
       ],
       "exceptions": [
         "Стружка собрана в лоток — признак организованного производства, а не единичной работы"
@@ -210,8 +215,15 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Metal)",
-          "note": "металлические частицы как следовой материал",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3501-25 (Standard Guide for Forensic Analysis of Geological Materials by Scanning Electron Microscopy and Energy Dispersive X-Ray Spectrometry)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "минеральные частицы как следовое вещество: ANSI/ASTM E3501-25 (анализ геологических материалов методом SEM/EDS); металлические частицы в нём не выделены (текст стандарта платный, не открывался)",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3294-23 (Standard Guide for Forensic Analysis of Geological Materials by Powder X-Ray Diffraction)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "анализ геологических материалов методом рентгеновской дифракции: ANSI/ASTM E3294-23; металлические частицы в нём не выделены (текст стандарта платный, не открывался)",
           "verified": false
         }
       ],
@@ -219,7 +231,7 @@
     },
     {
       "id": "TRD-006",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Штукатурная пыль",
       "domain": "trade",
@@ -242,7 +254,8 @@
       "anchors": ["regions[kind=plaster_dust].id"],
       "confounds": [
         "Пыль от штукатурки может быть старой, из прошлого ремонта",
-        "Белый налёт бывает от извести или от мела"
+        "Белый налёт бывает от извести или от мела",
+        "Основание — стандарты обращения с почвами и минеральными частицами; штукатурная пыль в них прямо не названа"
       ],
       "exceptions": [
         "Пыль осела на упаковочной плёнке и защищённых поверхностях — следы шлифовки"
@@ -253,8 +266,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Particulate: Construction Dust)",
-          "note": "строительная пыль как следовой материал",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; строительная пыль; ближайшее подтверждаемое — ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ) и OSAC 2025-S-0011 (микроскопия почв): пылеобразные вещества стройматериалов в перечне веществ прямо не названы, вывод о шлифовке не подтверждён",
           "verified": false
         }
       ],
@@ -262,7 +275,7 @@
     },
     {
       "id": "TRD-007",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Повторяющиеся следы кружки",
       "domain": "trade",
@@ -285,7 +298,8 @@
       "anchors": ["regions[kind=cup_ring].id"],
       "confounds": [
         "Круги могли оставить разные люди",
-        "Круги в ряд — это не привычка, а просевшая посуда"
+        "Круги в ряд — это не привычка, а просевшая посуда",
+        "Основание правила — стандарт документирования сцены; бытовая интерпретация кружек как привычки не подтверждена"
       ],
       "exceptions": [
         "Круги совпадают по форме и размеру с одной кружкой — тогда это один человек"
@@ -296,8 +310,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Surface Patterns)",
-          "note": "следы на поверхностях; бытовая интерпретация кружек требует экспертной проверки",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; следы на поверхностях (повторяющиеся кольца); ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены): повторяющиеся следы фиксируются в описании сцены, бытовая интерпретация кружек документом не подтверждена",
           "verified": false
         }
       ],
@@ -305,7 +319,7 @@
     },
     {
       "id": "TRD-008",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Следы чернил",
       "domain": "trade",
@@ -328,7 +342,8 @@
       "anchors": ["regions[kind=ink_trace].id"],
       "confounds": [
         "Пятно чернил могло остаться от подписи документа",
-        "Тонер и чернила различаются, а на фото путаются"
+        "Тонер и чернила различаются, а на фото путаются",
+        "Основание — стандарты экспертизы документов; перенос их на следы чернил и тонера на рабочей поверхности — допущение правила"
       ],
       "exceptions": [
         "Пятно совпадает с подписью на бумаге рядом"
@@ -339,8 +354,15 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Ink)",
-          "note": "чернила и тонер как следовые материалы",
+          "ref": "OSAC Registry (NIST), подкомитет Forensic Document Examination: ANSI/ASB 011-22 (Scope of Expertise in Forensic Document Examination)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "чернила и тонер как материалы экспертизы документов: ANSI/ASB 011-22 (область компетенции экспертизы документов); стандарта по следам чернил на поверхности в реестре нет (текст стандарта платный, не открывался)",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Forensic Document Examination: ANSI/ASB 070-22 (Standard for Examination of Handwritten Items)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "рукописные материалы исследуются в экспертизе документов: ANSI/ASB 070-22; следы чернил или тонера на рабочей поверхности в нём не описаны (текст стандарта платный, не открывался)",
           "verified": false
         }
       ],
@@ -348,7 +370,7 @@
     },
     {
       "id": "TRD-009",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Мастерская: стружка вместе с маслом",
       "domain": "trade",
@@ -373,7 +395,8 @@
       "anchors": [],
       "confounds": [
         "Следы могли попасть с одежды мастера, пришедшего в гости",
-        "Стружка и масло могли попасть в сцену разными путями и в разное время"
+        "Стружка и масло могли попасть в сцену разными путями и в разное время",
+        "Основание — стандарты обращения со следовыми материалами; вывод о том, что сцену использовали как рабочую, ими не подтверждён"
       ],
       "exceptions": [
         "Предметы сложены вместе к продаже, а не использовались"
@@ -384,8 +407,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "комбинирование следов разных материалов для вывода о месте работы",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3462-25e1 (Standard Guide for Interpretation and Reporting in Forensic Comparisons of Trace Materials), ANSI/ASTM E3457-25 (Standard Guide for Detection and Preservation of Forensic Trace Evidence)",
+          "note": "комбинирование следов разных материалов: ANSI/ASTM E3462-25e1 (интерпретация и отчётность по сравнениям следовых материалов) и ANSI/ASTM E3457-25 (обнаружение и сохранение следовых веществ); вывод о характере работ по набору следов в них не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -393,7 +416,7 @@
     },
     {
       "id": "TRD-010",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Отпечаток рядом со следами краски",
       "domain": "trade",
@@ -419,7 +442,8 @@
       "confounds": [
         "Отпечаток мог быть оставлен раньше или позже краски",
         "В сцене могли работать двое",
-        "Близость на фото не означает физической близости"
+        "Близость на фото не означает физической близости",
+        "Два разных стандарта по двум материалам: их совместная хронология не урегулирована ни одним прочитанным источником"
       ],
       "exceptions": [
         "Отпечаток и брызги находятся на разных предметах в разных концах комнаты"
@@ -430,8 +454,13 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
-          "note": "соотнесение следов разных материалов по последовательности наложения",
+          "ref": "OSAC Registry (NIST), подкомитет Friction Ridge: OSAC 2023-N-0020 (Standard for the On-Scene Collection and Preservation of Friction Ridge Impressions), OSAC 2022-N-0033 (Standard for Processing Evidence for the Detection of Friction Ridge Impressions), OSAC 2023-S-0026 (Task-Relevant Information in Friction Ridge Examination)",
+          "note": "отпечаток: OSAC 2023-N-0020 (сбор и сохранение отпечатков на месте) и OSAC 2022-N-0033 (обработка вещества для выявления отпечатков); последовательность наложения следов разных материалов ни одним прочитанным документом не подтверждена",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E1610-18 (Standard Guide for Forensic Paint Analysis and Comparison), ANSI/ASTM E2808-21a (Standard Guide for Microspectrophotometry in Forensic Paint Analysis)",
+          "note": "краска: ANSI/ASTM E1610-18 (криминалистический анализ и сравнение краски) и ANSI/ASTM E2808-21a (микроспектрофотометрия); совместная хронология следа и брызг этими документами не урегулирована",
           "verified": false
         }
       ],
@@ -439,7 +468,7 @@
     },
     {
       "id": "TRD-011",
-      "version": 1,
+      "version": 2,
       "pack": "trade",
       "title": "Ремонт: краска и штукатурная пыль вместе",
       "domain": "trade",
@@ -464,7 +493,8 @@
       "anchors": [],
       "confounds": [
         "Краску и пыль могли оставить разные люди в разные дни",
-        "Оба следа могли быть от прошлого ремонта"
+        "Оба следа могли быть от прошлого ремонта",
+        "Основания — стандарты по краске и по минеральным частицам; совместный вывод о ремонте и об его исполнителе не подтверждён"
       ],
       "exceptions": [
         "Пыль и краска лежат в разных помещениях и не пересекаются"
@@ -475,8 +505,13 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "комбинирование материалов для вывода о характере работ",
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E1610-18 (Standard Guide for Forensic Paint Analysis and Comparison), ANSI/ASTM E2808-21a (Standard Guide for Microspectrophotometry in Forensic Paint Analysis)",
+          "note": "краска: ANSI/ASTM E1610-18 (криминалистический анализ и сравнение краски) — краска как следовой материал, связь с ремонтом в нём не подтверждена",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Trace Materials: ANSI/ASTM E3272-23 (Standard Guide for the Collection of Soils and Other Geological Evidence for Criminal Forensic Applications), OSAC 2025-S-0011 (Standard Guide for Polarized Light Microscopy in the Forensic Examination and Comparison of Soils)",
+          "note": "штукатурная пыль: ANSI/ASTM E3272-23 (сбор почв и иных геологических веществ) — класс минеральных частиц, штукатурная пыль прямо не названа, совместный вывод о ремонте не подтверждён",
           "verified": false
         }
       ],
