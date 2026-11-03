@@ -133,6 +133,10 @@ def information_gain(hypotheses, kind, tags_by_hypothesis, tags_by_kind, base_ra
     Версия совместима со следом, если её метки пересекаются с метками
     правил, срабатывающих на этом следе. Несовместимые версии и делают
     вопрос полезным: ответ «след есть» резко перекашивает массу в их пользу.
+
+    Ограничение метода: совместимость выражена метками, поэтому версии,
+    опирающиеся на одну и ту же улику, неразличимы по построению — у них
+    метки совпадают. Для таких версий вопросы строит `discriminator_questions`.
     """
     scored = [h for h in hypotheses if h.get("log_odds") is not None]
     if len(scored) < 2:
@@ -161,6 +165,68 @@ def information_gain(hypotheses, kind, tags_by_hypothesis, tags_by_kind, base_ra
     return max(0.0, prior_entropy - expected_entropy)
 
 
+def tied_groups(hypotheses):
+    """Группы версий, которые движок сейчас не может различить.
+
+    Версии с одинаковым весом опираются на один и тот же вес улик и для
+    движка неразличимы: различить их может только то, что они считают
+    разным.
+    """
+    groups = {}
+    for hypothesis in hypotheses:
+        if hypothesis.get("log_odds") is None:
+            continue
+        groups.setdefault(round(hypothesis["log_odds"], 6), []).append(hypothesis)
+    return groups
+
+
+def discriminator_questions(hypotheses):
+    """Вопросы, которые заявлены самими версиями как различающие.
+
+    Метки не работают там, где версии опираются на одну улику. Но у версии
+    есть и другое: что она считает разным. Если версия объявляет вопрос,
+    который её разрешит, — этот вопрос и есть различающий.
+
+    Ценность измеряется долей неразличимой массы, которую вопрос затрагивает:
+    `splits` версий из группы `group`. Это не энтропия: предсказания версий
+    не записаны, поэтому о вероятностях судить не по чему, и честно сказать
+    можно только то, сколько версий вопрос затрагивает.
+    """
+    questions = {}
+    for group in tied_groups(hypotheses).values():
+        size = len(group)
+        for hypothesis in group:
+            discriminator = hypothesis.get("discriminator") or {}
+            text = (discriminator.get("question") or "").strip()
+            if not text:
+                continue
+            entry = questions.setdefault(text, {
+                "question": text,
+                "why": "",
+                "kinds": [],
+                "eig": 0.0,
+                "source": "discriminator",
+                "splits": 0,
+                "group": size,
+                "hypotheses": [],
+            })
+            entry["splits"] += 1
+            entry["hypotheses"].append(hypothesis.get("hypothesis_id"))
+            why = (discriminator.get("would_confirm") or "").strip()
+            if why and not entry["why"]:
+                entry["why"] = why
+
+    result = []
+    for entry in questions.values():
+        group = max(entry["group"], entry["splits"])
+        entry["group"] = group
+        entry["eig"] = round(entry["splits"] / group, 4) if group else 0.0
+        entry["why"] = entry["why"] or "вопрос заявлен версией как различающий"
+        result.append(entry)
+    result.sort(key=lambda e: (-e["splits"], -e["group"], e["question"]))
+    return result
+
+
 def rank_questions(hypotheses, tags_by_hypothesis, tags_by_kind, found_kinds=None, limit=3):
     """Ранжированный список вопросов с ценностью информации."""
     hypotheses = [h for h in hypotheses if h.get("log_odds") is not None]
@@ -179,6 +245,7 @@ def rank_questions(hypotheses, tags_by_hypothesis, tags_by_kind, found_kinds=Non
             "why": entry["why"],
             "kinds": kinds,
             "eig": round(gain, 4),
+            "source": "catalogue",
         })
     candidates.sort(key=lambda c: c["eig"], reverse=True)
     return candidates[:limit]
