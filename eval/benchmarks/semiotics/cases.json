@@ -1,0 +1,56 @@
+{
+  "benchmark": "semiotics",
+  "description": "Символический слой: знак, нанесённый по образцу, должен дать улику; наивный рисунок и пустая стена — не должны.",
+  "cases": [
+    {
+      "id": "symbol-by-model",
+      "scene": "scenes/symbol-by-model.json",
+      "packs": [
+        "semiotics"
+      ],
+      "expect": {
+        "finding_ids": [
+          "F-SEM-003",
+          "F-SEM-004"
+        ],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "symbol-freehand-is-not-a-sign",
+      "scene": "scenes/symbol-freehand.json",
+      "packs": [
+        "semiotics"
+      ],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    },
+    {
+      "id": "inscription-on-wall",
+      "scene": "scenes/inscription-on-wall.json",
+      "packs": [
+        "semiotics"
+      ],
+      "expect": {
+        "finding_ids": [
+          "F-SEM-005"
+        ],
+        "verdict": "sufficient_evidence"
+      }
+    },
+    {
+      "id": "plain-wall-has-no-signs",
+      "scene": "scenes/plain-wall.json",
+      "packs": [
+        "core",
+        "absence"
+      ],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      }
+    }
+  ]
+}

@@ -138,9 +138,9 @@
     },
     {
       "id": "HOME-003",
-      "version": 1,
+      "version": 2,
       "pack": "home",
-      "title": "Продукты в холодильнике вынуты",
+      "title": "Открытая ёмкость оставлена на виду",
       "domain": "household",
       "layer": "epistemic",
       "severity": "info",
@@ -154,7 +154,7 @@
         "gte": 1
       },
       "inference": {
-        "claim": "Открытые ёмкости на виду: продукты или посуду вынули и оставили открытой",
+        "claim": "В сцене оставлена открытая ёмкость: содержимое вынули и не закрыли",
         "confidence_prior": 0.4,
         "confidence_ceiling": 0.55,
         "step": "activity",

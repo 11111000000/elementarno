@@ -189,8 +189,28 @@
               "ink_trace",
               "cup_ring",
               "metal_swarf",
+              "symbol",
+              "inscription",
               "other"
             ]
+          },
+          "archetype": {
+            "description": "Опознанный образец знака, если он узнан: «all_seeing_eye», «пентаграмма» и т.п. Пусто, если знак не опознан.",
+            "type": "string"
+          },
+          "medium": {
+            "description": "Чем нанесено: карандаш, краска, уголь, процарапано, выжжено.",
+            "type": "string"
+          },
+          "construction": {
+            "description": "Как построен знак: по образцу, на глаз, или не разобрать.",
+            "type": "string",
+            "enum": ["by_model", "freehand", "unknown"]
+          },
+          "readings": {
+            "description": "Возможные прочтения знака, каждое своими словами. Их должно быть несколько: выбор одного — догадка, перечисление — прочтение.",
+            "type": "array",
+            "items": {"type": "string"}
           },
           "shape": {
             "type": "string"
