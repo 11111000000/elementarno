@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-shelf/after",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет убран, след не читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "shelf",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    }
+  ],
+  "objects": [],
+  "regions": [],
+  "observations": [],
+  "light": []
+}

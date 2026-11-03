@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "image_id": "syn-two-traces-corner/before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предметы на месте, обе отрицательные улики читаются"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "shelf",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    },
+    {
+      "id": "s2",
+      "name": "wall",
+      "material": "concrete",
+      "dust_present": false,
+      "dust_state": "none"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "vase",
+      "material": "ceramic",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.2
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "dust_outline",
+      "shape": "round",
+      "area_m2": 0.02,
+      "contrast": 0.13,
+      "freshness": "sharp",
+      "edges": "concave",
+      "bbox": [
+        0.16,
+        0.58,
+        0.34,
+        0.72
+      ],
+      "note": "граница пыли у основания вазы"
+    },
+    {
+      "id": "r2",
+      "kind": "empty_hook",
+      "shape": "round",
+      "area_m2": 0.003,
+      "contrast": 0.17,
+      "freshness": "sharp",
+      "edges": "flat",
+      "bbox": [
+        0.58,
+        0.22,
+        0.72,
+        0.36
+      ],
+      "note": "пустой крючок, вокруг него видно след крепления"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

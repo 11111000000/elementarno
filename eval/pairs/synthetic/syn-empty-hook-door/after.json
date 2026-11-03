@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "image_id": "syn-empty-hook-door/after",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "след затерт, читать нечего"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "door",
+      "material": "metal",
+      "dust_present": false,
+      "dust_state": "none"
+    }
+  ],
+  "objects": [],
+  "regions": [],
+  "observations": [],
+  "light": []
+}

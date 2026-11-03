@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "image_id": "syn-two-traces-corner/clean",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "контроль: здесь ничего никогда не стояло"
+  },
+  "surfaces": [
+    {
+      "id": "s9",
+      "name": "shelf_far",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    },
+    {
+      "id": "s8",
+      "name": "wall_far",
+      "material": "concrete",
+      "dust_present": false,
+      "dust_state": "none"
+    }
+  ],
+  "objects": [],
+  "regions": [
+    {
+      "id": "r9",
+      "kind": "stain",
+      "shape": "round",
+      "area_m2": 0.004,
+      "contrast": 0.1,
+      "freshness": "soft",
+      "edges": "ragged",
+      "bbox": [
+        0.42,
+        0.66,
+        0.58,
+        0.74
+      ],
+      "note": "старое пятно, не связанное с уборкой"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

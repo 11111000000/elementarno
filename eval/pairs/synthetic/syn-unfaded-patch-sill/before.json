@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-sill/before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет на месте, отрицательная улика читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "sill",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "patchy"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "pot",
+      "material": "ceramic",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.18
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "unfaded_patch",
+      "shape": "round",
+      "area_m2": 0.02,
+      "contrast": 0.22,
+      "freshness": "sharp",
+      "edges": "flat",
+      "bbox": [
+        0.35,
+        0.48,
+        0.65,
+        0.62
+      ],
+      "note": "участок без пыли вокруг основания горшка"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

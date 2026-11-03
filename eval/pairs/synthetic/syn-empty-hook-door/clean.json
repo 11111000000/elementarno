@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "image_id": "syn-empty-hook-door/clean",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "контроль: здесь крючка никогда не было"
+  },
+  "surfaces": [
+    {
+      "id": "s9",
+      "name": "cabinet_door",
+      "material": "metal",
+      "dust_present": false,
+      "dust_state": "none"
+    }
+  ],
+  "objects": [],
+  "regions": [
+    {
+      "id": "r9",
+      "kind": "scratch",
+      "shape": "linear",
+      "area_m2": 0.002,
+      "contrast": 0.2,
+      "freshness": "soft",
+      "edges": "ragged",
+      "bbox": [
+        0.62,
+        0.58,
+        0.8,
+        0.62
+      ],
+      "note": "старая царапина, не связанная с уборкой"
+    }
+  ],
+  "observations": [],
+  "light": []
+}

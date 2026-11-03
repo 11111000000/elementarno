@@ -1,0 +1,96 @@
+{
+  "note": "СЕЙЧАС ВСЕ ПАРЫ СИНТЕТИЧЕСКИЕ. Сцены нарисованы генератором tools/make_pairs.py, фотографий нет. Метрика ложных срабатываний на синтетике измеряет работу движка (срабатывает ли правило там, где в сцене стоит аннотация следа), а не мир: настоящий пылевой контур, пустой крючок и невыцветший участок на фотографиях выглядят иначе, чем в нарисованной сцене. Настоящие пары добавляются в этот же формат с \"real\": true, \"synthetic\": false; методика съёмки — docs/CAPTURE-PROTOCOL.md.",
+  "pairs": [
+    {
+      "id": "syn-dust-outline-shelf",
+      "before": "synthetic/syn-dust-outline-shelf/before.json",
+      "after": "synthetic/syn-dust-outline-shelf/after.json",
+      "clean": "synthetic/syn-dust-outline-shelf/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-001"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "С полки сняли керамическую вазу. В кадре «до» у её основания видна граница пыли — пылевой контур; в кадре «после» вазы нет и граница не читается.",
+      "real": false,
+      "synthetic": true
+    },
+    {
+      "id": "syn-dust-outline-table",
+      "before": "synthetic/syn-dust-outline-table/before.json",
+      "after": "synthetic/syn-dust-outline-table/after.json",
+      "clean": "synthetic/syn-dust-outline-table/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-001"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "С рабочего стола убрали жестяную коробку. В кадре «до» виден прямоугольный пылевой контур на месте коробки; в кадре «после» след не читается.",
+      "real": false,
+      "synthetic": true
+    },
+    {
+      "id": "syn-empty-hook-door",
+      "before": "synthetic/syn-empty-hook-door/before.json",
+      "after": "synthetic/syn-empty-hook-door/after.json",
+      "clean": "synthetic/syn-empty-hook-door/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-003"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "С дверного крючка сняли связку ключей. В кадре «до» крючок пуст, но след крепления виден; в кадре «после» след затерт.",
+      "real": false,
+      "synthetic": true
+    },
+    {
+      "id": "syn-two-traces-corner",
+      "before": "synthetic/syn-two-traces-corner/before.json",
+      "after": "synthetic/syn-two-traces-corner/after.json",
+      "clean": "synthetic/syn-two-traces-corner/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-001",
+          "F-ABS-003"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "Из угла убрали вазу с полки и сняли ключи с крючка. В кадре «до» видны и пылевой контур, и след крепления; в кадре «после» ни того, ни другого.",
+      "real": false,
+      "synthetic": true
+    },
+    {
+      "id": "syn-unfaded-patch-shelf",
+      "before": "synthetic/syn-unfaded-patch-shelf/before.json",
+      "after": "synthetic/syn-unfaded-patch-shelf/after.json",
+      "clean": "synthetic/syn-unfaded-patch-shelf/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-002"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "С полки убрали картонную коробку. В кадре «до» под ней виден невыцветший участок без пыли; в кадре «после» участок выцвел.",
+      "real": false,
+      "synthetic": true
+    },
+    {
+      "id": "syn-unfaded-patch-sill",
+      "before": "synthetic/syn-unfaded-patch-sill/before.json",
+      "after": "synthetic/syn-unfaded-patch-sill/after.json",
+      "clean": "synthetic/syn-unfaded-patch-sill/clean.json",
+      "expect": {
+        "finding_ids": [
+          "F-ABS-002"
+        ],
+        "trace_frame": "before"
+      },
+      "truth": "С подоконника убрали глиняный горшок. В кадре «до» вокруг основания виден невыцветший участок без пыли; в кадре «после» участок засыпан пылью.",
+      "real": false,
+      "synthetic": true
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "image_id": "syn-unfaded-patch-shelf/before",
+    "source": "synthetic",
+    "geometry": "relative",
+    "notes": "предмет на месте, отрицательная улика читается"
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "shelf",
+      "material": "wood",
+      "dust_present": true,
+      "dust_state": "even"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "box",
+      "material": "cardboard",
+      "on": "s1",
+      "state": "clean",
+      "size_m": 0.28
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "unfaded_patch",
+      "shape": "rectangular",
+      "area_m2": 0.07,
+      "contrast": 0.18,
+      "freshness": "sharp",
+      "edges": "flat",
+      "bbox": [
+        0.52,
+        0.42,
+        0.78,
+        0.56
+      ],
+      "note": "прямоугольный участок без пыли на месте коробки"
+    }
+  ],
+  "observations": [],
+  "light": []
+}
