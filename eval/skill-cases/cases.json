@@ -1,0 +1,60 @@
+{
+  "benchmark": "skill-cases",
+  "description": "Кейсы для харнесса скилла detective: одна фотография, ожидаемые улики и ожидаемый вердикт. Истина берётся из категории файла на Wikimedia Commons, а не из вывода модели.",
+  "cases": [
+    {
+      "id": "mold-wall",
+      "image": "eval/real/images/mold-wall.jpg",
+      "packs": [
+        "core",
+        "absence",
+        "biology",
+        "water"
+      ],
+      "expect": {
+        "finding_ids": [
+          "F-BIO-002"
+        ],
+        "verdict": "sufficient_evidence"
+      },
+      "note": "Плесень на стенах (Wikimedia Commons, CC BY-SA 4.0). Истина — очаг плесени, значит F-BIO-002 и вердикт «улик достаточно». Движковое восприятие на этом кадре след не находит: если F-BIO-002 не появится, расхождение с ожиданием — промах фазы 1–2, а не протокола. Паков biology и water в профиле detective нет, они заданы здесь явно."
+    },
+    {
+      "id": "footprints-mud",
+      "image": "eval/real/images/footprints-mud.jpg",
+      "packs": [
+        "core",
+        "absence",
+        "presence",
+        "biology",
+        "garden",
+        "water"
+      ],
+      "expect": {
+        "finding_ids": [
+          "F-BIO-001"
+        ],
+        "verdict": "sufficient_evidence"
+      },
+      "note": "Следы в грязи (Wikimedia Commons, CC BY-SA 2.0). Истина — следы ног, значит F-BIO-001 и вердикт «улик достаточно». Всё, что сработало сверх этого (например, след уровня воды, если восприятие его нашло), считается лишней уликой."
+    },
+    {
+      "id": "clean-kitchen-dining",
+      "image": "eval/real/images/clean-kitchen-dining.jpg",
+      "packs": [
+        "core",
+        "absence",
+        "presence",
+        "trade",
+        "home",
+        "garden",
+        "office"
+      ],
+      "expect": {
+        "finding_ids": [],
+        "verdict": "insufficient_evidence"
+      },
+      "note": "Обычная кухня-гостиная (Wikimedia Commons, CC BY-SA 4.0). Следов нет: любая улика здесь — ложное срабатывание, а отказ «улик недостаточно» — правильный ответ."
+    }
+  ]
+}
