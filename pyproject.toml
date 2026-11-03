@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "elementarno"
-version = "0.2.0"
+version = "0.3.0"
 description = "Доказательный разбор сцен по фотографиям: улики со ссылками, версии, уточняющие вопросы"
 readme = "README.md"
 requires-python = ">=3.11"
