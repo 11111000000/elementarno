@@ -2,12 +2,14 @@
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 from . import config as cfg
 from .diff import diff_scenes
-from .ledger import Verdict, score_hypotheses, validate, verdict as decide_verdict
+from .ledger import Verdict, score_hypotheses, validate
+from .ledger import verdict as decide_verdict
 from .providers import enrich, load_providers
 from .puzzle import build_claims, load_puzzle, solve
 from .render import render
@@ -42,6 +44,27 @@ def profile_for(args):
         return cfg.get_profile(config, getattr(args, "profile", None))
     except (FileNotFoundError, KeyError):
         return None
+
+
+def apply_profile(args, profile=None):
+    """Подставить профиль в аргументы команды.
+
+    Явно заданный флаг всегда сильнее профиля: иначе `--min-findings 1`
+    молча терялся рядом с `--profile`, и команды решали разные задачи по
+    разным правилам. Профиль задаёт значение только там, где флаг не задан.
+    """
+    profile = profile if profile is not None else profile_for(args)
+    if profile:
+        args.pack = args.pack or profile.get("packs")
+        if getattr(args, "mode", None) == "detective":
+            args.mode = profile.get("mode", args.mode)
+        if getattr(args, "persona", None) == "plain":
+            args.persona = profile.get("persona") or args.persona
+        if getattr(args, "min_findings", None) is None:
+            args.min_findings = profile.get("min_findings", 1)
+    if getattr(args, "min_findings", None) is None:
+        args.min_findings = 1
+    return profile
 
 
 def cmd_check(args):
@@ -103,28 +126,50 @@ def _ledger_for(scene, findings, ledger_path):
     return {"claims": build_claims(findings), "hypotheses": []}
 
 
+def _annotate_profile_gaps(report, all_rules, selected_rules):
+    """Отличить опечатку в ссылке от правила, не вошедшего в профиль.
+
+    Профиль задаёт доменный охват, и ссылка на правило вне профиля — это
+    не ошибка ссылки, а иной диагноз: либо сменить профиль, либо убрать
+    утверждение. Без подсказки агент ищет опечатку там, где её нет.
+    """
+    known = {rule.id for rule in all_rules}
+    in_scope = {rule.id for rule in selected_rules}
+    for error in report.get("errors", []):
+        if error.get("code") != "unresolved_citation":
+            continue
+        outside = []
+        for finding_id in re.findall(r"F-([A-Z]+-\d+)", error.get("detail", "")):
+            if finding_id in known and finding_id not in in_scope:
+                outside.append(finding_id)
+        if outside:
+            packs = ", ".join(sorted({rule.pack for rule in selected_rules}))
+            error["hint"] = (f"правило {', '.join(outside)} есть в базе, но не входит в профиль "
+                             f"(паки: {packs}). Смените профиль или уберите утверждение")
+
+
 def cmd_verify(args):
+    apply_profile(args)
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
     report = validate(findings, ledger)
+    _annotate_profile_gaps(report, load_packs(args.rules), rules)
     if args.json:
         dump(report)
     else:
         for error in report["errors"]:
             print(f"  ✗ {error.get('claim_id') or error.get('hypothesis_id')}: {error['code']} — {error['detail']}")
+            if error.get("hint"):
+                print(f"      {error['hint']}")
         print(f"полнота цитат: {report['citation_completeness']:.2f} "
               f"({report['resolvable_claims']}/{report['claims']})")
     return 1 if report["errors"] else 0
 
 
 def cmd_tell(args):
-    profile = profile_for(args)
-    if profile:
-        args.pack = args.pack or profile.get("packs")
-        args.persona = args.persona if args.persona != "plain" else (profile.get("persona") or args.persona)
-        args.min_findings = profile.get("min_findings", args.min_findings)
+    apply_profile(args)
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
@@ -180,7 +225,7 @@ def cmd_puzzle(args):
 
 def cmd_bench(args):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from run_eval import run_benchmark, discover_benchmarks
+    from run_eval import discover_benchmarks, run_benchmark
     benchmarks = discover_benchmarks(args.benchmarks)
     if not benchmarks:
         print("бенчмарки не найдены", file=sys.stderr)
@@ -233,12 +278,7 @@ def cmd_perceive(args):
 def cmd_analyze(args):
     from .perception import MiniMaxPerception
 
-    profile = profile_for(args)
-    if profile:
-        args.pack = args.pack or profile.get("packs")
-        args.mode = args.mode if args.mode != "detective" else profile.get("mode", args.mode)
-        args.persona = args.persona if args.persona != "plain" else (profile.get("persona") or args.persona)
-        args.min_findings = profile.get("min_findings", args.min_findings)
+    apply_profile(args)
 
     perception = MiniMaxPerception(model=args.model, think=args.think,
                                    votes=getattr(args, "votes", 1))
@@ -260,9 +300,7 @@ def cmd_analyze(args):
 def cmd_reason(args):
     from .reasoning import MiniMaxReasoner
 
-    profile = profile_for(args)
-    if profile:
-        args.pack = args.pack or profile.get("packs")
+    apply_profile(args)
 
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
@@ -284,19 +322,18 @@ def cmd_reason(args):
 
 
 def cmd_nextshot(args):
-    from .nextshot import hypothesis_tags, kind_tags_from_rules, rank_questions
+    from .nextshot import discriminator_questions, hypothesis_tags, kind_tags_from_rules, rank_questions
 
-    profile = profile_for(args)
-    if profile:
-        args.pack = args.pack or profile.get("packs")
+    apply_profile(args)
 
     scene = load_json(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
-    claims = build_claims(findings)
-    hypotheses = score_hypotheses(findings, claims, load_json(args.hypotheses)["hypotheses"]
-                                 if args.hypotheses else [])
+    ledger = load_json(args.hypotheses) if args.hypotheses else {}
+    claims = ledger.get("claims") or build_claims(findings)
+    hypotheses = score_hypotheses(findings, claims, ledger.get("hypotheses", []))
     found_kinds = {r.get("kind") for r in scene.get("regions", [])}
+    discriminators = discriminator_questions(hypotheses)[:args.limit]
     questions = rank_questions(
         hypotheses,
         hypothesis_tags(hypotheses, findings),
@@ -305,25 +342,31 @@ def cmd_nextshot(args):
         limit=args.limit,
     )
     if args.json:
-        dump(questions)
+        dump({"discriminators": discriminators, "catalogue": questions})
         return 0
-    if not questions:
+    if not discriminators and not questions:
         print("Спросить нечего: версий, которые можно различить, нет.")
         return 0
-    print("Что снять дальше (по ценности информации):")
-    for index, question in enumerate(questions, start=1):
-        print(f"\n{index}. {question['question']}")
-        print(f"   зачем: {question['why']}")
-        print(f"   ценность информации: {question['eig']:.3f} бит; следы: {', '.join(question['kinds']) or '—'}")
+    if discriminators:
+        print("Что разведут конкурирующие версии:")
+        for index, question in enumerate(discriminators, start=1):
+            print(f"\n{index}. {question['question']}")
+            print(f"   зачем: {question['why']}")
+            print(f"   затрагивает версий: {question['splits']} из {question['group']} "
+                  f"({', '.join(question['hypotheses'])})")
+    if questions:
+        print("\nЧто снять дальше (по ценности информации):")
+        for index, question in enumerate(questions, start=1):
+            print(f"\n{index}. {question['question']}")
+            print(f"   зачем: {question['why']}")
+            print(f"   ценность информации: {question['eig']:.3f} бит; следы: {', '.join(question['kinds']) or '—'}")
     return 0
 
 
 def cmd_session(args):
     from .dialog import Session
 
-    profile = profile_for(args)
-    if profile:
-        args.pack = args.pack or profile.get("packs")
+    apply_profile(args)
 
     rules = selected_rules(args.rules, args.pack)
     if args.state and Path(args.state).exists():
@@ -406,7 +449,8 @@ def build_parser():
     tell.add_argument("--pack", action="append")
     tell.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
     tell.add_argument("--persona", default="plain", choices=["plain", "doyle", "forensic"])
-    tell.add_argument("--min-findings", type=int, default=1)
+    tell.add_argument("--min-findings", type=int, default=None,
+                        help="сколько улик нужно для версии; флаг сильнее профиля")
     tell.add_argument("--profile", help="профиль из config/profiles.json")
     tell.set_defaults(func=cmd_tell)
 
@@ -447,7 +491,8 @@ def build_parser():
     analyze.add_argument("--pack", action="append")
     analyze.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic", "solve", "nextshot"])
     analyze.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
-    analyze.add_argument("--min-findings", type=int, default=1)
+    analyze.add_argument("--min-findings", type=int, default=None,
+                        help="сколько улик нужно для версии; флаг сильнее профиля")
     analyze.add_argument("--votes", type=int, default=1)
     analyze.add_argument("--profile", help="профиль из config/profiles.json")
     analyze.set_defaults(func=cmd_analyze)
@@ -461,7 +506,8 @@ def build_parser():
     reason.add_argument("--pack", action="append")
     reason.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic"])
     reason.add_argument("--persona", default="doyle", choices=["plain", "doyle", "forensic"])
-    reason.add_argument("--min-findings", type=int, default=1)
+    reason.add_argument("--min-findings", type=int, default=None,
+                        help="сколько улик нужно для версии; флаг сильнее профиля")
     reason.add_argument("--profile", help="профиль из config/profiles.json")
     reason.set_defaults(func=cmd_reason)
 

@@ -1,0 +1,126 @@
+[
+  {
+    "finding_id": "F-BIO-002",
+    "rule_id": "BIO-002",
+    "rule_version": 2,
+    "pack": "biology",
+    "title": "Очаг плесени",
+    "layer": "epistemic",
+    "step": "scene",
+    "inference": "В сцене есть очаг плесени: здесь длительно держалась влага",
+    "anchors": [
+      "r1",
+      "r2",
+      "r3",
+      "r4"
+    ],
+    "tags": [
+      "mold",
+      "damp"
+    ],
+    "sources": [
+      {
+        "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+        "note": "признаки плесени и их связь с влажностью",
+        "verified": false
+      }
+    ],
+    "confounds": [
+      "Плесень может быть свежей",
+      "Очаг может быть локальным (попавшая влага)"
+    ],
+    "exceptions": [
+      "Очаг совпадает с зоной разлива"
+    ],
+    "falsification": {
+      "refuted_by": [],
+      "physical_test": "Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага"
+    },
+    "confidence_prior": 0.8,
+    "confidence_ceiling": 0.5,
+    "provisional": true
+  },
+  {
+    "finding_id": "F-WAT-001",
+    "rule_id": "WAT-001",
+    "rule_version": 1,
+    "pack": "water",
+    "title": "След уровня воды",
+    "layer": "epistemic",
+    "step": "scene",
+    "inference": "На поверхности сохранилась граница прежнего уровня воды — помещение заливали",
+    "anchors": [
+      "r5",
+      "r6"
+    ],
+    "tags": [
+      "flood",
+      "water"
+    ],
+    "sources": [
+      {
+        "ref": "IIC S500: Standard for Professional Water Damage Restoration",
+        "note": "признаки залива и категории повреждения",
+        "verified": false
+      }
+    ],
+    "confounds": [
+      "Границу мог оставить иной раствор или клей",
+      "След конденсата на холодной поверхности"
+    ],
+    "exceptions": [
+      "Граница совпадает с высотой мебели, а не с заливом"
+    ],
+    "falsification": {
+      "refuted_by": [
+        "WAT-002"
+      ],
+      "physical_test": "Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали"
+    },
+    "confidence_prior": 0.8,
+    "confidence_ceiling": 0.5,
+    "provisional": true
+  },
+  {
+    "finding_id": "F-WAT-002",
+    "rule_id": "WAT-002",
+    "rule_version": 1,
+    "pack": "water",
+    "title": "Плесень в месте прежнего намокания",
+    "layer": "epistemic",
+    "step": "scene",
+    "inference": "Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера",
+    "anchors": [
+      "r1",
+      "r2",
+      "r3",
+      "r4"
+    ],
+    "tags": [
+      "mold",
+      "after_water",
+      "damp"
+    ],
+    "sources": [
+      {
+        "ref": "WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009",
+        "note": "связь влаги и роста плесени",
+        "verified": false
+      }
+    ],
+    "confounds": [
+      "Плесень может быть от сырости без залива",
+      "Плесень могла быть до залива и расти в другом месте"
+    ],
+    "exceptions": [
+      "Очаг плесени не пересекается с зоной прежнего намокания"
+    ],
+    "falsification": {
+      "refuted_by": [],
+      "physical_test": "Сравнить площадь очага плесени с зоной намокания"
+    },
+    "confidence_prior": 0.75,
+    "confidence_ceiling": 0.5,
+    "provisional": true
+  }
+]

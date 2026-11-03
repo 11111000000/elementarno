@@ -1,0 +1,14 @@
+{
+  "meta": {"image_id": "symbol-freehand", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "стена", "material": "plaster", "dust_present": false, "dust_state": "none"}
+  ],
+  "objects": [],
+  "regions": [
+    {"id": "r1", "kind": "symbol", "shape": "irregular",
+     "medium": "карандаш", "construction": "freehand",
+     "readings": ["наивный рисунок", "случайный росчерк"],
+     "note": "неровная каракуля, подобия образца нет"}
+  ],
+  "observations": []
+}

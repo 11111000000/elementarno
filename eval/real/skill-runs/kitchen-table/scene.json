@@ -1,0 +1,328 @@
+{
+  "meta": {
+    "image_id": "kitchen-table-2026-11-03",
+    "source": "загруженный пользователем кадр (20261103_110511.jpg), снят с поворотом на 90°",
+    "geometry": "relative",
+    "notes": "Кухня. Деревянный стол (слева, внизу) и плиточная столешница (справа), плетёные стулья, оштукатуренная стена с детским рисунком. Свет мягкий, справа-спереди."
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "деревянная столешница стола",
+      "material": "wood",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": true,
+      "region": "левая нижняя часть кадра"
+    },
+    {
+      "id": "s2",
+      "name": "плиточная столешница",
+      "material": "ceramic",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": true,
+      "region": "полоса вдоль правой половины кадра, от края стола до края изображения"
+    },
+    {
+      "id": "s3",
+      "name": "оштукатуренная стена",
+      "material": "plaster",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": false,
+      "region": "верхняя половина кадра за спиной сидящей"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "person",
+      "material": "cloth",
+      "visible": true,
+      "note": "женщина, сидит за столом, голова опущена, смотрит вниз на камеру; левая рука поджата под грудь, правая касается камеры. Пол вне кадра, поэтому опора не указана"
+    },
+    {
+      "id": "o2",
+      "category": "camera",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 0.15,
+      "on": "s1",
+      "visible": true,
+      "note": "старая серебристая камера с кожаной вставкой и тремя кнопками на корпусе, закреплена на мини-треноге"
+    },
+    {
+      "id": "o3",
+      "category": "tripod",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 0.2,
+      "on": "s1",
+      "visible": true,
+      "note": "маленькая настольная тренога с зажимом, стоит на деревянной столешнице"
+    },
+    {
+      "id": "o4",
+      "category": "open_container",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 0.1,
+      "on": "s2",
+      "visible": true,
+      "note": "чёрная эмалированная кружка с ручкой, стоит открытой; содержимое не разобрать"
+    },
+    {
+      "id": "o5",
+      "category": "tumbler",
+      "material": "ceramic",
+      "state": "clean",
+      "size_m": 0.12,
+      "on": "s1",
+      "visible": true,
+      "note": "белый гранёный стакан, пустой, на внутренней стенке несколько тёмных точек"
+    },
+    {
+      "id": "o6",
+      "category": "mug",
+      "material": "ceramic",
+      "state": "worn",
+      "size_m": 0.1,
+      "on": "s2",
+      "visible": true,
+      "note": "белая кружка, у края след капли"
+    },
+    {
+      "id": "o7",
+      "category": "open_container",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 0.2,
+      "on": "s2",
+      "visible": true,
+      "note": "стальная оловянная миска с гравировкой, дугообразная ручка, маленькое отверстие в стенке; стоит открытой, внутри пусто"
+    },
+    {
+      "id": "o8",
+      "category": "bottle",
+      "material": "plastic",
+      "state": "clean",
+      "size_m": 0.25,
+      "on": "s2",
+      "visible": true,
+      "fill_level": 0.4,
+      "note": "пластиковая бутылка 1.5 л с белой резьбовой крышкой, этикетка «МОЛОКО, отборное»; наполнена примерно на 40%"
+    },
+    {
+      "id": "o9",
+      "category": "medicine_box",
+      "material": "cardboard",
+      "state": "worn",
+      "size_m": 0.2,
+      "on": "s2",
+      "visible": true,
+      "note": "розовая картонная коробка лекарства с надписью «СЛЕПОТА»; верхняя крышка откинута, в окне виден блистер с таблетками"
+    },
+    {
+      "id": "o10",
+      "category": "chocolate_box",
+      "material": "cardboard",
+      "state": "worn",
+      "size_m": 0.25,
+      "on": "s2",
+      "visible": true,
+      "note": "золотая коробка шоколада с откинутой крышкой, внутри пусто"
+    },
+    {
+      "id": "o11",
+      "category": "power_bank",
+      "material": "plastic",
+      "state": "worn",
+      "size_m": 0.15,
+      "on": "s2",
+      "visible": true,
+      "note": "чёрный прямоугольный пауэрбанк, оранжевая кнопка, подключён белый кабель"
+    },
+    {
+      "id": "o12",
+      "category": "knife",
+      "material": "steel",
+      "state": "worn",
+      "size_m": 0.3,
+      "on": "s2",
+      "visible": true,
+      "note": "нож с чёрной рукояткой на заклёпках, лежит на плитке рядом с ложкой"
+    },
+    {
+      "id": "o13",
+      "category": "spoon",
+      "material": "steel",
+      "state": "worn",
+      "size_m": 0.18,
+      "on": "s2",
+      "visible": true,
+      "note": "ложка из оцинкованной стали, лежит на плитке"
+    },
+    {
+      "id": "o14",
+      "category": "plate",
+      "material": "ceramic",
+      "state": "worn",
+      "size_m": 0.25,
+      "on": "s2",
+      "visible": true,
+      "note": "белая тарелка с чёрным цветочным рисунком, на ней вилка и кусок сухого хлеба"
+    },
+    {
+      "id": "o15",
+      "category": "food_remains",
+      "material": "organic",
+      "state": "stale",
+      "size_m": 0.1,
+      "on": "s2",
+      "visible": true,
+      "note": "крошки, сушёные листья и тёмные кусочки на плитке у тарелки"
+    },
+    {
+      "id": "o16",
+      "category": "cork_trivet",
+      "material": "cork",
+      "state": "worn",
+      "size_m": 0.15,
+      "on": "s2",
+      "visible": true,
+      "note": "квадратная пробковая подставка под кружкой"
+    },
+    {
+      "id": "o17",
+      "category": "plastic_bag",
+      "material": "plastic",
+      "state": "worn",
+      "size_m": 0.3,
+      "on": "s2",
+      "visible": true,
+      "note": "мятый прозрачный пакет с чем-то коричневым внутри, у правого края"
+    },
+    {
+      "id": "o18",
+      "category": "cord",
+      "material": "cloth",
+      "state": "worn",
+      "size_m": 0.4,
+      "on": "s2",
+      "visible": true,
+      "note": "плетёный бирюзовый шнур, свободно лежит на плитке"
+    },
+    {
+      "id": "o19",
+      "category": "case",
+      "material": "leather",
+      "state": "worn",
+      "size_m": 0.25,
+      "on": "s2",
+      "visible": true,
+      "note": "чёрный кожаный футляр с металлическим зажимом, у левого края"
+    },
+    {
+      "id": "o20",
+      "category": "broom",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 1.4,
+      "visible": true,
+      "note": "метла с чёрной Г-образной рукояткой на металлическом древке, прислонена к стене; пол вне кадра"
+    },
+    {
+      "id": "o21",
+      "category": "chair",
+      "material": "wood",
+      "state": "worn",
+      "visible": true,
+      "note": "плетёный стул с гнутой спинкой; пол вне кадра, поэтому опора не указана"
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "symbol",
+      "shape": "triangle",
+      "edges": "unknown",
+      "freshness": "unknown",
+      "note": "на стене простым карандашом нарисован треугольник, внутри которого намечен глаз с радужкой и зрачком, от вершины и боков треугольника расходятся длинные лучи; ниже крупный треугольник с такими же лучами и едва читаемые буквы",
+      "medium": "карандаш",
+      "construction": "by_model",
+      "archetype": "all_seeing_eye",
+      "readings": [
+        "детский рисунок: треугольник с глазом и лучами",
+        "заимствованный образец «всевидящее око» в треугольнике"
+      ]
+    },
+    {
+      "id": "r2",
+      "kind": "stain",
+      "shape": "irregular",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "серые потёки и грязь на штукатурке: в верхней части стены и у края справа, в остальном штукатурка чистая"
+    },
+    {
+      "id": "r3",
+      "kind": "scratch",
+      "shape": "linear",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "деревянная столешница исцарапана: множество борозд и затёртостей вдоль края"
+    },
+    {
+      "id": "r4",
+      "kind": "other",
+      "shape": "irregular",
+      "edges": "unknown",
+      "freshness": "unknown",
+      "note": "крошки, сушёные листья и тёмные частицы рядом с тарелкой"
+    }
+  ],
+  "observations": [
+    {
+      "id": "x1",
+      "about": "o8",
+      "feature": "fill_state",
+      "value": "молоко на уровне примерно 40% высоты бутылки, крышка закрыта"
+    },
+    {
+      "id": "x2",
+      "about": "o9",
+      "feature": "state",
+      "value": "коробка открыта, в окне виден блистер с таблетками"
+    },
+    {
+      "id": "x3",
+      "about": "o10",
+      "feature": "state",
+      "value": "коробка открыта, внутри пусто"
+    },
+    {
+      "id": "x4",
+      "about": "o4",
+      "feature": "contents",
+      "value": "не разобрать: внутренность чёрная, ни уровня жидкости, ни блика не видно"
+    },
+    {
+      "id": "x5",
+      "about": "o1",
+      "feature": "posture",
+      "value": "сидит, голова опущена, взгляд вниз на камеру; левая рука поджата под грудь, правая касается корпуса камеры"
+    }
+  ],
+  "light": [
+    {
+      "id": "l1",
+      "kind": "window",
+      "direction": "справа-спереди",
+      "position": "за правым передним краем кадра"
+    }
+  ]
+}

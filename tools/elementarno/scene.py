@@ -12,13 +12,14 @@ VALID_REGIONS = {
     "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint", "wet_trace",
     "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
     "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
-    "metal_swarf", "other",
+    "metal_swarf", "symbol", "inscription", "other",
 }
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
 VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
 VALID_FRESHNESS = {"sharp", "soft", "erased", "unknown"}
 VALID_EDGES = {"concave", "convex", "flat", "ragged", "unknown"}
+VALID_CONSTRUCTION = {"by_model", "freehand", "unknown"}
 
 
 def validate_scene(scene):
@@ -76,7 +77,8 @@ def validate_scene(scene):
                 "code": "bad_enum",
                 "detail": f"region {region.get('id')}: unknown kind {kind}",
             })
-        for field, allowed in (("freshness", VALID_FRESHNESS), ("edges", VALID_EDGES)):
+        for field, allowed in (("freshness", VALID_FRESHNESS), ("edges", VALID_EDGES),
+                               ("construction", VALID_CONSTRUCTION)):
             value = region.get(field)
             if value and value not in allowed:
                 problems.append({

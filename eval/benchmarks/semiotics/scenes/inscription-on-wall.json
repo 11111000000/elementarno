@@ -1,0 +1,13 @@
+{
+  "meta": {"image_id": "inscription-on-wall", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "стена", "material": "plaster", "dust_present": false, "dust_state": "none"}
+  ],
+  "objects": [],
+  "regions": [
+    {"id": "r1", "kind": "inscription", "shape": "linear",
+     "medium": "процарапано", "construction": "freehand",
+     "note": "процарапанные буквы у нижнего края стены"}
+  ],
+  "observations": []
+}

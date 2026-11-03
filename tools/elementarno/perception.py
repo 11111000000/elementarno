@@ -27,7 +27,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from .scene import validate_scene
+from .scene import VALID_CONSTRUCTION, validate_scene
 
 DEFAULT_ENDPOINT = "https://api.minimaxi.chat/anthropic/v1/messages"
 DEFAULT_MODEL = "MiniMax-M3"
@@ -80,6 +80,11 @@ TRACE_CHECKLIST = [
     ("tyre_mark", "след шин"),
     ("scratch", "царапины или потёртости на поверхности"),
     ("crack", "трещина"),
+    ("symbol", "знак или символ, нанесённый на поверхность: фигура по образцу, "
+               "эмблема, герб, треугольник с глазом и лучами, знак с лучами, "
+               "оккультный или масонский знак, метка"),
+    ("inscription", "надпись от руки на поверхности: буквы, слова, цифры, "
+                    "инициалы, процарапанная надпись"),
 ]
 
 CHECKLIST_PROMPT = """Ты — эксперт по следовому анализу. Перечисли следы, которые ты ВИДИШЬ на фотографии.
@@ -109,6 +114,27 @@ VERIFY_PROMPT = """Ты эксперт по следовому анализу. �
 Ответь ТОЛЬКО JSON: {{"yes":true,"confidence":0.0,"note":""}}
 yes=false только если ты уверен, что такого на фотографии НЕТ.
 Сомневаешься — true с невысокой уверенностью."""
+
+IDENTIFY_PROMPT = """Ты эксперт по знакам и надписям. На фотографии найден знак или надпись:
+«{description}»
+
+Опиши его подробно. Ответь ТОЛЬКО JSON:
+{{"medium":"чем нанесено: карандаш|краска|уголь|выжжено|процарапано|вылеплено|не разобрать",
+ "construction":"by_model|freehand|unknown",
+ "archetype":"узнанный образец, если он есть (например all_seeing_eye, pentagram), иначе пустая строка",
+ "readings":["минимум два разных прочтения знака, каждое своими словами"],
+ "note":"что именно нарисовано и как выглядит, своими словами"}}
+
+ПРАВИЛА:
+1. construction=by_model — только если фигура явно построена по образцу: есть
+   симметрия, правильные пропорции, характерные детали образца.
+   construction=freehand — если это наивный рисунок или случайный росчерк.
+   unknown — если не разобрать.
+2. archetype — только если образец опознан уверенно. Сходство поверхностное —
+   это не опознание. Лучше пустая строка, чем неверный образец.
+3. readings — минимум два прочтения: например «детский рисунок» и «заимствованный
+   символический образец». Не выбирай одно, перечисли.
+4. Не выдумывай то, чего на фотографии нет."""
 
 
 def normalize_kind(raw, known):
@@ -146,6 +172,11 @@ def normalize_kind(raw, known):
         "metal_shavings": "metal_swarf", "swarf": "metal_swarf", "grinding_dust": "metal_swarf",
         "cup_mark": "cup_ring", "coffee_ring": "cup_ring", "mug_ring": "cup_ring",
         "ink": "ink_trace", "toner": "ink_trace",
+        "sign": "symbol", "signs": "symbol", "symbolic_mark": "symbol",
+        "drawing": "symbol", "graffiti": "symbol", "emblem": "symbol",
+        "writing": "inscription", "text": "inscription", "letters": "inscription",
+        "words": "inscription", "initials": "inscription", "handwriting": "inscription",
+        "engraving": "inscription", "scrawled_text": "inscription",
     }
     if value in aliases:
         return aliases[value]
@@ -466,6 +497,10 @@ class MiniMaxPerception:
             if verified is not None:
                 scene["regions"] = verified
 
+        identified, identify_calls = self._identify(image_b64, media_type, scene["regions"])
+        raw_calls.extend(identify_calls)
+        scene["regions"] = identified
+
         usage = (raw_calls[0]["payload"].get("usage") or {}) if raw_calls else {}
         meta = {
             "model": self.model,
@@ -590,3 +625,53 @@ class MiniMaxPerception:
                                   + (answer.get("note") or "")).strip()
                 verified.append(region)
         return verified, raw
+
+    def _identify(self, image_b64, media_type, regions, max_regions=4):
+        """Опознание знака: что нарисовано, чем, по образцу ли и как это читается.
+
+        Детекция отвечает на вопрос «есть ли знак», опознание — «что это за
+        знак». Без второго шага знак остаётся пятном непонятного происхождения,
+        и ни одно правило о нём не срабатывает.
+
+        Прочтений должно быть несколько: выбрать одно — значит выдать
+        догадку за прочтение. Перечисление сохраняет право голоса читателю.
+        """
+        targets = {r.get("id") for r in regions if r.get("kind") in ("symbol", "inscription")}
+        if not targets:
+            return regions, []
+
+        raw = []
+        result = []
+        for region in regions:
+            if region.get("id") not in targets:
+                result.append(region)
+                continue
+            description = region.get("note") or region.get("question") or region.get("kind")
+            prompt = IDENTIFY_PROMPT.format(description=description)
+            payload, latency = self.call(image_b64, media_type, prompt, max_tokens=700)
+            raw.append({"pass": "identify", "prompt": prompt, "payload": payload,
+                        "latency_ms": latency, "region": region.get("id")})
+            try:
+                answer = self.extract_json(self.text_of(payload))
+            except (json.JSONDecodeError, PerceptionError):
+                result.append(region)
+                continue
+            updated = dict(region)
+            construction = answer.get("construction")
+            if construction in VALID_CONSTRUCTION:
+                updated["construction"] = construction
+            medium = (answer.get("medium") or "").strip()
+            if medium:
+                updated["medium"] = medium
+            archetype = (answer.get("archetype") or "").strip()
+            if archetype:
+                updated["archetype"] = archetype
+            readings = [text for text in (answer.get("readings") or [])
+                        if isinstance(text, str) and text.strip()]
+            if readings:
+                updated["readings"] = readings
+            note = (answer.get("note") or "").strip()
+            if note:
+                updated["note"] = note
+            result.append(updated)
+        return result, raw

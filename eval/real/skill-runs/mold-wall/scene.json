@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "image_id": "mold-wall",
+    "source": "eval/real/images/mold-wall.jpg",
+    "geometry": "relative",
+    "notes": "Внутренний двор заброшенного здания. Свет сверху, дневной. Вид изнутри двора, камера у земли, смотрит вверх на заднюю стену."
+  },
+  "surfaces": [
+    {
+      "id": "s1",
+      "name": "земля во дворе",
+      "material": "soil",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": true,
+      "region": "низ кадра, от края до основания задней стены"
+    },
+    {
+      "id": "s2",
+      "name": "левая стена с нишей",
+      "material": "plaster",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": false,
+      "region": "левая треть кадра, высокая, уходит за верхний край"
+    },
+    {
+      "id": "s3",
+      "name": "задняя стена",
+      "material": "plaster",
+      "dust_present": false,
+      "dust_state": "none",
+      "wet": false,
+      "sunlit": false,
+      "region": "центр кадра, за лесами"
+    }
+  ],
+  "objects": [
+    {
+      "id": "o1",
+      "category": "scaffolding",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 4.0,
+      "on": "s1",
+      "wet": false,
+      "visible": true,
+      "note": "трубчатые строительные леса, ржавые, стоят вдоль задней стены, частично закрывают её"
+    },
+    {
+      "id": "o2",
+      "category": "column",
+      "material": "concrete",
+      "state": "damaged",
+      "size_m": 3.5,
+      "wet": false,
+      "visible": true,
+      "note": "бетонная колонна справа, с сеткой трещин, внизу облупившаяся штукатурка"
+    },
+    {
+      "id": "o3",
+      "category": "canopy",
+      "material": "concrete",
+      "state": "worn",
+      "size_m": 2.0,
+      "wet": false,
+      "visible": true,
+      "note": "бетонный козырёк/карниз справа вверху, с него идут потёки"
+    },
+    {
+      "id": "o4",
+      "category": "tree",
+      "material": "wood",
+      "state": "worn",
+      "size_m": 5.0,
+      "on": "s1",
+      "wet": false,
+      "visible": true,
+      "note": "дерево, проросло из земли за лесами, крона вверху кадра"
+    },
+    {
+      "id": "o5",
+      "category": "plant",
+      "material": "wood",
+      "state": "worn",
+      "size_m": 2.0,
+      "on": "s1",
+      "wet": false,
+      "visible": true,
+      "note": "пальма/фикус в центре, в клетке между лесами и стеной"
+    },
+    {
+      "id": "o6",
+      "category": "air_conditioner",
+      "material": "metal",
+      "state": "worn",
+      "size_m": 0.8,
+      "wet": false,
+      "visible": true,
+      "note": "сплит-кондиционер на кронштейне наверху, у края задней стены"
+    },
+    {
+      "id": "o7",
+      "category": "window",
+      "material": "glass",
+      "state": "clean",
+      "wet": false,
+      "visible": true,
+      "note": "окна соседнего здания в глубине, за проёмом двора, вверху по центру"
+    },
+    {
+      "id": "o8",
+      "category": "trash",
+      "material": "plastic",
+      "state": "worn",
+      "size_m": 0.6,
+      "on": "s1",
+      "wet": false,
+      "visible": true,
+      "note": "россыпь мусора в правом нижнем углу: пакеты, обрывки, бутылки"
+    },
+    {
+      "id": "o9",
+      "category": "rubble",
+      "material": "concrete",
+      "state": "worn",
+      "size_m": 0.8,
+      "on": "s1",
+      "wet": false,
+      "visible": true,
+      "note": "обломки кирпича и бетона у основания задней стены, справа внизу"
+    }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "kind": "mold_patch",
+      "shape": "irregular",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "левая стена, нижняя треть: тёмное зелёно-бурое пятно с чёрными участками, граница рваная, идёт вверх от земли примерно на треть высоты"
+    },
+    {
+      "id": "r2",
+      "kind": "mold_patch",
+      "shape": "irregular",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "глубокая ниша-арка на левой стене, ближе к зрителю: самое тёмное пятно, почти чёрное, с зелёным отливом"
+    },
+    {
+      "id": "r3",
+      "kind": "mold_patch",
+      "shape": "irregular",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "задняя стена: россыпь чёрных и бурых пятен по всей плоскости, гуще в верхней части под козырьком и по краям"
+    },
+    {
+      "id": "r4",
+      "kind": "mold_patch",
+      "shape": "streak",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "колонна справа: тёмные зелёные потёки под карнизом и у основания"
+    },
+    {
+      "id": "r5",
+      "kind": "water_line",
+      "shape": "streak",
+      "edges": "unknown",
+      "freshness": "soft",
+      "note": "задняя стена: три вертикальные тёмные полосы-подтёка от верхнего края вниз, шириной с ладонь, края размыты"
+    },
+    {
+      "id": "r6",
+      "kind": "water_line",
+      "shape": "streak",
+      "edges": "unknown",
+      "freshness": "soft",
+      "note": "колонна справа: тёмные вертикальные следы сверху вниз от карниза"
+    },
+    {
+      "id": "r7",
+      "kind": "stain",
+      "shape": "irregular",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "левая стена: бурые и серые пятна на штукатурке выше потемнения, чередование светлых и тёмных участков"
+    },
+    {
+      "id": "r8",
+      "kind": "crack",
+      "shape": "linear",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "колонна справа: сетка тонких трещин в бетоне на протяжении всей высоты"
+    },
+    {
+      "id": "r9",
+      "kind": "crack",
+      "shape": "linear",
+      "edges": "ragged",
+      "freshness": "unknown",
+      "note": "задняя стена: трещины в штукатурке, особенно в верхней части и у правого края"
+    }
+  ],
+  "observations": [
+    {
+      "id": "x1",
+      "about": "s3",
+      "feature": "wall_condition",
+      "value": "штукатурка отслаивается пятнами, поверхность местами выветрилась до кирпича"
+    },
+    {
+      "id": "x2",
+      "about": "o1",
+      "feature": "rust",
+      "value": "трубы лесов ржавые, местами с осыпавшейся краской"
+    },
+    {
+      "id": "x3",
+      "about": "s1",
+      "feature": "vegetation",
+      "value": "трава и сорняки густо, в правой части — заметная тропинка к стене"
+    }
+  ],
+  "light": [
+    {
+      "id": "l1",
+      "kind": "sun",
+      "direction": "сверху",
+      "position": "над открытым проёмом двора"
+    }
+  ]
+}

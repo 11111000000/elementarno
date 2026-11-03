@@ -83,7 +83,7 @@
         "Одна книга ничего не говорит о владельце"
       ],
       "exceptions": [
-        "Книга лежит стопкой для строительства или в мусор"
+        "Книга лежит стопкой для строительства или в мусоре"
       ],
       "falsification": {
         "refuted_by": [],
@@ -93,6 +93,172 @@
         {
           "ref": "NL-Eye: Abductive NLI for Images, 2024",
           "note": "категория social reasoning: предметы как отсылки к персонажу",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "SEM-003",
+      "version": 1,
+      "pack": "semiotics",
+      "title": "Знак нанесён по образцу, а не на глаз",
+      "domain": "semiotics",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=symbol][construction=by_model]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности знак, построенный по образцу: его наносили как знак, а не как случайный росчерк",
+        "confidence_prior": 0.55,
+        "confidence_ceiling": 0.7,
+        "tags": [
+          "deliberate_mark",
+          "constructed"
+        ],
+        "step": "scene"
+      },
+      "anchors": [
+        "regions[kind=symbol].id"
+      ],
+      "confounds": [
+        "Свободный росчерк может случайно оказаться симметричным и сойти за знак",
+        "Знак могли нанести без всякого смысла — подражанием или игрой",
+        "По фотографии нельзя определить, когда знак нанесён и сколько раз"
+      ],
+      "exceptions": [
+        "Линии знака не отличимы от царапины, потёртости или трещины"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Наложить на знак образец той же фигуры: если линии не совпадают по геометрии, это не знак, а росчерк"
+      },
+      "sources": [
+        {
+          "ref": "ENFSI Best Practice Manual for the Forensic Examination of Handwriting, 2019",
+          "note": "различение намеренно построенных штрихов и случайных черт: признаки конструкции против совпадения",
+          "verified": false
+        },
+        {
+          "ref": "Sebeok, T. A. Semeiotics: An Introduction, Indiana University Press, 1975",
+          "note": "знак как намеренно построенный объект, а не как случайный след",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "SEM-004",
+      "version": 1,
+      "pack": "semiotics",
+      "title": "Знак опознан по устоявшемуся образцу",
+      "domain": "semiotics",
+      "layer": "interpretive",
+      "severity": "info",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [
+        "SEM-003"
+      ],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=symbol].archetype",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Знак опознаётся как устоявшийся образец — символическое прочтение сцены, а не проверяемый факт",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.4,
+        "tags": [
+          "symbolic",
+          "archetype",
+          "interpretation"
+        ],
+        "step": "scene"
+      },
+      "anchors": [
+        "regions[kind=symbol].id"
+      ],
+      "confounds": [
+        "Опознание образца может быть ошибочным: сходство бывает поверхностным",
+        "Рисунок могли повторить, ничего не зная о происхождении образца",
+        "Намеренность знака ничего не говорит о том, что рисунок значил для автора"
+      ],
+      "exceptions": [
+        "Фигура совпадает с образцом лишь приблизительно"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сверить знак с каталогом образцов: расхождение в деталях фигуры опровергает опознание"
+      },
+      "sources": [
+        {
+          "ref": "Ronnberg, A. The Book of Symbols: Reflections on Archetypal Images, Taschen, 1997",
+          "note": "каталог архетипических образцов, включая глаз в треугольнике",
+          "verified": false
+        },
+        {
+          "ref": "Sebeok, T. A. Semeiotics: An Introduction, Indiana University Press, 1975",
+          "note": "различие знака и его истолкования",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "SEM-005",
+      "version": 1,
+      "pack": "semiotics",
+      "title": "Надпись на поверхности",
+      "domain": "semiotics",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "regions"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "regions[kind=inscription]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "На поверхности надпись, нанесённая от руки: её начертание и содержание могут указать на автора",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.65,
+        "tags": [
+          "inscription",
+          "writing"
+        ],
+        "step": "scene"
+      },
+      "anchors": [
+        "regions[kind=inscription].id"
+      ],
+      "confounds": [
+        "Надпись может быть фабричной маркировкой упаковки, а не следом действия",
+        "Надпись может быть выцарапана, а не написана",
+        "По начертанию нельзя судить о возрасте или о человеке — только о факте нанесения"
+      ],
+      "exceptions": [
+        "Надпись — часть печати, тиснения или маркировки изделия"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Разобрать начертание: печатный шрифт отличается от рукописного"
+      },
+      "sources": [
+        {
+          "ref": "ENFSI Best Practice Manual for the Forensic Examination of Handwriting, 2019",
+          "note": "различение рукописного и печатного текста в исследуемом объекте",
           "verified": false
         }
       ],

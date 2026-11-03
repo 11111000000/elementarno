@@ -12,7 +12,7 @@
 import json
 import time
 
-from .ledger import ACCUSATORY_TERMS, LADDER_ORDER, ladder_jump, mentions_personality
+from .ledger import ACCUSATORY_TERMS, LADDER_ORDER, REFUTATION_OUTCOMES, ladder_jump, mentions_personality
 from .perception import MiniMaxPerception, PerceptionError
 
 REASONING_PROMPT = """Ты — аналитик, который восстанавливает картину по найденным уликам.
@@ -30,6 +30,20 @@ REASONING_PROMPT = """Ты — аналитик, который восстана
 ПРОВЕРКА: у каждого утверждения укажи falsification — что конкретно надо
 посмотреть или переснять, чтобы это утверждение опроверглось.
 
+ОТРИЦАНИЕ — обязательная часть протокола. Утверждение, которое идёт дальше
+вывода улики, должно нести refutation:
+  "negation" — что ты проверял в отрицательной форме («в кадре НЕ было...»);
+  "outcome" — "survived" (отрицание не подтвердилось), "refuted" (отрицание
+  подтвердилось, утверждение падает) или "undetermined" (не разобрал).
+Если outcome="refuted" — не выдавай это утверждение вовсе: выброси его и
+запиши, что его убило. Утверждение, которое дословно повторяет вывод улики,
+отрицать не нужно: работает опровержение самого правила.
+
+ДИСКРИМИНАТОР: у каждой версии укажи discriminator — вопрос, который её
+разведёт с конкурирующими («что было в коробке: блистер или пусто?»), и
+что он подтвердил бы (would_confirm) и что опроверг (would_refute). Версии,
+которые различаются только словами, неразличимы — их различает вопрос.
+
 ЛЕСТНИЦА: step — одна из: scene, activity, presence, role, action. Утверждение
 не может быть «мельче» ступени своих улик.
 
@@ -40,11 +54,15 @@ REASONING_PROMPT = """Ты — аналитик, который восстана
      "text":"утверждение по-русски, осторожно",
      "support":[{"finding_id":"F-ABS-001"}],
      "confidence":0.4,"step":"activity",
-     "confounds":["оговорка"],"falsification":"что проверить","speculative":false}
+     "confounds":["оговорка"],"falsification":"что проверить","speculative":false,
+     "refutation":{"negation":"что проверял в отрицательной форме",
+                   "outcome":"survived|refuted|undetermined","note":"чем кончилось"}}
   ],
   "hypotheses": [
     {"hypothesis_id":"H-1","text":"версия по-русски",
      "claims":["C-1","C-2"],"status":"open|rejected","step":"presence",
+     "discriminator":{"question":"что развело бы версии",
+                      "would_confirm":"что подтвердило бы","would_refute":"что опровергло бы"},
      "kill_log":[{"rule_id":"F-ABS-001","note":"чем убита версия"}]}
   ]
 }
@@ -133,6 +151,16 @@ def sanitize_claims(claims, findings):
             drop("ladder_break")
             continue
 
+        refutation = claim.get("refutation") or {}
+        negation = (refutation.get("negation") or "").strip()
+        outcome = refutation.get("outcome")
+        if negation and outcome in REFUTATION_OUTCOMES:
+            if outcome == "refuted":
+                drop("refuted_by_negation")
+                continue
+        else:
+            refutation = {}
+
         kept.append({
             "claim_id": claim_id,
             "kind": claim.get("kind", "inference"),
@@ -144,6 +172,7 @@ def sanitize_claims(claims, findings):
             "falsification": claim.get("falsification"),
             "provisional": bool(provisional),
             "speculative": bool(claim.get("speculative")),
+            "refutation": refutation or None,
         })
     return kept, dropped
 
@@ -160,12 +189,18 @@ def sanitize_hypotheses(hypotheses, claims):
         if hypothesis.get("status") == "rejected" and not hypothesis.get("kill_log"):
             dropped["rejected_without_kill_log"] = dropped.get("rejected_without_kill_log", 0) + 1
             continue
+        discriminator = hypothesis.get("discriminator") or {}
         kept.append({
             "hypothesis_id": hypothesis.get("hypothesis_id"),
             "text": hypothesis.get("text", ""),
             "claims": references,
             "status": hypothesis.get("status", "open"),
             "step": hypothesis.get("step", "action"),
+            "discriminator": {
+                "question": (discriminator.get("question") or "").strip(),
+                "would_confirm": (discriminator.get("would_confirm") or "").strip(),
+                "would_refute": (discriminator.get("would_refute") or "").strip(),
+            } if (discriminator.get("question") or "").strip() else None,
             "kill_log": hypothesis.get("kill_log") or [],
         })
     return kept, dropped
