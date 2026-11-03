@@ -1,0 +1,15 @@
+{
+  "meta": {"image_id": "food-remains-on-table", "source": "synthetic"},
+  "surfaces": [
+    {"id": "s1", "name": "table", "material": "wood", "dust_present": false, "dust_state": "none"}
+  ],
+  "objects": [
+    {"id": "o1", "category": "plate", "material": "ceramic", "state": "worn", "on": "s1", "visible": true},
+    {"id": "o2", "category": "mug", "material": "ceramic", "state": "worn", "on": "s1", "visible": true}
+  ],
+  "regions": [
+    {"id": "r1", "kind": "food_remains", "shape": "irregular", "area_m2": 0.01, "contrast": 0.3,
+     "freshness": "sharp", "edges": "ragged", "note": "крошки и корка хлеба рядом с тарелкой"}
+  ],
+  "observations": []
+}

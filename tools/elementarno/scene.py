@@ -12,7 +12,7 @@ VALID_REGIONS = {
     "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint", "wet_trace",
     "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
     "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
-    "metal_swarf", "symbol", "inscription", "other",
+    "food_remains", "metal_swarf", "symbol", "inscription", "other",
 }
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}

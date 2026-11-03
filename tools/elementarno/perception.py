@@ -75,6 +75,7 @@ TRACE_CHECKLIST = [
     ("plaster_dust", "штукатурная или цементная пыль"),
     ("ink_trace", "пятно чернил или тонера"),
     ("cup_ring", "след кружки или стакана на поверхности"),
+    ("food_remains", "крошки, корки хлеба, объедки или остатки еды на тарелке"),
     ("fingerprint", "отпечаток пальца или ладони"),
     ("tool_mark", "след от инструмента: царапина, выбоина, след зубила"),
     ("tyre_mark", "след шин"),
@@ -171,6 +172,10 @@ def normalize_kind(raw, known):
         "plaster": "plaster_dust", "cement_dust": "plaster_dust",
         "metal_shavings": "metal_swarf", "swarf": "metal_swarf", "grinding_dust": "metal_swarf",
         "cup_mark": "cup_ring", "coffee_ring": "cup_ring", "mug_ring": "cup_ring",
+        "crumbs": "food_remains", "crumb": "food_remains", "food_crumb": "food_remains",
+        "leftovers": "food_remains", "leftover": "food_remains", "food_waste": "food_remains",
+        "food_remnant": "food_remains", "food_remnants": "food_remains",
+        "food_scraps": "food_remains", "plate_leftovers": "food_remains",
         "ink": "ink_trace", "toner": "ink_trace",
         "sign": "symbol", "signs": "symbol", "symbolic_mark": "symbol",
         "drawing": "symbol", "graffiti": "symbol", "emblem": "symbol",
@@ -237,6 +242,12 @@ def normalize_scene(scene):
     objects = kept
 
     for obj in objects:
+        category = (obj.get("category") or "").lower()
+        if category in PERSON_CATEGORIES:
+            obj["category"] = "person"
+        if "visible" not in obj:
+            # инвентарь описывает только видимое, поэтому отсутствие поля означает «виден»
+            obj["visible"] = True
         on = obj.get("on")
         if on is None:
             obj.pop("on", None)
@@ -283,6 +294,11 @@ def normalize_scene(scene):
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
 VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
+PERSON_CATEGORIES = {
+    "person", "people", "human", "man", "woman", "male", "female", "boy", "girl",
+    "child", "adult", "человек", "люди", "мужчина", "женщина", "мальчик", "девочка",
+    "ребёнок", "ребенок",
+}
 VALID_REGION_FIELDS = {
     "freshness": {"sharp", "soft", "erased", "unknown"},
     "edges": {"concave", "convex", "flat", "ragged", "unknown"},
@@ -293,7 +309,7 @@ VALID_REGION_KINDS = {
     "tool_mark", "puddle", "condensation", "disturbed_dust", "mud_footprint",
     "fingerprint", "paint_splash", "paint_trace", "sawdust", "flour_dust",
     "oil_trace", "weld_spatter", "plaster_dust", "ink_trace", "cup_ring",
-    "metal_swarf", "other",
+    "food_remains", "metal_swarf", "other",
 }
 
 

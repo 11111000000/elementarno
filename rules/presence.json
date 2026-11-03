@@ -4,19 +4,29 @@
   "rules": [
     {
       "id": "PRES-001",
-      "version": 1,
+      "version": 2,
       "pack": "presence",
       "title": "Следы обуви разного размера",
       "domain": "presence",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "regions[kind=footprint]", "gte": 2},
-          {"kind": "distinct", "path": "regions[kind=footprint].size_m", "gte": 2}
+          {
+            "kind": "count",
+            "path": "regions[kind=footprint]",
+            "gte": 2
+          },
+          {
+            "kind": "distinct",
+            "path": "regions[kind=footprint].size_m",
+            "gte": 2
+          }
         ]
       },
       "inference": {
@@ -24,13 +34,19 @@
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
         "step": "presence",
-        "tags": ["two_people", "different_shoes"]
+        "tags": [
+          "two_people",
+          "different_shoes"
+        ]
       },
-      "anchors": ["regions[kind=footprint].id"],
+      "anchors": [
+        "regions[kind=footprint].id"
+      ],
       "confounds": [
         "Один человек мог сменить обувь",
         "Следы разного размера могут оставить игрушки или животные",
-        "Оценка размера по фотографии без опоры неточна"
+        "Оценка размера по фотографии без опоры неточна",
+        "Основание — стандарты обуви и шин; оценка размера следа по фотографии ими не предусмотрена"
       ],
       "exceptions": [
         "Следы принадлежат одному человеку, но сняты разной обувью"
@@ -41,8 +57,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Footwear and Textile Standards Committee",
-          "note": "след обуви как индивидуализирующий признак и оценка размера",
+          "ref": "OSAC Registry (NIST), подкомитет Footwear & Tire: OSAC 2023-S-0017 (Standard for the Articulation of Footwear and Tire Interpretations), ANSI/ASB BPR 052-22 (Best Practice Recommendation for the Detection and Collection of Footwear and Tire Impression Evidence)",
+          "note": "след обуви как индивидуализирующий признак и оценка размера: OSAC 2023-S-0017 (порядок формулирования выводов: класс против индивидуализации), ANSI/ASB BPR 052-22 (обнаружение и сбор); оценка размера следа по фотографии в этих документах не оговорена (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -50,13 +66,15 @@
     },
     {
       "id": "PRES-002",
-      "version": 1,
+      "version": 2,
       "pack": "presence",
       "title": "Отпечаток ладони на стекле",
       "domain": "presence",
       "layer": "epistemic",
       "severity": "notice",
-      "requires": ["regions"],
+      "requires": [
+        "regions"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "count",
@@ -68,12 +86,18 @@
         "confidence_prior": 0.6,
         "confidence_ceiling": 0.8,
         "step": "action",
-        "tags": ["touched", "carried"]
+        "tags": [
+          "touched",
+          "carried"
+        ]
       },
-      "anchors": ["regions[kind=fingerprint].id"],
+      "anchors": [
+        "regions[kind=fingerprint].id"
+      ],
       "confounds": [
         "Отпечаток мог остаться от заводской упаковки или ремонта",
-        "След может быть загрязнением, а не отпечатком"
+        "След может быть загрязнением, а не отпечатком",
+        "Основание — стандарты выявления и оценки отпечатков; связь отпечатка с переносом предметов в них не подтверждена"
       ],
       "exceptions": [
         "Отпечаток совпадает с технологическим следом производства"
@@ -84,8 +108,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
-          "note": "проявление и оценка следов пальцевых ладоней",
+          "ref": "OSAC Registry (NIST), подкомитет Friction Ridge: OSAC 2023-N-0020 (Standard for the On-Scene Collection and Preservation of Friction Ridge Impressions), OSAC 2022-N-0033 (Standard for Processing Evidence for the Detection of Friction Ridge Impressions), OSAC 2023-S-0026 (Task-Relevant Information in Friction Ridge Examination)",
+          "note": "проявление и оценка следов пальцевых ладоней: OSAC 2022-N-0033 (обработка вещества для выявления отпечатков), OSAC 2023-N-0020 (сбор и сохранение отпечатков на месте), OSAC 2023-S-0026 (задачи, значимые для экспертизы); связь отпечатка с переносом предметов в них не подтверждена",
           "verified": false
         }
       ],
@@ -93,19 +117,30 @@
     },
     {
       "id": "PRES-003",
-      "version": 1,
+      "version": 2,
       "pack": "presence",
       "title": "Отпечаток в слое пыли",
       "domain": "presence",
       "layer": "epistemic",
       "severity": "critical",
-      "requires": ["regions", "surfaces"],
+      "requires": [
+        "regions",
+        "surfaces"
+      ],
       "depends_on": [],
       "predicate": {
         "kind": "all",
         "conditions": [
-          {"kind": "count", "path": "regions[kind=fingerprint]", "gte": 1},
-          {"kind": "count", "path": "surfaces[dust_present=true]", "gte": 1}
+          {
+            "kind": "count",
+            "path": "regions[kind=fingerprint]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "surfaces[dust_present=true]",
+            "gte": 1
+          }
         ]
       },
       "inference": {
@@ -113,12 +148,19 @@
         "confidence_prior": 0.7,
         "confidence_ceiling": 0.85,
         "step": "action",
-        "tags": ["touched", "recent_touch", "after_dust"]
+        "tags": [
+          "touched",
+          "recent_touch",
+          "after_dust"
+        ]
       },
-      "anchors": ["regions[kind=fingerprint].id"],
+      "anchors": [
+        "regions[kind=fingerprint].id"
+      ],
       "confounds": [
         "Пыль могла осесть уже после касания, если она была сухой и рыхлой",
-        "След мог быть оставлен протиркой или ремонтом"
+        "След мог быть оставлен протиркой или ремонтом",
+        "Основание — стандарты выявления отпечатков; очередность «пыль, потом касание» в них не подтверждена"
       ],
       "exceptions": [
         "Отпечаток проявился при уборке, а не от касания"
@@ -129,8 +171,68 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Fingerprint and Friction Ridge Standards",
-          "note": "следы в пыли и на запылённых поверхностях",
+          "ref": "OSAC Registry (NIST), подкомитет Friction Ridge: OSAC 2023-N-0020 (Standard for the On-Scene Collection and Preservation of Friction Ridge Impressions), OSAC 2022-N-0033 (Standard for Processing Evidence for the Detection of Friction Ridge Impressions), OSAC 2023-S-0026 (Task-Relevant Information in Friction Ridge Examination)",
+          "note": "следы в пыли и на запылённых поверхностях: OSAC 2022-N-0033 (обработка вещества для выявления отпечатков) и OSAC 2023-N-0020 (сбор и сохранение отпечатков на месте) — документы о выявлении отпечатков на поверхностях; хронология «отпечаток после оседания пыли» в них не подтверждена",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "PRES-004",
+      "version": 2,
+      "pack": "presence",
+      "title": "Человек виден в кадре",
+      "domain": "presence",
+      "layer": "epistemic",
+      "severity": "notice",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "present",
+        "path": "objects[category=person].visible",
+        "value": true
+      },
+      "inference": {
+        "claim": "В кадре виден человек",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.5,
+        "step": "presence",
+        "tags": [
+          "visible_person",
+          "direct_observation"
+        ]
+      },
+      "anchors": [
+        "objects[category=person].id"
+      ],
+      "confounds": [
+        "Человек может быть виден за стеклом, в зеркале или на экране",
+        "Это может быть статуя или манекен",
+        "В кадр могла попасть фотография или снимок экрана с изображением человека",
+        "За человека могли принять силуэт или тень",
+        "Правило best evidence (FRE 1002) по собственному примечанию редко применяется к обычным фотографиям: кадр остаётся иллюстрацией, а не доказанным содержанием"
+      ],
+      "exceptions": [
+        "Изображение человека на экране, фотографии или в зеркале"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Проследить за отражением и глубиной: изменить точку съёмки и проверить, совпадает ли изображение с объектом в кадре"
+      },
+      "sources": [
+        {
+          "ref": "Federal Rules of Evidence, Rule 1002 (Requirement of the Original), Cornell Legal Information Institute",
+          "url": "https://www.law.cornell.edu/rules/fre/rule_1002",
+          "note": "содержание фотографии доказывается оригиналом: Rule 1002 — «An original writing, recording, or photograph is required in order to prove its content unless these rules or a federal statute provides otherwise»; по примечанию Комитета правило редко применяется к обычным фотографиям",
+          "verified": false
+        },
+        {
+          "ref": "Eyewitness Evidence: A Guide for Law Enforcement, National Institute of Justice (1999)",
+          "url": "https://nij.ojp.gov/library/publications/eyewitness-evidence-guide-law-enforcement",
+          "note": "личность устанавливается процедурой опознания, а не самим фактом изображения в кадре: разделы 4–5 руководства NIJ — шоу-ап, фото- и живые линейки, фиксация результатов опознания (прочитано описание издателя; текст буклета — сканы)",
           "verified": false
         }
       ],

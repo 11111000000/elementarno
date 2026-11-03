@@ -4,7 +4,7 @@
   "rules": [
     {
       "id": "OFF-001",
-      "version": 2,
+      "version": 3,
       "pack": "office",
       "title": "Несколько колец от кружек на поверхности",
       "domain": "office",
@@ -34,7 +34,8 @@
       ],
       "confounds": [
         "Круги могли остаться от разных людей или от уборки",
-        "Одинаковые круги в ряд — просевшая посуда, а не привычка"
+        "Одинаковые круги в ряд — просевшая посуда, а не привычка",
+        "Основание правила — стандарт документирования сцены; бытовая интерпретация кружек как привычки не подтверждена"
       ],
       "exceptions": [
         "Круги в ряд и на одном уровне — след просадки стопки"
@@ -45,8 +46,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; повторяющиеся кольцевые следы на поверхности; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены): повторяющиеся следы фиксируются в описании сцены, вывод о привычке сидеть за столом документом не подтверждён",
           "verified": false
         }
       ],
@@ -54,7 +55,7 @@
     },
     {
       "id": "OFF-002",
-      "version": 1,
+      "version": 2,
       "pack": "office",
       "title": "Следы чернил на столе",
       "domain": "office",
@@ -84,7 +85,8 @@
       ],
       "confounds": [
         "Пятно могло остаться от подписи или от протечки с pensila",
-        "Тонер и чернила на фото неразличимы"
+        "Тонер и чернила на фото неразличимы",
+        "Основание — стандарты экспертизы документов; перенос их на следы чернил и тонера на рабочей поверхности — допущение правила"
       ],
       "exceptions": [
         "Пятно совпадает с подписью на бумаге рядом"
@@ -95,8 +97,15 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence (Trace Materials: Ink and Paper)",
-          "note": "чернила и бумага как следовые материалы",
+          "ref": "OSAC Registry (NIST), подкомитет Forensic Document Examination: ANSI/ASB 011-22 (Scope of Expertise in Forensic Document Examination)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "чернила, тонер и бумага как материалы экспертизы документов: ANSI/ASB 011-22 (область компетенции экспертизы документов); стандарта по следам чернил на поверхности в реестре нет (текст стандарта платный, не открывался)",
+          "verified": false
+        },
+        {
+          "ref": "OSAC Registry (NIST), подкомитет Forensic Document Examination: ANSI/ASB 070-22 (Standard for Examination of Handwritten Items)",
+          "url": "https://www.nist.gov/osac/registry",
+          "note": "рукописные материалы исследуются в экспертизе документов: ANSI/ASB 070-22; следы чернил или тонера на рабочей поверхности в нём не описаны (текст стандарта платный, не открывался)",
           "verified": false
         }
       ],
@@ -104,7 +113,7 @@
     },
     {
       "id": "OFF-003",
-      "version": 1,
+      "version": 2,
       "pack": "office",
       "title": "След пальца на стеклянной перегородке",
       "domain": "office",
@@ -134,7 +143,8 @@
       ],
       "confounds": [
         "Отпечаток мог быть оставлен при монтаже или уборке",
-        "След на стекле может быть заводским загрязнением"
+        "След на стекле может быть заводским загрязнением",
+        "Основание — стандарты выявления и оценки отпечатков; связь отпечатка с переносом предметов в них не подтверждена"
       ],
       "exceptions": [
         "Отпечаток совпадает по форме с отпечатком другой поверхности в сцене"
@@ -145,8 +155,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Friction Ridge: OSAC 2023-N-0020 (Standard for the On-Scene Collection and Preservation of Friction Ridge Impressions), OSAC 2022-N-0033 (Standard for Processing Evidence for the Detection of Friction Ridge Impressions), OSAC 2023-S-0026 (Task-Relevant Information in Friction Ridge Examination)",
+          "note": "проявление и оценка следов ладоней: OSAC 2023-N-0020 (сбор и сохранение отпечатков на месте), OSAC 2022-N-0033 (обработка вещества для выявления отпечатков), OSAC 2023-S-0026 (задачи, значимые для экспертизы); вывод о касании запылённого стекла в них не подтверждён (текст стандартов платный, не открывался)",
           "verified": false
         }
       ],
@@ -154,7 +164,7 @@
     },
     {
       "id": "OFF-004",
-      "version": 1,
+      "version": 2,
       "pack": "office",
       "title": "Кабель уведён в сторону от розетки",
       "domain": "office",
@@ -182,7 +192,8 @@
       "anchors": [],
       "confounds": [
         "Оборудование может питаться от удлинителя или скрытой розетки",
-        "Граф сцены может быть неполным, и розетка в него не попала"
+        "Граф сцены может быть неполным, и розетка в него не попала",
+        "Основание правила — стандарт документирования сцены; вывод о перестановке или переподключении не подтверждён"
       ],
       "exceptions": [
         "В сцене есть удлинитель или напольная розетка"
@@ -193,8 +204,8 @@
       },
       "sources": [
         {
-          "ref": "OSAC Registry, NIST — Trace Evidence",
-          "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+          "ref": "OSAC Registry (NIST), подкомитет Crime Scene Investigation & Reconstruction: ANSI/ASB 159-24 (Standard for Scene Investigation and Reconstruction — Foundational Principles), OSAC 2023-N-0002 (Standard for Scene Documentation Procedures), OSAC 2021-N-0018 (Standard for On-Scene Collection and Preservation of Physical Evidence)",
+          "note": "прямая ссылка на документ, подтверждающий это утверждение, не установлена; перестановка оборудования; ближайшее подтверждаемое — OSAC-реестр, подкомитет Crime Scene Investigation & Reconstruction: OSAC 2023-N-0002 (документирование сцены) и ANSI/ASB 159-24 (реконструкция сцены): расположение предметов фиксируется в описании сцены, вывод о перестановке не подтверждён",
           "verified": false
         }
       ],
