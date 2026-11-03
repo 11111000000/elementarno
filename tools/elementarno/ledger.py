@@ -45,6 +45,42 @@ PERSONALITY_TERMS = (
 
 LADDER_ORDER = {"scene": 0, "activity": 1, "presence": 2, "role": 3, "action": 4}
 
+# Исход отрицания: чем кончилась попытка опровергнуть утверждение.
+REFUTATION_OUTCOMES = ("survived", "refuted", "undetermined")
+
+
+def _restates_rule(claim, findings_by_id):
+    """Утверждение, которое дословно повторяет вывод своей улики.
+
+    Повтор не добавляет ничего, поэтому отрицать его нечего: работает
+    опровержение самого правила (`falsification.physical_test`). Всё, что
+    идёт дальше вывода улики, обязано быть атаковано отдельно.
+    """
+    text = (claim.get("text") or "").strip()
+    if not text:
+        return False
+    for support in claim.get("support") or []:
+        finding = findings_by_id.get(support.get("finding_id"))
+        if finding and (finding.get("inference") or "").strip() == text:
+            return True
+    return False
+
+
+def _refutation_problem(claim, findings_by_id):
+    """Что не так с попыткой опровержения. None — претензий нет."""
+    refutation = claim.get("refutation")
+    if not refutation:
+        if _restates_rule(claim, findings_by_id):
+            return None
+        return "утверждение идёт дальше вывода улики и не подвергнуто отрицанию"
+    negation = (refutation.get("negation") or "").strip()
+    outcome = refutation.get("outcome")
+    if not negation:
+        return "в записи об отрицании нет самой гипотезы, которую проверяли"
+    if outcome not in REFUTATION_OUTCOMES:
+        return f"неизвестный исход отрицания: {outcome!r}"
+    return None
+
 
 def ladder_jump(claim_step, finding_step):
     """На сколько ступеней утверждение опережает свою улику.
@@ -58,7 +94,6 @@ def ladder_jump(claim_step, finding_step):
     finding = LADDER_ORDER.get(finding_step, 4)
     if finding > claim:
         return 99
-    limit = 2 if claim == LADDER_ORDER["action"] else 1
     return claim - finding
 
 
@@ -170,6 +205,21 @@ def validate(findings, ledger):
                     "detail": f"улика {finding['rule_id']} относится к более частной ступени, "
                               f"чем утверждение ({claim.get('step') or 'action'})",
                 })
+
+        problem = _refutation_problem(claim, findings_by_id)
+        if problem:
+            errors.append({
+                "claim_id": claim["claim_id"],
+                "code": "missing_refutation",
+                "detail": problem,
+            })
+        elif (claim.get("refutation") or {}).get("outcome") == "refuted":
+            errors.append({
+                "claim_id": claim["claim_id"],
+                "code": "refuted_claim_present",
+                "detail": "утверждение опровергнуто собственной проверкой — его нужно убрать, "
+                          "а не отвечать им",
+            })
 
         accusatory = _has_term(claim.get("text"), ACCUSATORY_TERMS)
         if accusatory:

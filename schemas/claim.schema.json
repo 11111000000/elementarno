@@ -31,7 +31,21 @@
           "provisional": {"type": "boolean"},
           "speculative": {"type": "boolean"},
           "confounds": {"type": "array", "items": {"type": "string"}},
-          "falsification": {"type": "string"}
+          "falsification": {"type": "string"},
+          "refutation": {
+            "description": "Попытка опровергнуть утверждение: что именно проверяли и с каким исходом. Утверждение, которое идёт дальше вывода улики, обязано нести эту запись.",
+            "type": "object",
+            "required": ["negation", "outcome"],
+            "properties": {
+              "negation": {
+                "description": "Гипотеза, которую проверяли: утверждение в отрицательной форме",
+                "type": "string",
+                "minLength": 3
+              },
+              "outcome": {"type": "string", "enum": ["survived", "refuted", "undetermined"]},
+              "note": {"type": "string"}
+            }
+          }
         }
       }
     },
@@ -46,6 +60,16 @@
           "claims": {"type": "array", "items": {"type": "string"}},
           "status": {"type": "string", "enum": ["open", "rejected"]},
           "log_odds": {"type": "number"},
+          "discriminator": {
+            "description": "Наблюдение, которое развело бы эту версию с конкурирующими: вопрос и то, что он подтвердил бы и что опроверг.",
+            "type": "object",
+            "required": ["question"],
+            "properties": {
+              "question": {"type": "string", "minLength": 3},
+              "would_confirm": {"type": "string"},
+              "would_refute": {"type": "string"}
+            }
+          },
           "kill_log": {
             "type": "array",
             "items": {

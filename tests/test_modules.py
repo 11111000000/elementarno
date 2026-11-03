@@ -1,12 +1,16 @@
 import unittest
 
 from elementarno.dialog import Session, merge_scenes
+from elementarno.ledger import validate
+from elementarno.nextshot import (
+    hypothesis_tags,
+    information_gain,
+    kind_tags_from_rules,
+    rank_questions,
+)
 from elementarno.puzzle import build_claims
-from elementarno.rules import evaluate_all
-from elementarno.nextshot import (hypothesis_tags, information_gain, kind_tags_from_rules,
-                                  rank_questions)
 from elementarno.reasoning import sanitize_claims, sanitize_hypotheses
-from elementarno.rules import load_packs
+from elementarno.rules import evaluate_all, load_packs
 
 RULES = load_packs("rules")
 
@@ -288,3 +292,62 @@ class AuditFixTests(unittest.TestCase):
         }
         findings = evaluate_all(RULES, scene)
         self.assertNotIn("PHY-003", {f["rule_id"] for f in findings})
+
+
+class RefutationTests(unittest.TestCase):
+    """Отрицание — часть протокола, а не пожелание."""
+
+    def setUp(self):
+        self.findings = [make_finding("F-ABS-001")]
+        self.finding = self.findings[0]
+
+    def claim(self, **overrides):
+        base = {
+            "claim_id": "C-1", "kind": "inference", "text": "предмет убрали",
+            "support": [{"finding_id": "F-ABS-001"}], "confidence": 0.4,
+            "step": "activity", "provisional": True,
+        }
+        base.update(overrides)
+        return base
+
+    def test_claim_beyond_the_rule_must_be_refuted(self):
+        report = validate(self.findings, {"claims": [self.claim()]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("missing_refutation", codes)
+
+    def test_claim_restating_the_rule_needs_no_refutation(self):
+        report = validate(self.findings, {"claims": [self.claim(text=self.finding["inference"])]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertNotIn("missing_refutation", codes)
+
+    def test_refutation_survived_keeps_the_claim(self):
+        report = validate(self.findings, {"claims": [self.claim(refutation={
+            "negation": "контура не было", "outcome": "survived"})]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertNotIn("missing_refutation", codes)
+        self.assertNotIn("refuted_claim_present", codes)
+
+    def test_refuted_claim_must_be_removed(self):
+        report = validate(self.findings, {"claims": [self.claim(refutation={
+            "negation": "контура не было", "outcome": "refuted"})]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("refuted_claim_present", codes)
+
+    def test_refutation_without_negation_is_rejected(self):
+        report = validate(self.findings, {"claims": [self.claim(refutation={
+            "negation": "", "outcome": "survived"})]})
+        codes = {e["code"] for e in report["errors"]}
+        self.assertIn("missing_refutation", codes)
+
+    def test_sanitizer_drops_claim_refuted_by_its_own_check(self):
+        claims, dropped = sanitize_claims([self.claim(refutation={
+            "negation": "контура не было", "outcome": "refuted"})], self.findings)
+        self.assertEqual(claims, [])
+        self.assertEqual(dropped["refuted_by_negation"], 1)
+
+    def test_sanitizer_keeps_refutation_record(self):
+        claims, _ = sanitize_claims([self.claim(refutation={
+            "negation": "контура не было", "outcome": "survived", "note": "светом проверили"})],
+            self.findings)
+        self.assertEqual(claims[0]["refutation"]["outcome"], "survived")
+        self.assertEqual(claims[0]["refutation"]["note"], "светом проверили")
