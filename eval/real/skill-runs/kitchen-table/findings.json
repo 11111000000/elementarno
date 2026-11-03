@@ -1,0 +1,37 @@
+[
+  {
+    "finding_id": "F-HOME-003",
+    "rule_id": "HOME-003",
+    "rule_version": 1,
+    "pack": "home",
+    "title": "Продукты в холодильнике вынуты",
+    "layer": "epistemic",
+    "step": "activity",
+    "inference": "Открытые ёмкости на виду: продукты или посуду вынули и оставили открытой",
+    "anchors": [],
+    "tags": [
+      "household_habit"
+    ],
+    "sources": [
+      {
+        "ref": "OSAC Registry, NIST — Trace Evidence",
+        "note": "частицы и следы как следовые материалы; конкретный стандарт уточняет эксперт",
+        "verified": false
+      }
+    ],
+    "confounds": [
+      "Открытая банка может стоять так месяцами",
+      "На фотографии мог просто быть снят открытый контейнер без связи со сценой"
+    ],
+    "exceptions": [
+      "Контейнер пуст и давно вымыт"
+    ],
+    "falsification": {
+      "refuted_by": [],
+      "physical_test": "Проверить остатки содержимого и свежесть: у открытого продукта есть следы использования"
+    },
+    "confidence_prior": 0.4,
+    "confidence_ceiling": 0.5,
+    "provisional": true
+  }
+]
