@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -125,6 +126,28 @@ def _ledger_for(scene, findings, ledger_path):
     return {"claims": build_claims(findings), "hypotheses": []}
 
 
+def _annotate_profile_gaps(report, all_rules, selected_rules):
+    """Отличить опечатку в ссылке от правила, не вошедшего в профиль.
+
+    Профиль задаёт доменный охват, и ссылка на правило вне профиля — это
+    не ошибка ссылки, а иной диагноз: либо сменить профиль, либо убрать
+    утверждение. Без подсказки агент ищет опечатку там, где её нет.
+    """
+    known = {rule.id for rule in all_rules}
+    in_scope = {rule.id for rule in selected_rules}
+    for error in report.get("errors", []):
+        if error.get("code") != "unresolved_citation":
+            continue
+        outside = []
+        for finding_id in re.findall(r"F-([A-Z]+-\d+)", error.get("detail", "")):
+            if finding_id in known and finding_id not in in_scope:
+                outside.append(finding_id)
+        if outside:
+            packs = ", ".join(sorted({rule.pack for rule in selected_rules}))
+            error["hint"] = (f"правило {', '.join(outside)} есть в базе, но не входит в профиль "
+                             f"(паки: {packs}). Смените профиль или уберите утверждение")
+
+
 def cmd_verify(args):
     apply_profile(args)
     scene = load_json(args.scene)
@@ -132,11 +155,14 @@ def cmd_verify(args):
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
     report = validate(findings, ledger)
+    _annotate_profile_gaps(report, load_packs(args.rules), rules)
     if args.json:
         dump(report)
     else:
         for error in report["errors"]:
             print(f"  ✗ {error.get('claim_id') or error.get('hypothesis_id')}: {error['code']} — {error['detail']}")
+            if error.get("hint"):
+                print(f"      {error['hint']}")
         print(f"полнота цитат: {report['citation_completeness']:.2f} "
               f"({report['resolvable_claims']}/{report['claims']})")
     return 1 if report["errors"] else 0

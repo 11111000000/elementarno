@@ -130,3 +130,35 @@ class RenderHonestyTests(unittest.TestCase):
         text = render("detective", self.findings, self.claims, [], "insufficient_evidence", "plain")
         self.assertNotIn("Улик недостаточно для вывода.", text)
         self.assertIn("Улик мало для версии", text)
+
+
+class ProfileGapTests(unittest.TestCase):
+    """Правило вне профиля — не опечатка в ссылке, а иной диагноз."""
+
+    def ledger_with_biology_rule(self, tmp):
+        path = Path(tmp) / "ledger.json"
+        path.write_text(json.dumps({
+            "claims": [{"claim_id": "C-1", "kind": "inference", "text": "очаг плесени",
+                        "support": [{"finding_id": "F-BIO-002"}], "confidence": 0.4,
+                        "step": "scene", "provisional": True}],
+            "hypotheses": [],
+        }, ensure_ascii=False), encoding="utf-8")
+        return str(path)
+
+    def test_verify_hints_that_the_rule_is_outside_the_profile(self):
+        import contextlib
+        import io
+        from types import SimpleNamespace
+        from elementarno.cli import cmd_verify
+        with tempfile.TemporaryDirectory() as tmp:
+            args = SimpleNamespace(
+                scene=str(BENCH / "protocol-core/scenes/absence-dust-outline.json"),
+                ledger=self.ledger_with_biology_rule(tmp),
+                rules=str(ROOT / "rules"), pack=None,
+                profile=None, config=str(ROOT / "config/profiles.json"), json=False)
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                cmd_verify(args)
+        output = buffer.getvalue()
+        self.assertIn("BIO-002", output)
+        self.assertIn("не входит в профиль", output)
