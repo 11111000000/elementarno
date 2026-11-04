@@ -186,6 +186,77 @@ def cmd_tell(args):
     return 0
 
 
+def cmd_board(args):
+    from .board import build
+    from .nextshot import discriminator_questions
+
+    apply_profile(args)
+    scene = load_json(args.scene)
+    rules = selected_rules(args.rules, args.pack)
+    findings = evaluate_all(rules, scene)
+    ledger = _ledger_for(scene, findings, args.ledger)
+    report = validate(findings, ledger)
+    usable_claims = []
+    for claim in ledger.get("claims", []):
+        if any(error.get("claim_id") == claim["claim_id"] for error in report["errors"]):
+            continue
+        usable_claims.append(claim)
+    hypotheses = score_hypotheses(findings, usable_claims, ledger.get("hypotheses", []))
+    state = decide_verdict(findings, usable_claims, args.min_findings, args.mode)
+    questions = discriminator_questions(hypotheses)
+
+    scene_path = Path(args.scene)
+    ledger_path = Path(args.ledger) if args.ledger else None
+    commands = [
+        f"python3 -m tools.elementarno.cli verify {scene_path} --ledger {ledger_path or 'ledger.json'}",
+        f"python3 -m tools.elementarno.cli tell {scene_path} --ledger {ledger_path or 'ledger.json'} --persona {args.persona}",
+        f"python3 -m tools.elementarno.cli nextshot {scene_path} --hypotheses {ledger_path or 'ledger.json'}",
+        f"python3 -m tools.elementarno.cli board {scene_path} --ledger {ledger_path or 'ledger.json'} --out {args.out}",
+    ]
+
+    title = args.title or f"Доска разбора: {scene_path.stem}"
+    subtitle = args.subtitle or (
+        f"Кадр {scene.get('meta', {}).get('image_id', scene_path.stem)}; "
+        f"улик — {len(findings)}, утверждений — {len(usable_claims)}, версий — {len(hypotheses)}."
+    )
+    verdict_text = {
+        "sufficient_evidence": "улик достаточно",
+        "insufficient_evidence": "улик недостаточно",
+        "conflicting_evidence": "улики противоречат друг другу",
+    }.get(getattr(state, "value", str(state)), str(state))
+    badges = [
+        ("вердикт", verdict_text),
+        ("улик", str(len(findings))),
+        ("утверждений", str(len(usable_claims))),
+        ("версий", str(len(hypotheses))),
+        ("ошибок протокола", str(len(report["errors"]))),
+        ("различающих вопросов", str(len(questions))),
+    ]
+    meta = {"badges": badges, "tone": "warn" if report["errors"] else "good"}
+
+    html_doc = build(
+        scene,
+        findings,
+        ledger,
+        hypotheses=hypotheses,
+        questions=questions,
+        verdict=state,
+        narrative=render(args.mode, findings, usable_claims, hypotheses, state, args.persona, report),
+        title=title,
+        subtitle=subtitle,
+        commands=commands,
+        meta=meta,
+        rules=rules,
+    )
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(html_doc, encoding="utf-8")
+    print(f"доска собрана: {out} ({len(html_doc)} байт)")
+    print(f"улик: {len(findings)}; утверждений: {len(usable_claims)}; версий: {len(hypotheses)}; "
+          f"ошибок протокола: {len(report['errors'])}")
+    return 0
+
+
 def cmd_puzzle(args):
     puzzle, scenes = load_puzzle(args.puzzle)
     rules = selected_rules(args.rules, args.pack)
@@ -453,6 +524,18 @@ def build_parser():
                         help="сколько улик нужно для версии; флаг сильнее профиля")
     tell.add_argument("--profile", help="профиль из config/profiles.json")
     tell.set_defaults(func=cmd_tell)
+
+    board = sub.add_parser("board", help="HTML-доска разбора: улики, нити, версии, переразбор")
+    board.add_argument("scene")
+    board.add_argument("--ledger", help="файл с утверждениями и гипотезами")
+    board.add_argument("--out", default="board.html", help="куда записать страницу")
+    board.add_argument("--pack", action="append")
+    board.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic"])
+    board.add_argument("--persona", default="plain", choices=["plain", "doyle", "forensic"])
+    board.add_argument("--title")
+    board.add_argument("--subtitle")
+    board.add_argument("--profile")
+    board.set_defaults(func=cmd_board)
 
     puzzle = sub.add_parser("puzzle", help="разобрать загадку по серии кадров")
     puzzle.add_argument("puzzle")
