@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Образец доски: плесень и следы воды</title>
+<style>
+:root{
+  --cork-1:#3c2b1d; --cork-2:#201510; --paper:#f0e5cb; --paper-2:#e0d0ae;
+  --paper-3:#f7efdc; --ink:#2a2017; --ink-soft:#6a5947; --rule:#8d7a60;
+  --red:#c0392b; --gold:#d9a72c; --steel:#6f93b8; --green:#5f7a3c; --violet:#8b6bb1;
+  --shadow:0 12px 26px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:linear-gradient(170deg,#171009,#241710 60%,#120c07);
+  color:var(--ink);font:15px/1.55 "Segoe UI",Roboto,system-ui,sans-serif;
+}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:600;margin:0}
+a{color:#7c5b2a}
+.wrap{max-width:1680px;margin:0 auto;padding:0 22px 70px}
+
+.masthead{position:relative;padding:26px 4px 18px;border-bottom:1px solid rgba(255,225,180,.14)}
+.masthead .kicker{letter-spacing:.32em;text-transform:uppercase;font-size:11px;color:#c9a86a}
+.masthead h1{color:#f6e6c8;font-size:34px;letter-spacing:.01em;margin:8px 0 6px}
+.masthead .sub{color:#b7a48a;max-width:90ch;font-size:14px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.badge{
+  display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;
+  font-size:12px;letter-spacing:.04em;border:1px solid rgba(255,225,180,.22);
+  background:rgba(255,220,170,.07);color:#e8d5b3;
+}
+.badge b{color:#fff5e2;font-weight:600}
+.badge.warn{border-color:rgba(217,167,44,.55);background:rgba(217,167,44,.13);color:#f0d493}
+.badge.good{border-color:rgba(95,122,60,.7);background:rgba(95,122,60,.18);color:#cfe0b4}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
+.tab{
+  cursor:pointer;padding:9px 16px;border-radius:8px 8px 0 0;font-size:14px;
+  border:1px solid rgba(255,225,180,.14);border-bottom:none;color:#c3ae8d;background:rgba(255,255,255,.03);
+}
+.tab.on{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 -6px 18px rgba(0,0,0,.35)}
+.panel{display:none;padding-top:18px}
+.panel.on{display:block}
+
+.board{
+  position:relative;border-radius:14px;padding:26px 22px 30px;overflow:hidden;
+  border:1px solid rgba(255,225,180,.12);box-shadow:var(--shadow);
+  background:
+    radial-gradient(1100px 620px at 18% -10%, rgba(255,205,140,.12), transparent 62%),
+    radial-gradient(900px 620px at 92% 110%, rgba(0,0,0,.42), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.022) 0 2px, rgba(0,0,0,.03) 2px 5px),
+    linear-gradient(160deg,var(--cork-1),var(--cork-2));
+}
+.cols{position:relative;display:grid;grid-template-columns:1.05fr 1.15fr 1.15fr .95fr;gap:96px;z-index:2}
+.col h3{
+  color:#e9d4ac;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  margin:0 0 12px;padding-bottom:8px;border-bottom:1px dashed rgba(233,212,172,.28)
+}
+.col .stack{display:flex;flex-direction:column;gap:16px}
+.strings{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
+.strings path{fill:none;stroke-linecap:round;filter:drop-shadow(0 2px 2px rgba(0,0,0,.55));
+  transition:stroke-width .15s,opacity .15s}
+.strings path.s-scene{stroke:var(--gold)}
+.strings path.s-evid{stroke:var(--red)}
+.strings path.s-ver{stroke:var(--steel)}
+.strings text{
+  font:700 10.5px/1 "Segoe UI",system-ui,sans-serif;letter-spacing:.05em;
+  paint-order:stroke;stroke:rgba(20,12,6,.9);stroke-width:4px;stroke-linejoin:round
+}
+.strings text.s-scene{fill:#f0cf87}
+.strings text.s-evid{fill:#f4b1a8}
+.strings text.s-ver{fill:#bcd8f0}
+
+.card{
+  position:relative;background:linear-gradient(178deg,var(--paper-3),var(--paper));
+  border-radius:3px;padding:13px 14px 12px;color:var(--ink);
+  box-shadow:var(--shadow);outline:1px solid rgba(120,96,63,.35);outline-offset:-1px}
+.card::before{
+  content:"";position:absolute;left:13px;top:-7px;width:15px;height:15px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#f0c1a0,#a8382c 62%,#5d1a13);
+  box-shadow:0 3px 5px rgba(0,0,0,.5);z-index:3
+}
+.card .kind{
+  font:700 10px/1 "Segoe UI",system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;gap:8px
+}
+.card h4{font:600 16px/1.3 Georgia,serif;margin:7px 0 6px}
+.card .note{font-size:12.5px;color:var(--ink-soft);margin:0 0 7px}
+.card .rows{margin:0;font-size:12.5px}
+.card .rows div{display:flex;gap:8px;padding:2px 0;border-top:1px dotted rgba(120,96,63,.35)}
+.card .rows div:first-child{border-top:none}
+.card .rows span:first-child{color:var(--ink-soft);min-width:88px}
+.card.gap{background:linear-gradient(178deg,#f4e7e6,#ead7d4);outline-color:rgba(176,57,43,.5)}
+.card.gap .kind{color:#9d3b2c}
+.card.refuted{filter:saturate(.7)}
+.card .flag{
+  display:inline-block;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:700;
+  letter-spacing:.04em;border:1px solid currentColor
+}
+.card .flag.ok{color:var(--green)}
+.card .flag.warn{color:#b8860b}
+.card .flag.bad{color:var(--red)}
+.card .flag.draft{color:var(--ink-soft)}
+
+.bar{height:7px;border-radius:4px;background:rgba(90,74,55,.18);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#b6761f,#e3bc63)}
+.bar.conf i{background:linear-gradient(90deg,#8d3b2c,#d8735c)}
+.bar.logodds i{background:linear-gradient(90deg,#3f6b96,#7fb0d8)}
+
+.panel-h{color:#f2e3c8;font:600 22px/1.2 Georgia,serif;margin:0 0 6px}
+.panel-sub{color:#b49f81;font-size:13.5px;margin:0 0 16px;max-width:100ch}
+
+table.grid{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;
+  background:var(--paper);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+table.grid th{
+  text-align:left;padding:10px 12px;background:linear-gradient(180deg,#3b2a1c,#2a1d13);
+  color:#e9d4ac;font:600 11px/1.3 "Segoe UI",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  border-bottom:1px solid #191009;position:sticky;top:0
+}
+table.grid td{padding:9px 12px;border-bottom:1px solid rgba(120,96,63,.22);vertical-align:top}
+table.grid tr:last-child td{border-bottom:none}
+table.grid tr:nth-child(even) td{background:rgba(120,96,63,.06)}
+table.grid td.mono{font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;white-space:nowrap}
+table.grid .sub{color:var(--ink-soft);font-size:12px}
+
+.dossier{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.dossier .d{
+  background:var(--paper);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
+  border-left:5px solid var(--red)
+}
+.dossier .d h4{font:600 16px/1.3 Georgia,serif;margin:0 0 4px}
+.dossier .d .meta{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}
+.dossier .d p{margin:0 0 8px;font-size:13px}
+.dossier .d ul{margin:0 0 8px;padding-left:18px;font-size:12.5px;color:#4a3c2d}
+.dossier .d .src{font-size:12px;color:#5d4c39;border-top:1px dotted rgba(120,96,63,.4);padding-top:7px}
+
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.claim{background:var(--paper);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);position:relative}
+.claim .cid{font:700 11px/1 "Segoe UI",system-ui,sans-serif;letter-spacing:.16em;color:var(--ink-soft)}
+.claim h4{font:600 17px/1.35 Georgia,serif;margin:7px 0 9px}
+.claim .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:9px;font-size:11.5px}
+.claim .meta .chip{padding:2px 9px;border-radius:999px;border:1px solid rgba(120,96,63,.4);color:#5b4a38}
+.claim ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:#4a3c2d}
+.claim .quote{
+  margin:10px 0 0;padding:9px 12px;border-left:3px solid var(--gold);
+  background:rgba(217,167,44,.1);font-size:12.5px;font-style:italic;color:#4d3f2e
+}
+.claim .quote b{font-style:normal}
+.ver{background:var(--paper);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);border-top:5px solid var(--steel)}
+.ver h4{font:600 17px/1.35 Georgia,serif;margin:4px 0 9px}
+.ver .disc{background:rgba(111,147,184,.12);border-left:3px solid var(--steel);padding:9px 12px;font-size:12.5px;margin-top:9px}
+
+.rerun{background:var(--paper);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
+.rerun textarea{
+  width:100%;height:320px;font-family:"JetBrains Mono",Consolas,monospace;font-size:12.5px;
+  border:1px solid rgba(120,96,63,.45);border-radius:8px;padding:12px;background:#fbf6e9;color:#2a2017;resize:vertical
+}
+.cmd{
+  display:flex;gap:10px;align-items:center;justify-content:space-between;
+  background:#241a12;color:#e8d5b3;border-radius:8px;padding:9px 12px;margin:9px 0;font-size:12.5px
+}
+.cmd code{font-family:"JetBrains Mono",Consolas,monospace}
+.cmd button{
+  cursor:pointer;background:rgba(255,225,180,.12);border:1px solid rgba(255,225,180,.28);color:#f2e3c8;
+  border-radius:6px;padding:5px 11px;font-size:12px;white-space:nowrap
+}
+.cmd button:hover{background:rgba(255,225,180,.22)}
+.note-box{border:1px dashed rgba(217,167,44,.55);border-radius:10px;padding:14px 16px;margin:16px 0;
+  background:rgba(217,167,44,.08);color:#e9d7b6;font-size:13.5px}
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}
+.toolbar button{
+  cursor:pointer;border-radius:8px;padding:8px 14px;font-size:13px;
+  background:var(--paper);color:var(--ink);border:1px solid rgba(120,96,63,.4);box-shadow:0 2px 6px rgba(0,0,0,.3)
+}
+.toolbar button:hover{background:var(--paper-3)}
+.narrative{background:var(--paper);border-radius:10px;padding:18px 22px;box-shadow:var(--shadow);
+  white-space:pre-wrap;font-size:14px;line-height:1.6;max-width:96ch}
+.hidden{display:none !important}
+@media (max-width:1180px){.cols{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="kicker">ЭЛЕМЕНТАРНО · протокол доказательности</div>
+    <h1>Образец доски: плесень и следы воды</h1>
+    <div class="sub">Синтетический кейс из бенчмарка protocol-core — три улики, три утверждения, ни одной версии</div>
+    <div class="badges"><div class="badge good"><span>вердикт</span><b>улик достаточно</b></div><div class="badge good"><span>улик</span><b>3</b></div><div class="badge good"><span>утверждений</span><b>3</b></div><div class="badge good"><span>версий</span><b>0</b></div><div class="badge good"><span>ошибок протокола</span><b>0</b></div><div class="badge good"><span>различающих вопросов</span><b>0</b></div></div>
+  </header>
+  <nav class="tabs"><div class="tab on" data-tab="board">Доска</div><div class="tab" data-tab="findings">Находки</div><div class="tab" data-tab="claims">Утверждения</div><div class="tab" data-tab="versions">Версии</div><div class="tab" data-tab="rerun">Переразбор</div></nav>
+
+  <section class="panel on" id="board">
+    <div class="toolbar"><button id="reset">показать всё</button>
+      <span class="sub" style="color:#b49f81;align-self:center;font-size:12.5px">
+        нити: золотая — след ведёт к улике, красная — улика к утверждению, синяя — утверждение к версии;
+        клик по карточке оставляет только связанные</span></div>
+    <div class="board" id="board">
+      <svg class="strings" id="strings"></svg>
+      <div class="cols">
+        <div class="col"><h3>Следы и предметы</h3><div class="stack"><div class="card " data-node="r1"><div class="kind"><span>region</span></div><h4>след: water_line</h4></div><div class="card " data-node="r2"><div class="kind"><span>region</span></div><h4>след: mold_patch</h4></div></div></div>
+        <div class="col"><h3>Улики</h3><div class="stack"><div class="card" data-node="F-BIO-002"><div class="kind"><span>улика BIO-002</span><span class="flag draft">черновик</span></div><h4>Очаг плесени</h4><p class="note">В сцене есть очаг плесени: здесь длительно держалась влага</p><div class="rows"><div><span>правило</span><span>BIO-002 · версия 2</span></div><div><span>ступень</span><span>scene</span></div><div><span>потолок</span><span>0.50</span></div><div><span>приор</span><span>0.80</span></div><div><span>якоря</span><span>r2</span></div></div></div><div class="card" data-node="F-WAT-001"><div class="kind"><span>улика WAT-001</span><span class="flag draft">черновик</span></div><h4>След уровня воды</h4><p class="note">На поверхности сохранилась граница прежнего уровня воды — помещение заливали</p><div class="rows"><div><span>правило</span><span>WAT-001 · версия 2</span></div><div><span>ступень</span><span>scene</span></div><div><span>потолок</span><span>0.50</span></div><div><span>приор</span><span>0.80</span></div><div><span>якоря</span><span>r1</span></div></div></div><div class="card" data-node="F-WAT-002"><div class="kind"><span>улика WAT-002</span><span class="flag draft">черновик</span></div><h4>Плесень в месте прежнего намокания</h4><p class="note">Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера</p><div class="rows"><div><span>правило</span><span>WAT-002 · версия 1</span></div><div><span>ступень</span><span>scene</span></div><div><span>потолок</span><span>0.50</span></div><div><span>приор</span><span>0.75</span></div><div><span>якоря</span><span>r2</span></div></div></div></div></div>
+        <div class="col"><h3>Утверждения</h3><div class="stack"><div class="card" data-node="C-BIO-002"><div class="kind"><span>утверждение C-BIO-002</span><span class="flag ok">50%</span></div><h4>В сцене есть очаг плесени: здесь длительно держалась влага</h4><div class="rows"><div><span>ступень</span><span>scene</span></div><div><span>основание</span><span>F-BIO-002</span></div><div><span>отрицание</span><span>—</span></div></div></div><div class="card" data-node="C-WAT-001"><div class="kind"><span>утверждение C-WAT-001</span><span class="flag ok">50%</span></div><h4>На поверхности сохранилась граница прежнего уровня воды — помещение заливали</h4><div class="rows"><div><span>ступень</span><span>scene</span></div><div><span>основание</span><span>F-WAT-001</span></div><div><span>отрицание</span><span>—</span></div></div></div><div class="card" data-node="C-WAT-002"><div class="kind"><span>утверждение C-WAT-002</span><span class="flag ok">50%</span></div><h4>Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера</h4><div class="rows"><div><span>ступень</span><span>scene</span></div><div><span>основание</span><span>F-WAT-002</span></div><div><span>отрицание</span><span>—</span></div></div></div></div></div>
+        <div class="col"><h3>Версии</h3><div class="stack"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="findings">
+    <h2 class="panel-h">Находки</h2>
+    <p class="panel-sub">Полный список сработавших правил: что они утверждают, на каких якорях держатся,
+      чем ограничены и каким источником подкреплены.</p>
+    <table class="grid"><thead><tr><th>Улика</th><th>Правило</th><th>Название</th><th>Ступень</th><th>Потолок</th><th>Статус</th><th>Вывод</th><th>Якоря</th><th>Источник</th></tr></thead><tbody><tr><td class="mono">F-BIO-002</td><td class="mono">BIO-002 v2</td><td>Очаг плесени</td><td>scene</td><td class="mono">0.50</td><td>черновик</td><td>В сцене есть очаг плесени: здесь длительно держалась влага</td><td class="mono">r2</td><td class="sub">WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009</td></tr><tr><td class="mono">F-WAT-001</td><td class="mono">WAT-001 v2</td><td>След уровня воды</td><td>scene</td><td class="mono">0.50</td><td>черновик</td><td>На поверхности сохранилась граница прежнего уровня воды — помещение заливали</td><td class="mono">r1</td><td class="sub">ANSI/IICRC S500, Standard and Reference Guide for Professional Water Damage Restoration, 4</td></tr><tr><td class="mono">F-WAT-002</td><td class="mono">WAT-002 v1</td><td>Плесень в месте прежнего намокания</td><td>scene</td><td class="mono">0.50</td><td>черновик</td><td>Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера</td><td class="mono">r2</td><td class="sub">WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009</td></tr></tbody></table>
+    <div style="height:22px"></div>
+    <div class="dossier"><div class="d"><h4>Очаг плесени</h4><div class="meta">BIO-002 · версия 2 ·  · потолок 0.50 · черновик</div><p><b>Вывод:</b> В сцене есть очаг плесени: здесь длительно держалась влага</p><p><b>Якоря:</b> r2</p><p><b>Оговорки улики:</b></p><ul><li>Плесень может быть свежей</li><li>Очаг может быть локальным (попавшая влага)</li></ul><p><b>Исключения:</b></p><ul><li>Очаг совпадает с зоной разлива</li></ul><p><b>Опровержение:</b> Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага</p><p class="src"><b>источник:</b> WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009<br><span class="sub">признаки плесени и их связь с влажностью</span> · подтверждён</p></div><div class="d"><h4>След уровня воды</h4><div class="meta">WAT-001 · версия 2 ·  · потолок 0.50 · черновик</div><p><b>Вывод:</b> На поверхности сохранилась граница прежнего уровня воды — помещение заливали</p><p><b>Якоря:</b> r1</p><p><b>Оговорки улики:</b></p><ul><li>Границу мог оставить иной раствор или клей</li><li>След конденсата на холодной поверхности</li><li>Основание — платный отраслевой стандарт, прочитано только его назначение; категории повреждения и их признаки не сверены</li></ul><p><b>Исключения:</b></p><ul><li>Граница совпадает с высотой мебели, а не с заливом</li></ul><p><b>Опровержение:</b> Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали</p><p class="src"><b>источник:</b> ANSI/IICRC S500, Standard and Reference Guide for Professional Water Damage Restoration, 4th ed. 2015 (IICRC)<br><span class="sub">признаки залива и категории повреждения: ANSI/IICRC S500 (Standard and Reference Guide for Professional Water Damage Restoration, 4-е изд. 2015) — стандарт по восстановлению после залива; категории повреждения в тексте не сверены (стандарт платный), подтверждено только существование и назначение документа</span> · не подтверждён</p></div><div class="d"><h4>Плесень в месте прежнего намокания</h4><div class="meta">WAT-002 · версия 1 ·  · потолок 0.50 · черновик</div><p><b>Вывод:</b> Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера</p><p><b>Якоря:</b> r2</p><p><b>Оговорки улики:</b></p><ul><li>Плесень может быть от сырости без залива</li><li>Плесень могла быть до залива и расти в другом месте</li></ul><p><b>Исключения:</b></p><ul><li>Очаг плесени не пересекается с зоной прежнего намокания</li></ul><p><b>Опровержение:</b> Сравнить площадь очага плесени с зоной намокания</p><p class="src"><b>источник:</b> WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009<br><span class="sub">связь влаги и роста плесени</span> · подтверждён</p></div></div>
+  </section>
+
+  <section class="panel" id="claims">
+    <h2 class="panel-h">Утверждения</h2>
+    <p class="panel-sub">Каждое утверждение ссылается на улику, ограничено её потолком
+      и атаковано отрицанием: исход отрицания — часть вывода, а не формальность.</p>
+    <div class="cols2"><div class="claim"><div class="cid">УТВЕРЖДЕНИЕ C-BIO-002</div><h4>В сцене есть очаг плесени: здесь длительно держалась влага</h4><div class="meta"><span class="chip">ступень scene</span><span class="chip">уверенность 50%</span><span class="chip">основание F-BIO-002</span><span class="chip">правила BIO-002</span><span class="flag warn">не решено</span><span class="flag draft">provisional</span></div><div class="bar conf"><i style="width:50%"></i></div><ul><li>Плесень может быть свежей</li><li>Очаг может быть локальным (попавшая влага)</li></ul><p class="sub" style="margin:9px 0 0"><b>Что опровергло бы:</b> Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага</p></div><div class="claim"><div class="cid">УТВЕРЖДЕНИЕ C-WAT-001</div><h4>На поверхности сохранилась граница прежнего уровня воды — помещение заливали</h4><div class="meta"><span class="chip">ступень scene</span><span class="chip">уверенность 50%</span><span class="chip">основание F-WAT-001</span><span class="chip">правила WAT-001</span><span class="flag warn">не решено</span><span class="flag draft">provisional</span></div><div class="bar conf"><i style="width:50%"></i></div><ul><li>Границу мог оставить иной раствор или клей</li><li>След конденсата на холодной поверхности</li><li>Основание — платный отраслевой стандарт, прочитано только его назначение; категории повреждения и их признаки не сверены</li></ul><p class="sub" style="margin:9px 0 0"><b>Что опровергло бы:</b> Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали</p></div><div class="claim"><div class="cid">УТВЕРЖДЕНИЕ C-WAT-002</div><h4>Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера</h4><div class="meta"><span class="chip">ступень scene</span><span class="chip">уверенность 50%</span><span class="chip">основание F-WAT-002</span><span class="chip">правила WAT-002</span><span class="flag warn">не решено</span><span class="flag draft">provisional</span></div><div class="bar conf"><i style="width:50%"></i></div><ul><li>Плесень может быть от сырости без залива</li><li>Плесень могла быть до залива и расти в другом месте</li></ul><p class="sub" style="margin:9px 0 0"><b>Что опровергло бы:</b> Сравнить площадь очага плесени с зоной намокания</p></div></div>
+  </section>
+
+  <section class="panel" id="versions">
+    <h2 class="panel-h">Версии</h2>
+    <p class="panel-sub">Версии различаются весом улик и различающим вопросом.
+      Без разделителя конкурирующие версии остаются неразличимыми.</p>
+    <div class="cols2"></div>
+  </section>
+
+  <section class="panel" id="rerun">
+    <h2 class="panel-h">Переразбор</h2>
+    <p class="panel-sub">Правьте леджер, выгружайте и запускайте движок: страница показывает разбор,
+      истину считает движок.</p>
+    <div class="rerun"><h3 style="margin:0 0 6px;font-size:19px">Переразбор</h3><p class="sub" style="margin:0 0 14px;color:#6a5947">Леджер можно править прямо здесь и выгрузить, но истина остаётся в движке: правка текста здесь ничего не меняет в разборе, пока леджер не перезапущен движком.</p><div class="toolbar"><button id="download">выгрузить ledger.json</button><button data-copy="#ledger">скопировать леджер</button></div><textarea id="ledger">{
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C-BIO-002&quot;,
+      &quot;kind&quot;: &quot;inference&quot;,
+      &quot;text&quot;: &quot;В сцене есть очаг плесени: здесь длительно держалась влага&quot;,
+      &quot;support&quot;: [
+        {
+          &quot;finding_id&quot;: &quot;F-BIO-002&quot;
+        }
+      ],
+      &quot;confidence&quot;: 0.5,
+      &quot;provisional&quot;: true,
+      &quot;confounds&quot;: [
+        &quot;Плесень может быть свежей&quot;,
+        &quot;Очаг может быть локальным (попавшая влага)&quot;
+      ],
+      &quot;falsification&quot;: &quot;Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага&quot;,
+      &quot;step&quot;: &quot;scene&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C-WAT-001&quot;,
+      &quot;kind&quot;: &quot;inference&quot;,
+      &quot;text&quot;: &quot;На поверхности сохранилась граница прежнего уровня воды — помещение заливали&quot;,
+      &quot;support&quot;: [
+        {
+          &quot;finding_id&quot;: &quot;F-WAT-001&quot;
+        }
+      ],
+      &quot;confidence&quot;: 0.5,
+      &quot;provisional&quot;: true,
+      &quot;confounds&quot;: [
+        &quot;Границу мог оставить иной раствор или клей&quot;,
+        &quot;След конденсата на холодной поверхности&quot;,
+        &quot;Основание — платный отраслевой стандарт, прочитано только его назначение; категории повреждения и их признаки не сверены&quot;
+      ],
+      &quot;falsification&quot;: &quot;Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали&quot;,
+      &quot;step&quot;: &quot;scene&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C-WAT-002&quot;,
+      &quot;kind&quot;: &quot;inference&quot;,
+      &quot;text&quot;: &quot;Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера&quot;,
+      &quot;support&quot;: [
+        {
+          &quot;finding_id&quot;: &quot;F-WAT-002&quot;
+        }
+      ],
+      &quot;confidence&quot;: 0.5,
+      &quot;provisional&quot;: true,
+      &quot;confounds&quot;: [
+        &quot;Плесень может быть от сырости без залива&quot;,
+        &quot;Плесень могла быть до залива и расти в другом месте&quot;
+      ],
+      &quot;falsification&quot;: &quot;Сравнить площадь очага плесени с зоной намокания&quot;,
+      &quot;step&quot;: &quot;scene&quot;
+    }
+  ],
+  &quot;hypotheses&quot;: []
+}</textarea><div class="cmd"><code>python3 -m tools.elementarno.cli verify eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json</code><button data-copy="#cmd-0">копировать</button><textarea id="cmd-0" style="display:none">python3 -m tools.elementarno.cli verify eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json</textarea></div><div class="cmd"><code>python3 -m tools.elementarno.cli tell eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json --persona doyle</code><button data-copy="#cmd-1">копировать</button><textarea id="cmd-1" style="display:none">python3 -m tools.elementarno.cli tell eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json --persona doyle</textarea></div><div class="cmd"><code>python3 -m tools.elementarno.cli nextshot eval/benchmarks/protocol-core/scenes/water-and-mold.json --hypotheses ledger.json</code><button data-copy="#cmd-2">копировать</button><textarea id="cmd-2" style="display:none">python3 -m tools.elementarno.cli nextshot eval/benchmarks/protocol-core/scenes/water-and-mold.json --hypotheses ledger.json</textarea></div><div class="cmd"><code>python3 -m tools.elementarno.cli board eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json --out docs/board-sample.html</code><button data-copy="#cmd-3">копировать</button><textarea id="cmd-3" style="display:none">python3 -m tools.elementarno.cli board eval/benchmarks/protocol-core/scenes/water-and-mold.json --ledger ledger.json --out docs/board-sample.html</textarea></div></div>
+    <div class="note-box">Ответ движка на этот разбор:</div>
+    <div class="narrative">Позвольте представить вам, мой дорогой Уотсон, наши улики. Фотография молчит, но молчит она не зря.
+
+Место действия:
+В сцене есть очаг плесени: здесь длительно держалась влага — доказательство [BIO-002], уверенность 50%
+Правило BIO-002: Очаг плесени
+Оговорки улики: Плесень может быть свежей; Очаг может быть локальным (попавшая влага).
+Проверка: Оценить площадь и равномерность очага: локальный — разлив, размытый — стоячая влага
+На поверхности сохранилась граница прежнего уровня воды — помещение заливали — доказательство [WAT-001], уверенность 50%
+Правило WAT-001: След уровня воды
+Оговорки улики: Границу мог оставить иной раствор или клей; След конденсата на холодной поверхности; Основание — платный отраслевой стандарт, прочитано только его назначение; категории повреждения и их признаки не сверены.
+Проверка: Проверить высоту линии на разных стенах: залив даёт одну отметку по горизонтали
+Плесень развилась там, где ранее была вода, — влага стояла долго, залив был не вчера — доказательство [WAT-002], уверенность 50%
+Правило WAT-002: Плесень в месте прежнего намокания
+Оговорки улики: Плесень может быть от сырости без залива; Плесень могла быть до залива и расти в другом месте.
+Проверка: Сравнить площадь очага плесени с зоной намокания
+
+
+Повествование воспроизведено в стиле Артура Конана Дойла по данным протокола доказательности. Стиль не есть источник утверждений: каждая строка привязана к помеченной улике.</div>
+  </section>
+</div>
+<script>
+window.__LINKS__ = [{"from": "r2", "to": "F-BIO-002", "label": "BIO-002", "kind": "scene", "dir": 1}, {"from": "r1", "to": "F-WAT-001", "label": "WAT-001", "kind": "scene", "dir": 1}, {"from": "r2", "to": "F-WAT-002", "label": "WAT-002", "kind": "scene", "dir": 1}, {"from": "F-BIO-002", "to": "C-BIO-002", "label": "C-BIO-002", "kind": "evid", "dir": 1}, {"from": "F-WAT-001", "to": "C-WAT-001", "label": "C-WAT-001", "kind": "evid", "dir": 1}, {"from": "F-WAT-002", "to": "C-WAT-002", "label": "C-WAT-002", "kind": "evid", "dir": 1}];
+
+const LINKS = window.__LINKS__ || [];
+const board = document.getElementById('board');
+const svg = document.getElementById('strings');
+
+function nodeEl(id){ return document.querySelector('[data-node="'+id+'"]'); }
+
+function draw(){
+  if(!svg) return;
+  const box = board.getBoundingClientRect();
+  svg.setAttribute('viewBox', '0 0 '+box.width+' '+box.height);
+  svg.setAttribute('width', box.width);
+  svg.setAttribute('height', box.height);
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const dim = board.classList.contains('dim');
+  const gutters = {};
+  LINKS.forEach(function(l){
+    const a = nodeEl(l.from), b = nodeEl(l.to);
+    if(!a || !b) return;
+    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const x1 = ra.right - box.left, y1 = ra.top - box.top + ra.height/2;
+    const x2 = rb.left - box.left,  y2 = rb.top - box.top + rb.height/2;
+    const xm = (x1 + x2) / 2;
+    const key = Math.round(xm/40);
+    gutters[key] = (gutters[key] || 0) + 1;
+    const nudge = (gutters[key] - 1) * 13;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', 'M '+x1+' '+y1+' C '+(xm-46)+' '+y1+' '+(xm+46)+' '+y2+' '+x2+' '+y2);
+    path.setAttribute('class','s-'+l.kind);
+    path.setAttribute('stroke-width', l.hot ? 3 : 1.8);
+    path.setAttribute('opacity', dim && !l.hot ? 0.12 : 0.9);
+    svg.appendChild(path);
+    const ly = (y1 + y2) / 2 + nudge;
+    const lx = xm;
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x', lx); text.setAttribute('y', ly + 3.5);
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('class','s-'+l.kind);
+    text.setAttribute('opacity', dim && !l.hot ? 0.15 : 1);
+    text.textContent = l.label;
+    svg.appendChild(text);
+    const w = l.label.length * 5.6 + 12;
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x', lx - w/2); rect.setAttribute('y', ly - 9);
+    rect.setAttribute('width', w); rect.setAttribute('height', 14);
+    rect.setAttribute('rx', 4);
+    rect.setAttribute('fill','rgba(18,11,5,.82)');
+    rect.setAttribute('opacity', dim && !l.hot ? 0.15 : 1);
+    svg.insertBefore(rect, text);
+  });
+}
+
+function focusLink(id){
+  const keep = {};
+  LINKS.forEach(function(l){
+    if(l.from === id || l.to === id){ keep[l.from]=1; keep[l.to]=1; l.hot = true; }
+    else { l.hot = false; }
+  });
+  document.querySelectorAll('[data-node]').forEach(function(n){
+    n.classList.toggle('hidden', !(n.dataset.node in keep) && n.dataset.node !== id);
+  });
+  board.classList.add('dim');
+  draw();
+}
+
+function resetBoard(){
+  LINKS.forEach(function(l){ l.hot = false; });
+  document.querySelectorAll('[data-node]').forEach(function(n){ n.classList.remove('hidden'); });
+  board.classList.remove('dim');
+  draw();
+}
+
+function openTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('on', t.dataset.tab === id); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('on', p.id === id); });
+  if(id === 'board') draw();
+}
+
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){ openTab(tab.dataset.tab); });
+});
+window.addEventListener('hashchange', function(){ openTab(location.hash.slice(1) || 'board'); });
+
+document.querySelectorAll('[data-node]').forEach(function(n){
+  n.addEventListener('click', function(){ focusLink(n.dataset.node); });
+});
+document.getElementById('reset').addEventListener('click', resetBoard);
+
+function copy(text, btn){
+  const done = function(){ const old = btn.textContent; btn.textContent = 'скопировано';
+    setTimeout(function(){ btn.textContent = old; }, 1400); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); });
+  } else { fallback(text); done(); }
+}
+function fallback(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+document.querySelectorAll('[data-copy]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    const src = document.querySelector(btn.dataset.copy);
+    copy(src ? src.value || src.textContent : '', btn);
+  });
+});
+document.getElementById('download').addEventListener('click', function(){
+  const ta = document.getElementById('ledger');
+  const blob = new Blob([ta.value], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'ledger.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+
+window.addEventListener('resize', draw);
+window.addEventListener('load', function(){
+  const wanted = location.hash.slice(1);
+  if(wanted && document.getElementById(wanted)) openTab(wanted);
+  draw();
+});
+setTimeout(draw, 60);
+
+</script>
+</body>
+</html>
