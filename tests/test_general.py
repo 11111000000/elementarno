@@ -181,6 +181,15 @@ class AnswerTest(unittest.TestCase):
         result = answer("когда это было", self.scene, self.findings, [], [])
         self.assertIn("Время по кадру не видно", result["answer"])
 
+    def test_unclassified_question_does_not_crash(self):
+        result = answer("а погода", self.scene, self.findings, [], [])
+        self.assertIn("нет ответа", result["answer"])
+        self.assertEqual(result["uncertainty"], 1.0)
+
+    def test_who_worked_routes_to_presence(self):
+        self.assertEqual(classify("кем работали?"), "presence")
+        self.assertEqual(classify("кто работал за столом?"), "presence")
+
     def test_identity_question_lists_facts(self):
         result = answer("что лежит на столе?", self.scene, self.findings, [], [])
         self.assertIn("mug", result["answer"])

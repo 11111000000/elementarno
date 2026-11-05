@@ -12,12 +12,16 @@
   результат, а не отказ по умолчанию.
 """
 
+import re
+
 from .facts import facts
 
 QUESTION_KINDS = [
     ("activity", ["происходило", "происходило", "делали", "занимались", "деятельность", "чем занимались",
                   "что делали", "активност", "происходил"]),
-    ("presence", ["кто был", "кто там", "есть ли кто", "кто-то", "присутств", "кто это был", "кто-нибудь"]),
+    ("presence", ["кто был", "кто там", "есть ли кто", "кто-то", "присутств", "кто это был",
+                  "кто-нибудь", "кем работал", "кто работал", "кем занят", "кто здесь",
+                  "кем здесь", "кто такой"]),
     ("identity", ["что это", "что за", "какой предмет", "из чего", "какие предметы", "что лежит",
                   "что стоит", "что в кадре", "перечисл"]),
     ("check", ["проверить", "проверк", "что снять", "дальше", "следующ", "опроверг", "тест",
@@ -43,6 +47,21 @@ def classify(question):
         if any(word in low for word in words):
             return kind
     return "default"
+
+
+STOP_WORDS = {"как", "что", "кто", "где", "когда", "почему", "зачем", "какой", "какая",
+              "был", "была", "было", "тут", "там", "этот", "эта", "это", "для", "или",
+              "работали", "работал", "видно", "кадре", "сцене", "фото", "фотографии"}
+
+
+def _mentions(question, text):
+    """Есть ли в утверждении слово из вопроса — грубое, но честное совпадение."""
+    words = {w for w in re.findall(r"[\wа-яё]+", (question or "").lower()) if len(w) > 3}
+    words -= STOP_WORDS
+    if not words:
+        return False
+    haystack = (text or "").lower()
+    return any(word in haystack for word in words)
 
 
 def _claim_line(claim, findings_by_id):
@@ -110,6 +129,21 @@ def answer(question, scene, findings, claims=None, hypotheses=None):
                 "basis": [], "uncertainty": 1.0,
                 "caveats": ["свежесть видна только там, где есть для этого след: пыль, засохшая жидкость, смятая ткань"],
                 "next": ["снять след, который высох и оставил границу: сухое пятно на плитке, примятая подушка"]}
+
+    if kind == "default":
+        matched = [claim for claim in prepared if _mentions(question, claim["text"])]
+        if not matched:
+            return {"question": question, "kind": kind, "answer": REFUSAL["default"],
+                    "basis": [], "uncertainty": 1.0, "caveats": [], "next": []}
+        best = max(matched, key=lambda claim: claim["confidence"] or 0.0)
+        return {
+            "question": question, "kind": kind,
+            "answer": best["text"] + (f" И ещё: {matched[0]['text']}" if len(matched) > 1 else ""),
+            "basis": best["finding_ids"],
+            "uncertainty": round(1 - (best["confidence"] or 0), 3),
+            "caveats": best["caveats"],
+            "next": [best["falsification"]] if best["falsification"] else [],
+        }
 
     step_filter = {"activity": ("activity", "presence", "role", "action"),
                    "presence": ("presence", "role", "action"),
