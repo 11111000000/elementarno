@@ -16,7 +16,7 @@ VALID_REGIONS = {
 }
 
 VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "used",
-                       "open", "closed", "empty", "full", "unknown"}
+                       "open", "closed", "empty", "full", "partially_filled", "unknown"}
 VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
 VALID_FRESHNESS = {"sharp", "soft", "erased", "unknown"}
 VALID_EDGES = {"concave", "convex", "flat", "ragged", "unknown"}

@@ -147,6 +147,9 @@ def answer(question, scene, findings, claims=None, hypotheses=None):
         alternatives.append(hypothesis.get("text"))
 
     answer_text = top["text"]
+    also = [claim for _, claim in ranked[1:3]]
+    if also:
+        answer_text += " И ещё: " + "; ".join(c["text"] for c in also)
     if alternatives:
         answer_text += " (версии: " + "; ".join(alternatives[:3]) + ")"
 
@@ -158,7 +161,7 @@ def answer(question, scene, findings, claims=None, hypotheses=None):
         "question": question,
         "kind": kind,
         "answer": answer_text,
-        "basis": top["finding_ids"],
+        "basis": top["finding_ids"] + [fid for c in also for fid in c["finding_ids"]],
         "uncertainty": round(uncertainty, 3),
         "caveats": top["caveats"],
         "next": [top["falsification"]] if top["falsification"] else [],
