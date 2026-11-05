@@ -110,6 +110,11 @@
               "damaged",
               "fresh",
               "stale",
+              "used",
+              "open",
+              "closed",
+              "empty",
+              "full",
               "unknown"
             ]
           },
@@ -141,6 +146,13 @@
           },
           "region": {
             "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Нормализованные признаки предмета (drinkware, tool, food, textile, …): доменно-нейтральный словарь, по которому ищутся связи."
           }
         }
       }
@@ -206,12 +218,18 @@
           "construction": {
             "description": "Как построен знак: по образцу, на глаз, или не разобрать.",
             "type": "string",
-            "enum": ["by_model", "freehand", "unknown"]
+            "enum": [
+              "by_model",
+              "freehand",
+              "unknown"
+            ]
           },
           "readings": {
             "description": "Возможные прочтения знака, каждое своими словами. Их должно быть несколько: выбор одного — догадка, перечисление — прочтение.",
             "type": "array",
-            "items": {"type": "string"}
+            "items": {
+              "type": "string"
+            }
           },
           "shape": {
             "type": "string"
@@ -279,7 +297,8 @@
             "description": "id наблюдаемой вершины: региона, объекта или поверхности"
           },
           "feature": {
-            "type": "string"
+            "type": "string",
+            "description": "Признак в токенизированном словаре: open, closed, tilted, partially_filled, full, empty, damaged, torn, new, old, used, warm, cold."
           },
           "value": {},
           "confidence": {

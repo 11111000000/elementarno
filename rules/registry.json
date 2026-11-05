@@ -65,6 +65,11 @@
       "id": "office",
       "title": "Офис",
       "layer": "epistemic"
+    },
+    {
+      "id": "general",
+      "title": "Общие связи по набору вещей",
+      "layer": "epistemic"
     }
   ]
 }

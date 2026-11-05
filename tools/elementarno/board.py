@@ -335,6 +335,7 @@ setTimeout(draw, 60);
 
 TAB_BAR = [
     ("board", "Доска"),
+    ("facts", "Факты"),
     ("findings", "Находки"),
     ("claims", "Утверждения"),
     ("versions", "Версии"),
@@ -451,6 +452,26 @@ def _anchor_text(finding, implicit_by_finding=None):
     if implicit:
         parts.append("неявные: " + ", ".join(implicit))
     return " · ".join(parts) if parts else "—"
+
+
+def _facts_table(scene_facts):
+    rows = []
+    for fact in scene_facts:
+        rows.append(
+            "<tr>"
+            f'<td class="mono">{esc(fact["fact_id"])}</td>'
+            f'<td>{esc(fact["kind"])}</td>'
+            f'<td>{esc(fact["text"])}</td>'
+            f'<td class="mono">{esc(", ".join(fact.get("about") or []))}</td>'
+            f'<td class="sub">{esc(fact.get("basis"))}</td>'
+            f'<td class="mono">{fact.get("confidence", 0):.2f}</td>'
+            "</tr>"
+        )
+    return (
+        '<table class="grid"><thead><tr><th>Факт</th><th>Тип</th><th>Что видно</th>'
+        "<th>Объекты</th><th>Чем подтверждён</th><th>Уверенность</th></tr></thead><tbody>"
+        + "".join(rows) + "</tbody></table>"
+    )
 
 
 def _findings_table(findings, implicit_by_finding=None):
@@ -611,7 +632,8 @@ def _rerun_panel(ledger_text, commands):
 
 
 def build(scene, findings, ledger, hypotheses=None, questions=None, verdict=None,
-          narrative="", title="Доска разбора", subtitle="", commands=None, meta=None, rules=None):
+          narrative="", title="Доска разбора", subtitle="", commands=None, meta=None, rules=None,
+          scene_facts=None):
     """Собрать самодостаточную HTML-страницу доски."""
     findings = findings or []
     claims = ledger.get("claims") or []
@@ -703,6 +725,13 @@ def build(scene, findings, ledger, hypotheses=None, questions=None, verdict=None
         <div class="col"><h3>Версии</h3><div class="stack">{''.join(_version_card(h) for h in hypotheses)}</div></div>
       </div>
     </div>
+  </section>
+
+  <section class="panel" id="facts">
+    <h2 class="panel-h">Факты</h2>
+    <p class="panel-sub">Что видно в кадре и чем это подтверждено. Факты не знают ни про криминалистику,
+      ни про домен: это предметы, их состояния, количества и связи.</p>
+    {_facts_table(scene_facts or [])}
   </section>
 
   <section class="panel" id="findings">

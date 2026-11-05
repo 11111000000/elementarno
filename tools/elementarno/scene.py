@@ -15,7 +15,8 @@ VALID_REGIONS = {
     "food_remains", "metal_swarf", "symbol", "inscription", "other",
 }
 
-VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
+VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "used",
+                       "open", "closed", "empty", "full", "unknown"}
 VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
 VALID_FRESHNESS = {"sharp", "soft", "erased", "unknown"}
 VALID_EDGES = {"concave", "convex", "flat", "ragged", "unknown"}
