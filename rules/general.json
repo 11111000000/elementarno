@@ -1,0 +1,726 @@
+{
+  "rules": [
+    {
+      "id": "GEN-001",
+      "version": 1,
+      "pack": "general",
+      "title": "Кружка с напитком",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[features=drinkware][fill_level>0]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В сцене кружка с напитком: напиток пили или только что налили",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "step": "activity",
+        "tags": [
+          "drink",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=drinkware][fill_level>0].id"
+      ],
+      "confounds": [
+        "кружку могли наполнить из термоса минуту назад и никто не пил",
+        "напиток мог принести с собой тот, кто не в кадре",
+        "уровень виден по кадру, время налива — нет"
+      ],
+      "exceptions": [
+        "кружка пустая или переставлена холодной"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять кружку крупно: свежая пена — налито недавно, сухая плёнка — стоит давно"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-002",
+      "version": 1,
+      "pack": "general",
+      "title": "Недопитая кружка",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[features=drinkware][fill_level>0][fill_level<0.6]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "Кружка налита меньше, чем полная: её пили или налили неполной",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "step": "activity",
+        "tags": [
+          "drink",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=drinkware][fill_level>0][fill_level<0.6].id"
+      ],
+      "confounds": [
+        "чашка кофе наполовину — обычное дело без всякой истории",
+        "налить «не полную» специально — например, чтобы оставить больше тепла",
+        "уровень определён по кадру и может быть неточен"
+      ],
+      "exceptions": [
+        "кружка налита по особому поводу, например, чтобы дать остыть"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сравнить с полной кружкой того же вида в кадре: если такой нет, мерить уровень по объёму"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-003",
+      "version": 1,
+      "pack": "general",
+      "title": "Набор для курения",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "objects[features=tobacco]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "objects[features=ignition]",
+            "gte": 1
+          }
+        ]
+      },
+      "inference": {
+        "claim": "На столе лежат табак и огонь — набор, которым пользуются при курении",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "step": "scene",
+        "tags": [
+          "smoking",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=tobacco].id",
+        "objects[features=ignition].id"
+      ],
+      "confounds": [
+        "набор мог храниться на столе и не использоваться",
+        "спичка может быть не спичкой, а зажигалкой, а «табак» — жестянкой с травами",
+        "признаки предметов назначает модель восприятия"
+      ],
+      "exceptions": [
+        "упаковка табака пустая, огонь не трогали"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять содержимое коробки крупно и огонь с обеих сторон: следы использования есть?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-004",
+      "version": 1,
+      "pack": "general",
+      "title": "Еда на месте",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "count",
+                "path": "objects[features=food]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "regions[kind=food_remains]",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "count",
+                "path": "objects[features=packaged_food]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "regions[kind=food_remains]",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "inference": {
+        "claim": "В сцене еда и следы еды: за столом ели или готовились к еде",
+        "confidence_prior": 0.45,
+        "confidence_ceiling": 0.55,
+        "step": "activity",
+        "tags": [
+          "meal",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=food].id",
+        "objects[features=packaged_food].id",
+        "regions[kind=food_remains].id"
+      ],
+      "confounds": [
+        "еду принесли из магазина и ещё не ели",
+        "крошки могли остаться от давнего приёма пищи",
+        "признак «следы еды» ставится моделью по чек-листу"
+      ],
+      "exceptions": [
+        "остатки не связаны с приёмом пищи в этом месте"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять ту же область через час: если булка не тронута, а тарелки нет, «здесь ели» не подтверждается"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-005",
+      "version": 1,
+      "pack": "general",
+      "title": "Пустой держатель и закрытое устройство",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "observations[feature=empty].about",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "objects[features=device][state=closed]",
+            "gte": 1
+          }
+        ]
+      },
+      "inference": {
+        "claim": "В сцене пустой держатель при закрытом устройстве: одно убрали, другое закрыли",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "absence",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "observations[feature=empty].about",
+        "objects[features=device][state=closed].id"
+      ],
+      "confounds": [
+        "пустой предмет мог быть пустым всегда",
+        "устройство закрывают не вместо того, чтобы убрать",
+        "признак «empty» выставляет модель восприятия"
+      ],
+      "exceptions": [
+        "устройство и держатель не связаны между собой"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять рядом оба предмета: держатель действительно для этого устройства?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-006",
+      "version": 1,
+      "pack": "general",
+      "title": "Рабочее место",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "objects[features=device]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "objects[features=writing]",
+            "gte": 1
+          }
+        ]
+      },
+      "inference": {
+        "claim": "В кадре устройство и письменные принадлежности: здесь работают или учились",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "work",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=device].id",
+        "objects[features=writing].id"
+      ],
+      "confounds": [
+        "телефон и ручка лежат рядом по разным причинам",
+        "принадлежности могут принадлежать другому человеку"
+      ],
+      "exceptions": [
+        "устройство не связано с письменными принадлежностями"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Спросить по содержимому: чертёж, конспект или заметка в телефоне?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-007",
+      "version": 1,
+      "pack": "general",
+      "title": "Следы работы инструментом",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "objects[features=tool]",
+            "gte": 1
+          },
+          {
+            "kind": "any",
+            "conditions": [
+              {
+                "kind": "count",
+                "path": "regions[kind=sawdust]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "regions[kind=paint_splash]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "regions[kind=metal_swarf]",
+                "gte": 1
+              },
+              {
+                "kind": "count",
+                "path": "regions[kind=flour_dust]",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "inference": {
+        "claim": "Инструмент и следы работы рядом: здесь что-то делали руками",
+        "confidence_prior": 0.5,
+        "confidence_ceiling": 0.6,
+        "step": "activity",
+        "tags": [
+          "work",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=tool].id"
+      ],
+      "confounds": [
+        "след мог остаться от прошлой работы, инструмент принесли сейчас",
+        "инструмент мог быть не тем, которым сделали этот след"
+      ],
+      "exceptions": [
+        "инструмент и след не связаны"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Сопоставить след с конкретным инструментом: ширина, профиль, материал"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-008",
+      "version": 1,
+      "pack": "general",
+      "title": "Спальное место",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[features=bed]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В кадре постельные принадлежности: место для сна",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "sleep",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=bed].id"
+      ],
+      "confounds": [
+        "кровать может стоять в проходной и не использоваться",
+        "покрывало может быть сложено, а не расстелено"
+      ],
+      "exceptions": [
+        "текстиль не постельный"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять кровать целиком: видно ли, что на ней спали?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-009",
+      "version": 1,
+      "pack": "general",
+      "title": "Детские вещи",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[features=toy]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В кадре игрушка: здесь играли или играют",
+        "confidence_prior": 0.35,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "child",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=toy].id"
+      ],
+      "confounds": [
+        "игрушку могли купить и положить, а не играть",
+        "игрушка может быть коллекционной, а не детской"
+      ],
+      "exceptions": [
+        "предмет не игрушка"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Посмотреть: игрушка потёртая и разобранная или новенькая в упаковке?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-010",
+      "version": 1,
+      "pack": "general",
+      "title": "Туалетные принадлежности",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "objects[features=hygiene]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "objects[features=sanitary]",
+            "gte": 1
+          }
+        ]
+      },
+      "inference": {
+        "claim": "Туалетные принадлежности и сантехника рядом: это ванная или туалет",
+        "confidence_prior": 0.4,
+        "confidence_ceiling": 0.55,
+        "step": "scene",
+        "tags": [
+          "hygiene",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=hygiene].id"
+      ],
+      "confounds": [
+        "предметы могли быть принесены в другое место",
+        "категорию сантехники выставляет модель"
+      ],
+      "exceptions": [
+        "предметы не связаны с сантехникой"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Снять помещение целиком: видно ли ванну или раковину рядом?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-011",
+      "version": 1,
+      "pack": "general",
+      "title": "Спорт",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "count",
+        "path": "objects[features=sports]",
+        "gte": 1
+      },
+      "inference": {
+        "claim": "В кадре спортивные вещи: здесь занимаются спортом или собираются",
+        "confidence_prior": 0.3,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "sport",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=sports].id"
+      ],
+      "confounds": [
+        "вещи могли лежать в коридоре неделями",
+        "мяч может быть детским, лыжи — чужими"
+      ],
+      "exceptions": [
+        "предмет не спортивный"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Спросить, где обычно хранят: в шкафу для спорта или в коридоре"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    },
+    {
+      "id": "GEN-012",
+      "version": 1,
+      "pack": "general",
+      "title": "Дорожные вещи",
+      "domain": "general",
+      "layer": "epistemic",
+      "severity": "info",
+      "requires": [
+        "objects"
+      ],
+      "depends_on": [],
+      "predicate": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "count",
+            "path": "objects[features=luggage]",
+            "gte": 1
+          },
+          {
+            "kind": "count",
+            "path": "objects[features=small_device]",
+            "gte": 1
+          }
+        ]
+      },
+      "inference": {
+        "claim": "Рюкзак или чемодан и зарядное устройство рядом: вещи для дороги",
+        "confidence_prior": 0.3,
+        "confidence_ceiling": 0.5,
+        "step": "scene",
+        "tags": [
+          "travel",
+          "fact_based"
+        ]
+      },
+      "anchors": [
+        "objects[features=luggage].id",
+        "objects[features=small_device].id"
+      ],
+      "confounds": [
+        "рюкзак может лежать у входа и никто никуда не собирался",
+        "флешка рядом с рюкзаком — обычное совпадение",
+        "признаки предметов назначает модель восприятия"
+      ],
+      "exceptions": [
+        "предметы не связаны с поездкой"
+      ],
+      "falsification": {
+        "refuted_by": [],
+        "physical_test": "Спросить: сумка закрыта и полна или пустая и аккуратно сложена?"
+      },
+      "sources": [
+        {
+          "ref": "Наборы совместно употребляемых предметов (common-sense kits): прямого источника, подтверждающего связь, нет — наборы составлены по бытовому опыту и не рецензированы",
+          "note": "правило черновое: потолок 0.5; основание — сам набор предметов в кадре",
+          "verified": false
+        }
+      ],
+      "review_status": "draft"
+    }
+  ]
+}

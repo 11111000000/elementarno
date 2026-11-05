@@ -186,12 +186,95 @@ def cmd_tell(args):
     return 0
 
 
+def cmd_glance(args):
+    from .answer import answer
+    from .facts import enrich as enrich_scene
+    from .facts import facts
+
+    apply_profile(args)
+    scene = enrich_scene(load_json(args.scene))
+    rules = selected_rules(args.rules, args.pack)
+    findings = evaluate_all(rules, scene)
+    ledger = _ledger_for(scene, findings, args.ledger)
+    report = validate(findings, ledger)
+    usable_claims = []
+    for claim in ledger.get("claims", []):
+        if any(error.get("claim_id") == claim["claim_id"] for error in report["errors"]):
+            continue
+        usable_claims.append(claim)
+    hypotheses = score_hypotheses(findings, usable_claims, ledger.get("hypotheses", []))
+    scene_facts = facts(scene)
+    questions = args.question or ["что здесь происходило", "кто был в кадре", "что проверить дальше"]
+
+    if args.json:
+        dump({
+            "facts": scene_facts,
+            "findings": findings,
+            "claims": usable_claims,
+            "hypotheses": hypotheses,
+            "answers": [answer(q, scene, findings, usable_claims, hypotheses) for q in questions],
+            "protocol_errors": report["errors"],
+        })
+        return 0
+
+    print(f"СЦЕНА: объектов {len(scene.get('objects') or [])}, "
+          f"наблюдений {len(scene.get('observations') or [])}, фактов {len(scene_facts)}")
+    print("\nФАКТЫ (что видно):")
+    for fact in scene_facts:
+        if fact["kind"] in ("presence", "contrast", "absence", "observation"):
+            print(f"  {fact['fact_id']}  {fact['text']}  [{fact['basis']}, уверенность {fact['confidence']:.2f}]")
+
+    print("\nСВЯЗИ (что из этого следует):")
+    for finding in findings:
+        anchors = ", ".join(finding.get("anchors") or []) or "—"
+        print(f"  [{finding['rule_id']}] {finding['inference']}")
+        print(f"      основание: {anchors} · потолок {finding['confidence_ceiling']:.2f} · "
+              f"{'черновик' if finding['provisional'] else 'проверено'}")
+        for confound in (finding.get("confounds") or [])[:3]:
+            print(f"      оговорка: {confound}")
+
+    if usable_claims:
+        print("\nУТВЕРЖДЕНИЯ:")
+        for claim in usable_claims:
+            refutation = (claim.get("refutation") or {}).get("outcome")
+            suffix = f" · отрицание: {refutation}" if refutation else ""
+            print(f"  {claim['claim_id']} ({claim.get('confidence', 0):.0%}, {claim.get('step')}): "
+                  f"{claim['text']}{suffix}")
+
+    if hypotheses:
+        print("\nВЕРСИИ:")
+        for hypothesis in hypotheses:
+            weight = hypothesis.get("log_odds")
+            print(f"  {hypothesis['hypothesis_id']} (вес {weight}): {hypothesis['text']}")
+            disc = (hypothesis.get("discriminator") or {}).get("question")
+            if disc:
+                print(f"      что развело бы: {disc}")
+
+    print("\nОТВЕТЫ:")
+    for question in questions:
+        result = answer(question, scene, findings, usable_claims, hypotheses)
+        print(f"  ? {question}")
+        print(f"      → {result['answer']}")
+        if result["basis"]:
+            print(f"      основание: {', '.join(result['basis'])} · неопределённость {result['uncertainty']:.2f}")
+        for caveat in (result.get("caveats") or [])[:3]:
+            print(f"      оговорка: {caveat}")
+
+    if report["errors"]:
+        print(f"\nНАРУШЕНИЙ ПРОТОКОЛА: {len(report['errors'])}")
+        for error in report["errors"]:
+            print(f"  {error.get('claim_id')}: {error.get('code')} — {error.get('detail')}")
+    return 0
+
+
 def cmd_board(args):
     from .board import build
+    from .facts import enrich as enrich_scene
+    from .facts import facts
     from .nextshot import discriminator_questions
 
     apply_profile(args)
-    scene = load_json(args.scene)
+    scene = enrich_scene(load_json(args.scene))
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
@@ -247,6 +330,7 @@ def cmd_board(args):
         commands=commands,
         meta=meta,
         rules=rules,
+        scene_facts=facts(scene),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -524,6 +608,17 @@ def build_parser():
                         help="сколько улик нужно для версии; флаг сильнее профиля")
     tell.add_argument("--profile", help="профиль из config/profiles.json")
     tell.set_defaults(func=cmd_tell)
+
+    glance = sub.add_parser("glance", help="общий разбор фотографии: факты, связи, версии, ответы")
+    glance.add_argument("scene")
+    glance.add_argument("--ledger", help="файл с утверждениями и гипотезами")
+    glance.add_argument("--pack", action="append")
+    glance.add_argument("--question", action="append", help="вопрос к разбору (можно повторить)")
+    glance.add_argument("--mode", default="detective", choices=["detective", "audit", "forensic"])
+    glance.add_argument("--persona", default="plain", choices=["plain", "doyle", "forensic"])
+    glance.add_argument("--profile")
+    glance.add_argument("--json", action="store_true")
+    glance.set_defaults(func=cmd_glance)
 
     board = sub.add_parser("board", help="HTML-доска разбора: улики, нити, версии, переразбор")
     board.add_argument("scene")

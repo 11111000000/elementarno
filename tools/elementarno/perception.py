@@ -45,9 +45,9 @@ INVENTORY_PROMPT = """Ты — эксперт по осмотру сцены. П
 ФОРМАТ JSON:
 {
   "surfaces": [{"id":"s1","name":"table","material":"wood|floor|tile|soil|sand|gravel|concrete|stone|metal|cloth","dust_present":true,"dust_state":"none|even|uneven|patchy","wet":false,"sunlit":false}],
-  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|stale|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"visible":true,"bbox":[0.1,0.1,0.2,0.2]}],
+  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|stale|used|open|closed|empty|full|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"visible":true,"bbox":[0.1,0.1,0.2,0.2]}],
   "light": [{"id":"l1","kind":"window|lamp|sun|unknown","position":"left|right|above|behind"}],
-  "observations": [{"id":"x1","about":"o1","feature":"open|closed|tilted|full|empty|damaged|new|old","value":"что видно"}],
+  "observations": [{"id":"x1","about":"o1","feature":"open|closed|tilted|partially_filled|full|empty|damaged|torn|new|old|used|warm|cold","value":"что видно"}],
   "anomalies": ["что выглядит необычным"]
 }
 
