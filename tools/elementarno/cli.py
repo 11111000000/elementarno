@@ -67,6 +67,18 @@ def apply_profile(args, profile=None):
     return profile
 
 
+def load_scene(path):
+    """Сцена с признаками предметов: обогащение обязано быть везде.
+
+    Правила общего пака читают `objects[features=…]`. Если признаки есть
+    только в одном вызове, разные команды считают разные улики — поэтому
+    обогащение живёт здесь, а не в вызывающем коде.
+    """
+    from .facts import enrich as enrich_scene
+
+    return enrich_scene(load_json(path))
+
+
 def cmd_check(args):
     problems = validate_scene(load_json(args.scene))
     rules = load_packs(args.rules)
@@ -88,7 +100,7 @@ def cmd_check(args):
 
 
 def cmd_findings(args):
-    scene = load_json(args.scene)
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     if args.json:
@@ -150,7 +162,7 @@ def _annotate_profile_gaps(report, all_rules, selected_rules):
 
 def cmd_verify(args):
     apply_profile(args)
-    scene = load_json(args.scene)
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
@@ -170,7 +182,7 @@ def cmd_verify(args):
 
 def cmd_tell(args):
     apply_profile(args)
-    scene = load_json(args.scene)
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
@@ -188,11 +200,10 @@ def cmd_tell(args):
 
 def cmd_glance(args):
     from .answer import answer
-    from .facts import enrich as enrich_scene
     from .facts import facts
 
     apply_profile(args)
-    scene = enrich_scene(load_json(args.scene))
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
@@ -269,12 +280,11 @@ def cmd_glance(args):
 
 def cmd_board(args):
     from .board import build
-    from .facts import enrich as enrich_scene
     from .facts import facts
     from .nextshot import discriminator_questions
 
     apply_profile(args)
-    scene = enrich_scene(load_json(args.scene))
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = _ledger_for(scene, findings, args.ledger)
@@ -457,7 +467,7 @@ def cmd_reason(args):
 
     apply_profile(args)
 
-    scene = load_json(args.scene)
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     reasoner = MiniMaxReasoner(model=args.model, think=not args.no_think)
@@ -481,7 +491,7 @@ def cmd_nextshot(args):
 
     apply_profile(args)
 
-    scene = load_json(args.scene)
+    scene = load_scene(args.scene)
     rules = selected_rules(args.rules, args.pack)
     findings = evaluate_all(rules, scene)
     ledger = load_json(args.hypotheses) if args.hypotheses else {}

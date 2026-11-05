@@ -27,7 +27,12 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from .scene import VALID_CONSTRUCTION, validate_scene
+from .scene import (
+    VALID_CONSTRUCTION,
+    VALID_DUST_STATES,
+    VALID_OBJECT_STATES,
+    validate_scene,
+)
 
 DEFAULT_ENDPOINT = "https://api.minimaxi.chat/anthropic/v1/messages"
 DEFAULT_MODEL = "MiniMax-M3"
@@ -45,7 +50,7 @@ INVENTORY_PROMPT = """Ты — эксперт по осмотру сцены. П
 ФОРМАТ JSON:
 {
   "surfaces": [{"id":"s1","name":"table","material":"wood|floor|tile|soil|sand|gravel|concrete|stone|metal|cloth","dust_present":true,"dust_state":"none|even|uneven|patchy","wet":false,"sunlit":false}],
-  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|stale|used|open|closed|empty|full|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"visible":true,"bbox":[0.1,0.1,0.2,0.2]}],
+  "objects": [{"id":"o1","category":"vase","material":"ceramic","state":"new|clean|worn|damaged|fresh|stale|used|open|closed|empty|full|partially_filled|unknown","fill_level":0.0,"size_m":0.25,"on":"s1","wet":false,"visible":true,"bbox":[0.1,0.1,0.2,0.2]}],
   "light": [{"id":"l1","kind":"window|lamp|sun|unknown","position":"left|right|above|behind"}],
   "observations": [{"id":"x1","about":"o1","feature":"open|closed|tilted|partially_filled|full|empty|damaged|torn|new|old|used|warm|cold","value":"что видно"}],
   "anomalies": ["что выглядит необычным"]
@@ -292,8 +297,6 @@ def normalize_scene(scene):
     return scene, notes
 
 
-VALID_OBJECT_STATES = {"new", "clean", "worn", "damaged", "fresh", "stale", "unknown"}
-VALID_DUST_STATES = {"none", "even", "uneven", "patchy"}
 PERSON_CATEGORIES = {
     "person", "people", "human", "man", "woman", "male", "female", "boy", "girl",
     "child", "adult", "человек", "люди", "мужчина", "женщина", "мальчик", "девочка",

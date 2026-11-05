@@ -115,6 +115,7 @@
               "closed",
               "empty",
               "full",
+              "partially_filled",
               "unknown"
             ]
           },

@@ -110,6 +110,44 @@ class GeneralPackTest(unittest.TestCase):
                 self.assertLessEqual(rule.ceiling, 0.5)
 
 
+class CommandsAgreeTest(unittest.TestCase):
+    """Команды обязаны считать одни и те же улики: обогащение — в одном месте."""
+
+    def setUp(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "scene.json"
+        self.path.write_text(json.dumps(SCENE), encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_findings_and_verify_see_the_same_general_findings(self):
+        import json
+        from contextlib import redirect_stdout
+        from io import StringIO
+
+        from tools.elementarno.cli import main
+
+        out = StringIO()
+        with redirect_stdout(out):
+            main(["--rules", "rules", "findings", str(self.path), "--pack", "general", "--json"])
+        findings = json.loads(out.getvalue())
+        ids = {f["finding_id"] for f in findings}
+        self.assertIn("F-GEN-001", ids)
+
+        out = StringIO()
+        with redirect_stdout(out):
+            code = main(["--rules", "rules", "verify", str(self.path),
+                         "--pack", "general", "--json"])
+        report = json.loads(out.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(report["errors"], [])
+
+
 class AnswerTest(unittest.TestCase):
     def setUp(self):
         self.scene = enrich(SCENE)
